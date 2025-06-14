@@ -784,3 +784,31 @@ export function parseAddress(addressString: string | null): Address | null {
     return null;
   }
 }
+
+export function parseAddressExtended(addressString: string | null): {
+  text?: string;
+  lga?: string;
+  city?: string;
+  state?: string;
+  unit?: string;
+  country?: string;
+  postal_code?: string;
+} {
+  if (!addressString) return {};
+
+  try {
+    const parsed = JSON.parse(addressString);
+    return {
+      text: parsed.TEXT,
+      lga: parsed.LGA,
+      city: parsed.CITY,
+      state: parsed.STATE,
+      unit: parsed.UNIT,
+      country: parsed.COUNTRY,
+      postal_code: parsed.POSTAL_CODE,
+    };
+  } catch (error) {
+    console.error("Error parsing address:", error);
+    return {};
+  }
+}

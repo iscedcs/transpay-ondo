@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   }
   const user = await getMe();
   if (!user || user.role !== Role.SUPERADMIN) {
-    redirect("/");
+    redirect("/sign-in");
   }
 
   return <SuperadminDashboard />;

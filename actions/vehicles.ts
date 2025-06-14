@@ -54,6 +54,16 @@ export interface WalletAccount {
   deletedAt: string | null;
 }
 
+export interface Barcodes {
+  id: string;
+  code: string;
+  vehicleId: string | null;
+  isUsed: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
 export interface Vehicle {
   id: string;
   color: string;
@@ -64,7 +74,7 @@ export interface Vehicle {
   status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING";
   type: string;
   vin: string | null;
-  barcode: string | null;
+  barcode?: Barcodes;
   fairFlexImei: string | null;
   ownerId: string;
   stateCode: string;
@@ -94,6 +104,7 @@ export interface Vehicle {
     createdAt: string;
     updatedAt: string;
   } | null;
+  transactions?: any[];
 }
 
 export type VehicleFilter = {
@@ -281,6 +292,33 @@ export async function getVehicleById(id: string): Promise<Vehicle> {
     const session = await auth();
     const token = session?.user.access_token;
     const response = await fetch(`${API}/api/vehicles/${id}`, {
+      headers: {
+        accept: "*/*",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error(data.message || "Failed to fetch vehicle");
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching vehicle by ID:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to fetch vehicle"
+    );
+  }
+}
+
+export async function getVehicleByBarcode(barcode: string): Promise<Vehicle> {
+  try {
+    const session = await auth();
+    const token = session?.user.access_token;
+    const response = await fetch(`${API}/api/vehicles/barcode/${barcode}`, {
       headers: {
         accept: "*/*",
         Authorization: `Bearer ${token}`,

@@ -39,13 +39,10 @@ import { toast } from "sonner";
 
 interface PublicVehicleViewProps {
   vehicle: Vehicle;
-  barcodeId: string;
+  qrId: string;
 }
 
-export function PublicVehicleView({
-  vehicle,
-  barcodeId,
-}: PublicVehicleViewProps) {
+export function PublicVehicleView({ vehicle, qrId }: PublicVehicleViewProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
 
   // Format date
@@ -105,7 +102,7 @@ export function PublicVehicleView({
   // Generate share URL
   const shareUrl = `${
     typeof window !== "undefined" ? window.location.origin : ""
-  }/${barcodeId}`;
+  }/${qrId}`;
 
   // Generate share text
   const shareText = `Check out this vehicle information: ${

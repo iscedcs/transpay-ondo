@@ -9,11 +9,13 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -42,23 +44,15 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface GenerateAccountModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   walletId: string;
   bvn?: string;
   dob?: string;
-  onSuccess: (data: any) => void;
-  onError: (error: Error) => void;
 }
 
 export function GenerateAccountModal({
-  open,
-  onOpenChange,
   walletId,
   bvn,
   dob,
-  onSuccess,
-  onError,
 }: GenerateAccountModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -102,10 +96,6 @@ export function GenerateAccountModal({
       const data = await response.json();
 
       // Call success callback
-      onSuccess(data.data);
-
-      // Close the modal
-      onOpenChange(false);
 
       // Show success toast
       toast.success("Account Generated", {
@@ -113,13 +103,6 @@ export function GenerateAccountModal({
       });
     } catch (error) {
       console.error("Error creating virtual account:", error);
-
-      // Call error callback
-      onError(
-        error instanceof Error
-          ? error
-          : new Error("Failed to create virtual account")
-      );
 
       // Show error toast
       toast.error("Error", {
@@ -134,7 +117,10 @@ export function GenerateAccountModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Generate</Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Generate Virtual Account</DialogTitle>
@@ -196,14 +182,9 @@ export function GenerateAccountModal({
             />
 
             <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isSubmitting}
-              >
+              <DialogClose type="button" disabled={isSubmitting}>
                 Cancel
-              </Button>
+              </DialogClose>
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
