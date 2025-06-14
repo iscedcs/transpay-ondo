@@ -19,15 +19,15 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Vehicle, getVehicleById } from "@/actions/vehicles";
+import { Vehicle, getVehicleByBarcode } from "@/actions/vehicles";
 import { useSession } from "next-auth/react";
 import { formatCurrency } from "@/lib/utils";
 import { PublicVehicleView } from "@/components/public-vehicle-view";
 
-export default function BarcodePage() {
+export default function QrIdPage() {
   const params = useParams();
   const session = useSession();
-  const id = String(params.id);
+  const id = String(params.qrid);
   const user = session.data?.user;
   const router = useRouter();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
@@ -57,7 +57,7 @@ export default function BarcodePage() {
 
         // In a real implementation, you'd have an endpoint to get vehicle by barcode
         // For now, we'll use the vehicle ID directly
-        const vehicleData = await getVehicleById(id);
+        const vehicleData = await getVehicleByBarcode(id);
         setVehicle(vehicleData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Vehicle not found");
@@ -134,9 +134,11 @@ export default function BarcodePage() {
     );
   }
 
+  console.log({ vehicle });
+
   // Public View (Default)
   if (!userRole) {
-    return <PublicVehicleView vehicle={vehicle} barcodeId={id} />;
+    return <PublicVehicleView vehicle={vehicle} qrId={id} />;
   }
 
   // Vehicle Owner View
