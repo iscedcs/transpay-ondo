@@ -91,7 +91,7 @@ export async function vehicleWithStickerCount() {
     where: {
       NOT: [
         {
-          barcode: null,
+          BarCodes: null,
         },
       ],
     },
@@ -251,7 +251,9 @@ export const getVehicleBySticker = async (barcode: string) => {
   try {
     const vehicle = await db.vehicle.findFirst({
       where: {
-        barcode,
+        BarCodes: {
+          code: barcode,
+        },
       },
     });
     if (vehicle) {
@@ -370,7 +372,7 @@ export const getFullVehicleById = async (id: string) => {
       select: {
         vin: true,
         AuditTrail: true,
-        barcode: true,
+        BarCodes: true,
         blacklisted: true,
         category: true,
         color: true,

@@ -7,10 +7,61 @@ import { API } from "@/lib/const";
 import { auth } from "@/auth";
 import { CreateVehicleRequest } from "@/app/(root)/vehicles/vehicle-form-validation";
 import { revalidatePath } from "next/cache";
+import { VehicleOwner } from "@/types/vehicles";
 
 interface FetchVehicleParams {
   page?: number;
   pageSize?: number;
+}
+
+export interface VehicleWallet {
+  id: string;
+  vehicleId: string;
+  walletBalance: string;
+  amountOwed: string;
+  netTotal: string;
+  lastTransactionDate: string;
+  nextTransactionDate: string;
+  cvofBalance: string;
+  fareflexBalance: string;
+  isceBalance: string;
+  cvofOwing: string;
+  fareflexOwing: string;
+  isceOwing: string;
+  accountNumber: string | null;
+  bankCode: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  accounts: WalletAccount[];
+}
+
+export interface WalletAccount {
+  id: string;
+  accountNumber: string;
+  accountName: string;
+  reference: string;
+  bankCode: string;
+  accountType: "INBOUND" | "OUTBOUND"; // expand if needed
+  email: string;
+  phone: string;
+  creationDate: string;
+  bankName: string;
+  active: boolean;
+  walletId: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+export interface Barcodes {
+  id: string;
+  code: string;
+  vehicleId: string | null;
+  isUsed: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 export interface Vehicle {
@@ -23,7 +74,7 @@ export interface Vehicle {
   status: "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING";
   type: string;
   vin: string | null;
-  barcode: string | null;
+  barcode?: Barcodes;
   fairFlexImei: string | null;
   ownerId: string;
   stateCode: string;
@@ -37,56 +88,12 @@ export interface Vehicle {
   registeredLgaId: string;
   last_payment_date: string | null;
   // Populated fields
-  owner?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-    password?: string;
-    role?: string;
-    gender?: string;
-    marital_status?: string;
-    whatsapp?: string;
-    nok_name?: string;
-    nok_phone?: string;
-    nok_relationship?: string;
-    maiden_name?: string;
-    blacklisted?: boolean;
-    address?: string;
-    identification?: string | null;
-    createdAt?: string;
-    updatedAt?: string;
-    deletedAt?: string | null;
-    lastLogin?: string | null;
-    createdBy?: string | null;
-    lgaId?: string;
-    status?: string;
-  };
+  owner?: VehicleOwner;
   registeredLga?: {
     id: string;
     name: string;
   };
-  wallet?: {
-    id: string;
-    vehicleId: string;
-    walletBalance: string;
-    amountOwed: string;
-    netTotal: string;
-    lastTransactionDate: string;
-    nextTransactionDate: string;
-    cvofBalance: string;
-    fareflexBalance: string;
-    isceBalance: string;
-    cvofOwing: string;
-    fareflexOwing: string;
-    isceOwing: string;
-    accountNumber: string | null;
-    bankCode: string | null;
-    createdAt: string;
-    updatedAt: string;
-    deletedAt: string | null;
-  };
+  wallet?: VehicleWallet;
   tracker?: {
     id: string;
     vehicleId: string;
@@ -97,6 +104,7 @@ export interface Vehicle {
     createdAt: string;
     updatedAt: string;
   } | null;
+  transactions?: any[];
 }
 
 export type VehicleFilter = {
@@ -306,12 +314,39 @@ export async function getVehicleById(id: string): Promise<Vehicle> {
   }
 }
 
+export async function getVehicleByBarcode(barcode: string): Promise<Vehicle> {
+  try {
+    const session = await auth();
+    const token = session?.user.access_token;
+    const response = await fetch(`${API}/api/vehicles/barcode/${barcode}`, {
+      headers: {
+        accept: "*/*",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store",
+    });
+
+    const data = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error(data.message || "Failed to fetch vehicle");
+    }
+
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching vehicle by ID:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to fetch vehicle"
+    );
+  }
+}
+
 export async function vehicleWithStickerCount() {
   const vehicle = await db.vehicle.count({
     where: {
       NOT: [
         {
-          barcode: null,
+          BarCodes: null,
         },
       ],
     },
@@ -474,7 +509,9 @@ export const getVehicleBySticker = async (barcode: string) => {
   try {
     const vehicle = await db.vehicle.findFirst({
       where: {
-        barcode,
+        BarCodes: {
+          code: barcode,
+        },
       },
     });
     if (vehicle) {
@@ -593,7 +630,7 @@ export const getFullVehicleById = async (id: string) => {
       select: {
         vin: true,
         AuditTrail: true,
-        barcode: true,
+        BarCodes: true,
         blacklisted: true,
         category: true,
         color: true,

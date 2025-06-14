@@ -4,6 +4,7 @@ import {
   CarTaxiFront,
   Map,
   MapPin,
+  QrCodeIcon,
   SettingsIcon,
 } from "lucide-react";
 import {
@@ -38,6 +39,11 @@ export const SIDEBAR_LINKS = [
     title: "Users",
     href: "/users",
     icon: adminIcon,
+  },
+  {
+    title: "Stickers",
+    href: "/stickers",
+    icon: <QrCodeIcon className="h-5 w-5" />,
   },
   {
     title: "Activities",

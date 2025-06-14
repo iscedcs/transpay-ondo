@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useState } from "react";
 import { formatCurrency } from "@/lib/utils";
-import { getPaymentTotals } from "@/app/actions/payment-notification";
+import { getPaymentTotals } from "@/actions/payment-notification";
 
 interface PaymentDisplayProps {
      check: "cvof" | "dmf" | "ff";

@@ -25,19 +25,30 @@ export interface Vehicle {
 }
 
 export interface VehicleOwner {
-  firstName: string
-  lastName: string
-  phone: string
-  address: VehicleAddress
-  gender: Gender
-  marital_status: MaritalStatus
-  whatsapp?: string
-  email?: string
-  identification: Identification
-  nok_name: string
-  nok_phone: string
-  nok_relationship: string
-  maiden_name?: string
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  password?: string;
+  role?: string;
+  gender?: string;
+  marital_status?: string;
+  whatsapp?: string;
+  nok_name?: string;
+  nok_phone?: string;
+  nok_relationship?: string;
+  maiden_name?: string;
+  blacklisted?: boolean;
+  address?: string;
+  identification?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string | null;
+  lastLogin?: string | null;
+  createdBy?: string | null;
+  lgaId?: string;
+  status?: string;
 }
 
 export interface VehicleAddress {

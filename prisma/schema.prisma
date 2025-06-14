@@ -227,7 +227,6 @@ model Vehicle {
   status                     VehicleStatus                @default(ACTIVE)
   type                       String?
   vin                        String?
-  barcode                    String?                      @unique
   fairFlexImei               String?
   ownerId                    String?
   stateCode                  String?                      @unique
@@ -241,6 +240,7 @@ model Vehicle {
   registeredLgaId            String?
   last_payment_date          DateTime?
   AuditTrail                 AuditTrail[]
+  BarCodes                   BarCodes?
   Driver                     Driver[]
   LivePaymentNotification    LivePaymentNotification[]
   PaymentNotification        PaymentNotification[]
@@ -515,6 +515,19 @@ model Webhook {
   VehicleTransaction   VehicleTransaction? @relation(fields: [transactionId], references: [id])
 
   @@index([event, createdAt(sort: Desc)])
+}
+
+model BarCodes {
+  id        String    @id
+  code      String    @unique
+  vehicleId String?   @unique
+  isUsed    DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  deletedAt DateTime?
+  Vehicle   Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([code])
 }
 
 enum DriverStatus {

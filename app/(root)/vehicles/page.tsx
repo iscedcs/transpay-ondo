@@ -39,10 +39,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { } from "@/app/actions/vehicles";
-import { Vehicle } from "@prisma/client";
 import { getLGAs } from "@/actions/lga";
-import { getVehicles } from "@/actions/vehicles";
+import { Vehicle, getVehicles } from "@/actions/vehicles";
 import { VEHICLE_CATEGORIES } from "@/lib/const";
 import { VehicleActionButtons } from "./vehicle-action-buttons";
 import Link from "next/link";
@@ -135,6 +133,9 @@ export default function VehiclesPage() {
     fetchVehicles(0, size);
   };
 
+  const getLGAById = (id: string) => {
+    return lgas.find((a) => a.id === id);
+  };
   // Format date
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not set";
@@ -206,7 +207,7 @@ export default function VehiclesPage() {
         (v) => v.status === "ACTIVE" && !v.blacklisted && !v.deletedAt
       ).length,
       blacklisted: vehicles.filter((v) => v.blacklisted).length,
-      suspended: vehicles.filter((v) => v.status === "OWING").length,
+      suspended: vehicles.filter((v) => v.status === "SUSPENDED").length,
     };
   }, [vehicles, totalCount]);
 
@@ -484,6 +485,7 @@ export default function VehiclesPage() {
                 </TableHeader>
                 <TableBody>
                   {filteredVehicles.map((vehicle) => {
+                    const thisLGA = getLGAById(vehicle.registeredLgaId);
                     const statusInfo = getVehicleStatusInfo(vehicle);
                     return (
                       <TableRow key={vehicle.id}>
@@ -499,7 +501,10 @@ export default function VehiclesPage() {
                           />
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-3">
+                          <Link
+                            href={`/vehicles/${vehicle.id}`}
+                            className="flex items-center gap-3"
+                          >
                             <Avatar className="h-10 w-10">
                               <AvatarImage
                                 src={vehicle.image || "/placeholder.svg"}
@@ -517,10 +522,10 @@ export default function VehiclesPage() {
                                 {vehicle.category} • {vehicle.color}
                               </div>
                             </div>
-                          </div>
+                          </Link>
                         </TableCell>
                         <TableCell>
-                          {/* {vehicle?.owner ? (
+                          {vehicle?.owner ? (
                             <div>
                               <div className="font-medium">
                                 {vehicle?.owner?.firstName}{" "}
@@ -530,22 +535,20 @@ export default function VehiclesPage() {
                                 {vehicle?.owner?.email}
                               </div>
                             </div>
-                          ) : ( */}
+                          ) : (
                             <span className="text-muted-foreground">
                               No owner assigned
                             </span>
-                          {/* )} */}
+                          )}
                         </TableCell>
                         <TableCell>
-                          {/* {vehicle?.registeredLga ? (
-                            <Badge variant="outline">
-                              {vehicle?.registeredLga.name}
-                            </Badge>
-                          ) : ( */}
+                          {thisLGA?.id ? (
+                            <Badge variant="outline">{thisLGA.name}</Badge>
+                          ) : (
                             <span className="text-muted-foreground">
                               Not assigned
                             </span>
-                          {/* )} */}
+                          )}
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
