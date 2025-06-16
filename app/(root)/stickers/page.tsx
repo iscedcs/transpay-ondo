@@ -9,7 +9,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StickersContent } from "@/components/stickers-content";
 import { StickerUpload } from "@/components/sticker-upload";
-import { StickerStats } from "@/components/sticker-stats";
 import { Package, Upload, BarChart3, QrCode } from "lucide-react";
 
 interface SearchParams {
@@ -23,6 +22,18 @@ interface StickersPageProps {
   searchParams: Promise<SearchParams>;
 }
 
+export async function generateMetadata({ searchParams }: StickersPageProps) {
+  const params = await searchParams;
+  const title = params.tab
+    ? `${params.tab} - Sticker Management`
+    : "Sticker Management";
+  return {
+    title,
+    description:
+      "Manage vehicle stickers, upload barcodes, and track assignments",
+  };
+}
+
 export default async function StickersPage({
   searchParams,
 }: StickersPageProps) {
@@ -30,7 +41,7 @@ export default async function StickersPage({
   const activeTab = params.tab || "overview";
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="mx-auto p-5 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -47,11 +58,11 @@ export default async function StickersPage({
       </div>
 
       {/* Stats Overview */}
-      <Suspense
+      {/* <Suspense
         fallback={<div className="h-32 bg-muted animate-pulse rounded-lg" />}
       >
         <StickerStats />
-      </Suspense>
+      </Suspense> */}
 
       {/* Main Content */}
       <Tabs defaultValue={activeTab} className="space-y-6">

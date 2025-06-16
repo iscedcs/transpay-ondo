@@ -27,17 +27,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { $Enums, User } from "@prisma/client";
+import { getUserById, updateUser, type User } from "@/actions/users";
 import {
-  UserEditFormValues,
-  genderOptions,
   userEditFormSchema,
+  type UserEditFormValues,
+  roleOptions,
+  genderOptions,
+  maritalStatusOptions,
+  identificationOptions,
 } from "../../user-edit-form-validation";
-import { parseAddress } from "@/lib/utils";
-import { getUserById, updateUser } from "@/actions/users";
+import { parseAddressExtended } from "@/lib/utils";
 import { getLGAs } from "@/actions/lga";
 import { toast } from "sonner";
-import { USER_ROLES } from "@/lib/constants";
+
+// Update the identification handling
+interface IdentificationData {
+  idType: string;
+  value: string;
+}
 
 export default function EditUserPage() {
   const params = useParams();
@@ -51,7 +58,6 @@ export default function EditUserPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
   const [hasChanges, setHasChanges] = useState(false);
-  const id = params.id as string;
 
   // Initialize form
   const form = useForm<UserEditFormValues>({
@@ -61,17 +67,17 @@ export default function EditUserPage() {
       lastName: "",
       email: "",
       phone: "",
-      role: $Enums.Role.LGA_C_AGENT,
+      role: "ADMIN",
       identification: "NIN",
       identificationNumber: "",
       address: {
-        STREET: "",
-        UNIT: "",
-        CITY: "",
-        STATE: "",
-        POSTAL_CODE: "",
-        COUNTRY: "Nigeria",
-        LGA: "",
+        street: "",
+        unit: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "Nigeria",
+        lga: "",
       },
       lgaId: "",
       password: "",
@@ -83,7 +89,6 @@ export default function EditUserPage() {
       nok_phone: "",
       nok_relationship: "",
       maiden_name: "",
-      profileImage: "",
       blacklisted: false,
     },
   });
@@ -108,21 +113,33 @@ export default function EditUserPage() {
     switch (key) {
       case "address":
         return (
-          // @ts-expect-error: TypeScript doesn't recognize the context in refine
-          parseAddress(user.address) || {
-            STREET: "",
-            UNIT: "",
-            CITY: "",
-            STATE: "",
-            POSTAL_CODE: "",
-            COUNTRY: "Nigeria",
-            LGA: "",
+          parseAddressExtended(user.address) || {
+            street: "",
+            unit: "",
+            city: "",
+            state: "",
+            postal_code: "",
+            country: "Nigeria",
+            lga: "",
           }
         );
       case "blacklisted":
         return user.blacklisted;
       default:
         return user[key as keyof User] || "";
+    }
+  };
+
+  const parseIdentification = (
+    identification: string | null | undefined
+  ): IdentificationData | null => {
+    if (!identification) return null;
+
+    try {
+      return JSON.parse(identification) as IdentificationData;
+    } catch (error) {
+      console.error("Error parsing identification:", error);
+      return null;
     }
   };
 
@@ -135,8 +152,8 @@ export default function EditUserPage() {
 
         // Fetch user data and LGAs in parallel
         const [userData, lgaResponse] = await Promise.all([
-          getUserById(id),
-          getLGAs({ limit: 50, page: 1 }),
+          getUserById(String(params.id)),
+          getLGAs({ limit: 100, page: 1 }),
         ]);
 
         setUser(userData);
@@ -145,29 +162,32 @@ export default function EditUserPage() {
         );
 
         // Populate form with user data
-        // @ts-expect-error: TypeScript doesn't recognize the context in refine
-        const address = parseAddress(userData.address);
+        const address = parseAddressExtended(userData.address);
+
+        // In the useEffect where form is populated, update the identification parsing:
+        const identificationData = parseIdentification(userData.identification);
+
         form.reset({
           firstName: userData.firstName || "",
           lastName: userData.lastName || "",
           email: userData.email || "",
           phone: userData.phone || "",
-          role: userData.role || "LGA_COMPLIANCE",
-          identification: JSON.parse(String(userData.identification)) || "NIN",
+          role: userData.role || "ADMIN",
+          identification: identificationData?.idType || "NIN",
           identificationNumber: "", // Don't populate for security
           address: address || {
-            STREET: "",
-            UNIT: "",
-            CITY: "",
-            STATE: "",
-            POSTAL_CODE: "",
-            COUNTRY: "Nigeria",
-            LGA: "",
+            street: "",
+            unit: "",
+            city: "",
+            state: "",
+            postal_code: "",
+            country: "Nigeria",
+            lga: "",
           },
           lgaId: userData.lgaId || "",
           password: "",
           confirmPassword: "",
-          gender: userData.gender || "OTHER",
+          gender: userData.gender || "MALE",
           marital_status: userData.marital_status || "SINGLE",
           whatsapp: userData.whatsapp || "",
           nok_name: userData.nok_name || "",
@@ -205,8 +225,8 @@ export default function EditUserPage() {
         email: data.email,
         phone: data.phone,
         role: data.role,
-        identification: data.identification,
-        address: JSON.stringify(data.address),
+        // @ts-expect-error: skip the identificationNumber for security
+        address: data.address,
         lgaId: data.lgaId || undefined,
         gender: data.gender,
         marital_status: data.marital_status,
@@ -218,27 +238,31 @@ export default function EditUserPage() {
         blacklisted: data.blacklisted,
       };
 
-      // Only include identification number if provided
-      if (data.identificationNumber) {
-        updateData.identification = data.identification;
-      }
-
-      // Only include password if provided
-      if (data.password) {
-        updateData.password = data.password;
+      // Only include identification if provided
+      if (data.identificationNumber && data.identification) {
+        updateData.identification = JSON.stringify({
+          idType: data.identification,
+          value: data.identificationNumber,
+        });
       }
 
       const result = await updateUser(user.id, updateData);
 
-      toast.success("Success", {
-        description: "User updated successfully",
-      });
+      if (result) {
+        toast.success("Success", {
+          description: "User updated successfully",
+        });
 
-      setHasChanges(false);
+        setHasChanges(false);
 
-      // Redirect to user detail page
-      router.push(`/users/${user.id}`);
-      router.refresh();
+        // Redirect to user detail page
+        router.push(`/users/${user.id}`);
+        router.refresh();
+      } else {
+        toast.error("Error", {
+          description: "Failed to update user. Please try again.",
+        });
+      }
     } catch (error) {
       console.error("Failed to update user:", error);
       toast.error("Error", {
@@ -250,12 +274,6 @@ export default function EditUserPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Handle profile image upload
-  const handleProfileImageUpload = (imageUrl: string) => {
-    form.setValue("profileImage", imageUrl);
-    return { success: "Profile image uploaded successfully" };
   };
 
   // Handle cancel with unsaved changes warning
@@ -273,7 +291,7 @@ export default function EditUserPage() {
 
   if (isFetching) {
     return (
-      <div className="container mx-auto py-8 space-y-6">
+      <div className="mx-auto p-5 space-y-6">
         <div className="flex items-center gap-4">
           <Skeleton className="h-10 w-20" />
           <div className="space-y-2">
@@ -308,7 +326,7 @@ export default function EditUserPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="mx-auto p-5">
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="outline"
@@ -329,7 +347,7 @@ export default function EditUserPage() {
 
   if (!user) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="mx-auto p-5">
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="outline"
@@ -348,7 +366,7 @@ export default function EditUserPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="mx-auto p-5 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-4">
@@ -469,9 +487,9 @@ export default function EditUserPage() {
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.keys(USER_ROLES).map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option.replace(/_/g, " ")}
+                        {roleOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -543,9 +561,9 @@ export default function EditUserPage() {
                         <SelectValue placeholder="Select identification type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {["BVN"].map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
+                        {identificationOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -564,11 +582,6 @@ export default function EditUserPage() {
                     <p className="text-xs text-muted-foreground">
                       Leave empty to keep existing identification number
                     </p>
-                    {form.formState.errors.identificationNumber && (
-                      <p className="text-sm text-destructive">
-                        {form.formState.errors.identificationNumber.message?.toString()}
-                      </p>
-                    )}
                   </div>
                 </div>
 
@@ -677,11 +690,11 @@ export default function EditUserPage() {
                     <Input
                       id="street"
                       placeholder="Enter street address"
-                      {...form.register("address.STREET")}
+                      {...form.register("address.street")}
                     />
-                    {form.formState.errors.address?.STREET && (
+                    {form.formState.errors.address?.street && (
                       <p className="text-sm text-destructive">
-                        {form.formState.errors.address.STREET.message}
+                        {form.formState.errors.address.street.message}
                       </p>
                     )}
                   </div>
@@ -691,7 +704,7 @@ export default function EditUserPage() {
                     <Input
                       id="unit"
                       placeholder="Apartment, suite, unit, etc."
-                      {...form.register("address.UNIT")}
+                      {...form.register("address.unit")}
                     />
                   </div>
 
@@ -700,11 +713,11 @@ export default function EditUserPage() {
                     <Input
                       id="city"
                       placeholder="Enter city"
-                      {...form.register("address.CITY")}
+                      {...form.register("address.city")}
                     />
-                    {form.formState.errors.address?.CITY && (
+                    {form.formState.errors.address?.city && (
                       <p className="text-sm text-destructive">
-                        {form.formState.errors.address.CITY.message}
+                        {form.formState.errors.address.city.message}
                       </p>
                     )}
                   </div>
@@ -714,11 +727,11 @@ export default function EditUserPage() {
                     <Input
                       id="state"
                       placeholder="Enter state"
-                      {...form.register("address.STATE")}
+                      {...form.register("address.state")}
                     />
-                    {form.formState.errors.address?.STATE && (
+                    {form.formState.errors.address?.state && (
                       <p className="text-sm text-destructive">
-                        {form.formState.errors.address.STATE.message}
+                        {form.formState.errors.address.state.message}
                       </p>
                     )}
                   </div>
@@ -728,7 +741,7 @@ export default function EditUserPage() {
                     <Input
                       id="postalCode"
                       placeholder="Enter postal code"
-                      {...form.register("address.POSTAL_CODE")}
+                      {...form.register("address.postal_code")}
                     />
                   </div>
 
@@ -737,7 +750,7 @@ export default function EditUserPage() {
                     <Input
                       id="country"
                       placeholder="Enter country"
-                      {...form.register("address.COUNTRY")}
+                      {...form.register("address.country")}
                     />
                   </div>
                 </div>
@@ -756,7 +769,7 @@ export default function EditUserPage() {
                           (lga) => lga.id === value
                         );
                         if (selectedLga) {
-                          form.setValue("address.LGA", selectedLga.name);
+                          form.setValue("address.lga", selectedLga.name);
                         }
                       }}
                       defaultValue={form.watch("lgaId")}
@@ -823,9 +836,9 @@ export default function EditUserPage() {
                         <SelectValue placeholder="Select marital status" />
                       </SelectTrigger>
                       <SelectContent>
-                        {["SINGLE", "MARRIED", "DIVORCED"].map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
+                        {maritalStatusOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>

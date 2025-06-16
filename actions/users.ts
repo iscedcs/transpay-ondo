@@ -4,19 +4,51 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { API, URLS } from "@/lib/const";
 import { db } from "@/lib/db";
-import { $Enums, Role, User } from "@prisma/client";
+import { $Enums, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 // Types for the User dat
 
 export interface Address {
-  COUNTRY?: string;
-  TEXT?: string;
-  LGA?: string;
-  CITY?: string;
-  STATE?: string;
-  UNIT?: string;
-  POSTAL_CODE?: string;
+  country?: string;
+  text?: string;
+  lga?: string;
+  city?: string;
+  state?: string;
+  unit?: string;
+  postal_code?: string;
+}
+
+export interface User {
+  id: string; // UUID format
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  role: string; // Adjust roles as necessary
+  blacklisted: boolean;
+  address: string; // JSON string format
+  identification: string | null;
+  createdAt: string; // ISO 8601 date string
+  updatedAt: string; // ISO 8601 date string
+  deletedAt: string | null; // ISO 8601 date string or null
+  lastLogin: string | null; // ISO 8601 date string or null
+  lgaId: string; // UUID format
+  lga: {
+    id: string; // UUID format
+    name: string;
+    createdAt: string; // ISO 8601 date string
+    updatedAt: string; // ISO 8601 date string
+    deletedAt: string | null; // ISO 8601 date string or null
+  };
+  gender: string | null;
+  whatsapp: string | null;
+  createdBy: string | null;
+  maiden_name: string | null;
+  marital_status: string | null;
+  nok_name: string | null;
+  nok_phone: string | null;
+  nok_relationship: string | null;
 }
 
 export interface UsersResponse {
@@ -363,7 +395,7 @@ export const getMe = async () => {
   }
 };
 
-export async function createUser(userData: Partial<User>): Promise<User> {
+export async function createUser(userData: Partial<any>): Promise<User> {
   const session = await auth();
   if (!session || !session.user) {
     throw new Error("Unauthorized access: No session found");
