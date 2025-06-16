@@ -23,8 +23,8 @@ export async function VehicleTypes() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {data.map((vehicle) => {
-            const maxCount = Math.max(...data.map((v) => v.count));
+          {data.map((vehicle: any) => {
+            const maxCount = Math.max(...data.map((v: any) => v.count));
             const percentage = (vehicle.count / maxCount) * 100;
 
             return (

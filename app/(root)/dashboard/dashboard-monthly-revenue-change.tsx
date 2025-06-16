@@ -6,10 +6,8 @@ import { TrendingDown, TrendingUp } from "lucide-react";
 export async function MonthlyRevenueChange() {
   const data = await getMonthlyRevenueChange();
   const revenueChange = data.currentMonthRevenue - data.lastMonthRevenue;
-  const revenueChangePercent = (
-    (revenueChange / data.lastMonthRevenue) *
-    100
-  ).toFixed(1);
+  const revenueChangePercent =
+    (revenueChange / data.lastMonthRevenue) * 100 || 0;
 
   return (
     <Card>
@@ -27,7 +25,11 @@ export async function MonthlyRevenueChange() {
         </div>
         <p
           className={`text-xs ${
-            data.change === "HIGHER" ? "text-green-600" : "text-red-600"
+            data.change === "HIGHER"
+              ? "text-green-600"
+              : data.change === "SAME"
+              ? "text-orange-400"
+              : "text-red-600"
           }`}
         >
           {data.change === "HIGHER" ? "+" : ""}

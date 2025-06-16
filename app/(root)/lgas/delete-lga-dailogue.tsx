@@ -30,8 +30,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
-import { LGA } from "@/types/lga";
-import { hardDeleteLGA, softDeleteLGA } from "@/actions/lga";
+import { LGA, hardDeleteLGA, softDeleteLGA } from "@/actions/lga";
 
 interface DeleteLGADialogProps {
   lga: LGA | null;

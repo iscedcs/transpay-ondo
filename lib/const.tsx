@@ -1707,7 +1707,8 @@ export const LGA = [
 ];
 
 export const API =
-  process.env.BACKEND_URL || "https://shark-app-pxxc6.ondigitalocean.app";
+  process.env.BACKEND_URL ||
+  "https://transpay-api-edo-9ta8i.ondigitalocean.app/";
 export const URLS = {
   activity: {
     all: "/api/activities",
@@ -1743,6 +1744,10 @@ export const URLS = {
       owing_summary: "/api/superadmin-dashboard/summary/owing",
       compliance_rate: "/api/superadmin-dashboard/compliance-rate",
       user_count: "/api/superadmin-dashboard/user-counts-by-role",
+      vehicle_count_by_lga: "/api/superadmin-dashboard/vehicle-count-by-lga",
+      lga_revenue_all: "/api/superadmin-dashboard/revenue-by-lga-all",
+      vehicle_category_count:
+        "/api/superadmin-dashboard/vehicle-category-counts",
       lga_revenue: "/api/superadmin-dashboard/lga-revenue",
       monthly_revenue_change:
         "/api/superadmin-dashboard/monthly-revenue-change",
@@ -1822,6 +1827,9 @@ export const URLS = {
   },
   lga: {
     create: "/api/lga/create",
+    users: "/api/lga/users/{id}",
+    vehicles: "/api/lga/vehicles/{id}",
+    scans: "/api/lga/scans/{id}",
   },
 };
 
@@ -2263,37 +2271,29 @@ export const DATE_RANGE = [
 ] as const;
 
 export const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#A28DFF",
-  "#FF637D",
-  "#FF9F7F",
-  "#FFA600",
-  "#FFB567",
-  "#FFD700",
-  "#DA70D6",
-  "#8B008B",
-  "#6A5ACD",
-  "#7FFFD4",
-  "#228B22",
-  "#DC143C",
-  "#1E90FF",
-  "#FF4500",
-  "#32CD32",
-  "#B22222",
-  "#FF1493",
-  "#00FF7F",
-  "#D2691E",
-  "#4682B4",
-  "#CD5C5C",
-  "#8A2BE2",
-  "#FFD700",
-  "#C71585",
-  "#40E0D0",
-  "#F4A460",
-  "#778899",
+  "#FF0000", // Red
+  "#FF7F00", // Orange
+  "#FFFF00", // Yellow
+  "#7FFF00", // Chartreuse
+  "#00FF00", // Green
+  "#00FF7F", // Spring Green
+  "#00FFFF", // Cyan
+  "#007FFF", // Azure
+  "#0000FF", // Blue
+  "#7F00FF", // Violet
+  "#9B30FF", // Purple
+  "#9400D3", // Dark Violet
+  "#4B0082", // Indigo
+  "#8B0000", // Dark Red
+  "#FF1493", // Pink
+  "#FF69B4", // Hot Pink
+  "#FFB6C1", // Light Pink
+  "#FFD700", // Gold
+  "#ADFF2F", // Green Yellow
+  "#00FA9A", // Medium Spring Green
+  "#1E90FF", // Dodger Blue
+  "#8A2BE2", // Blue Violet
+  "#DDA0DD", // Plum
 ];
 
 export const vehicleTypeData = [

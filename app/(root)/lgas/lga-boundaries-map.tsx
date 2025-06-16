@@ -7,8 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { MapPin, DollarSign, Calendar, Layers, X } from "lucide-react";
 import dynamic from "next/dynamic";
-import { LGA } from "@/types/lga";
-import { VehicleFee } from "@/actions/lga";
+import { LGA, VehicleFee } from "@/actions/lga";
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(

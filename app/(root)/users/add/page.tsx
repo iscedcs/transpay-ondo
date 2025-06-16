@@ -29,7 +29,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
 import { getLGAs } from "@/actions/lga";
 import { toast } from "sonner";
-import { fetchUserByNIN } from "@/actions/nvs";
 import { createUser } from "@/actions/users";
 import { USER_ROLES } from "@/lib/constants";
 import { formatRoleName } from "@/lib/utils";
@@ -47,13 +46,13 @@ const userFormSchema = z
       .string()
       .min(1, "Identification number is required"),
     address: z.object({
-      STREET: z.string().min(1, "Street is required"),
-      UNIT: z.string().optional(),
-      CITY: z.string().min(1, "City is required"),
-      STATE: z.string().min(1, "State is required"),
-      POSTAL_CODE: z.string().optional(),
-      COUNTRY: z.string().default("Nigeria"),
-      LGA: z.string().optional(),
+      text: z.string().min(1, "Street is required"),
+      unit: z.string().optional(),
+      city: z.string().min(1, "City is required"),
+      state: z.string().min(1, "State is required"),
+      postal_code: z.string().optional(),
+      country: z.string().default("Nigeria"),
+      lga: z.string().optional(),
     }),
     lgaId: z.string().optional(),
     password: z.string().min(8, "Password must be at least 8 characters"),
@@ -102,13 +101,13 @@ export default function AddUserPage() {
       identification: "NIN",
       identificationNumber: "",
       address: {
-        STREET: "",
-        UNIT: "",
-        CITY: "",
-        STATE: "",
-        POSTAL_CODE: "",
-        COUNTRY: "Nigeria",
-        LGA: "",
+        text: "",
+        unit: "",
+        city: "",
+        state: "",
+        postal_code: "",
+        country: "Nigeria",
+        lga: "",
       },
       lgaId: "",
       password: "",
@@ -141,56 +140,54 @@ export default function AddUserPage() {
   }, []);
 
   // Handle NIN verification
-  const handleVerifyNIN = async () => {
-    if (!nin || nin.length < 11) {
-      setVerificationError("Please enter a valid NIN (at least 11 characters)");
-      return;
-    }
+  // const handleVerifyNIN = async () => {
+  //   if (!nin || nin.length < 11) {
+  //     setVerificationError("Please enter a valid NIN (at least 11 characters)");
+  //     return;
+  //   }
 
-    setIsVerifying(true);
-    setVerificationError(null);
+  //   setIsVerifying(true);
+  //   setVerificationError(null);
 
-    try {
-      const userData = await fetchUserByNIN(nin);
+  //   try {
+  //     const userData = await fetchUserByNIN(nin);
 
-      if (userData) {
-        // Populate form with fetched data
-        form.setValue("firstName", userData.firstName || "");
-        form.setValue("lastName", userData.lastName || "");
-        form.setValue("email", userData.email || "");
-        form.setValue("phone", userData.phone || "");
-        form.setValue("identificationNumber", nin);
+  //     if (userData) {
+  //       // Populate form with fetched data
+  //       form.setValue("firstName", userData.firstName || "");
+  //       form.setValue("lastName", userData.lastName || "");
+  //       form.setValue("email", userData.email || "");
+  //       form.setValue("phone", userData.phone || "");
+  //       form.setValue("identificationNumber", nin);
 
-        if (userData.address) {
-          const address =
-            typeof userData.address === "string"
-              ? JSON.parse(userData.address)
-              : userData.address;
+  //       if (userData.address) {
+  //         const address = userData.address;
 
-          form.setValue("address", {
-            STREET: address.STREET || "",
-            UNIT: address.UNIT || "",
-            CITY: address.CITY || "",
-            STATE: address.STATE || "",
-            POSTAL_CODE: address.POSTAL_CODE || "",
-            COUNTRY: address.COUNTRY || "Nigeria",
-            LGA: address.LGA || "",
-          });
-        }
+  //         form.setValue("address", {
+  //           street: address.street || "",
+  //           UNIT: address.UNIT || "",
+  //           CITY: address.CITY || "",
+  //           STATE: address.STATE || "",
+  //           POSTAL_CODE: address.POSTAL_CODE || "",
+  //           COUNTRY: address.COUNTRY || "Nigeria",
+  //           LGA: address.LGA || "",
+  //         });
+  //       }
 
-        toast.success("Success", {
-          description: "User information retrieved successfully",
-        });
-      }
-    } catch (error) {
-      console.error("NIN verification failed:", error);
-      setVerificationError(
-        "Failed to verify NIN. You can proceed with manual entry."
-      );
-    } finally {
-      setIsVerifying(false);
-    }
-  };
+  //       toast.success("Success", {
+  //         description: "User information retrieved successfully",
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("NIN verification failed:", error);
+  //     setVerificationError(
+  //       "Failed to verify NIN. You can proceed with manual entry."
+  //     );
+  //   } finally {
+  //     setIsVerifying(false);
+  //   }
+  // };
+  console.log(form.getValues("address"));
 
   // Handle form submission
   const onSubmit = async (data: UserFormValues) => {
@@ -277,7 +274,7 @@ export default function AddUserPage() {
             </div>
             <div className="flex items-end">
               <Button
-                onClick={handleVerifyNIN}
+                // onClick={handleVerifyNIN}
                 disabled={isVerifying || !nin}
                 className="flex items-center gap-2"
               >
@@ -564,11 +561,11 @@ export default function AddUserPage() {
                     <Input
                       id="street"
                       placeholder="Enter street address"
-                      {...form.register("address.STREET")}
+                      {...form.register("address.text")}
                     />
-                    {form.formState.errors.address?.STREET && (
-                      <p className="text-sm text-destructive">
-                        {form.formState.errors.address.STREET.message}
+                    {form.formState.errors.address?.text && (
+                      <p className="text-sm text-text">
+                        {form.formState.errors.address.text.message}
                       </p>
                     )}
                   </div>
@@ -578,7 +575,7 @@ export default function AddUserPage() {
                     <Input
                       id="unit"
                       placeholder="Apartment, suite, unit, etc."
-                      {...form.register("address.UNIT")}
+                      {...form.register("address.unit")}
                     />
                   </div>
 
@@ -587,11 +584,11 @@ export default function AddUserPage() {
                     <Input
                       id="city"
                       placeholder="Enter city"
-                      {...form.register("address.CITY")}
+                      {...form.register("address.city")}
                     />
-                    {form.formState.errors.address?.CITY && (
+                    {form.formState.errors.address?.city && (
                       <p className="text-sm text-destructive">
-                        {form.formState.errors.address.CITY.message}
+                        {form.formState.errors.address.city.message}
                       </p>
                     )}
                   </div>
@@ -601,11 +598,11 @@ export default function AddUserPage() {
                     <Input
                       id="state"
                       placeholder="Enter state"
-                      {...form.register("address.STATE")}
+                      {...form.register("address.state")}
                     />
-                    {form.formState.errors.address?.STATE && (
+                    {form.formState.errors.address?.state && (
                       <p className="text-sm text-destructive">
-                        {form.formState.errors.address.STATE.message}
+                        {form.formState.errors.address.state.message}
                       </p>
                     )}
                   </div>
@@ -615,7 +612,7 @@ export default function AddUserPage() {
                     <Input
                       id="postalCode"
                       placeholder="Enter postal code"
-                      {...form.register("address.POSTAL_CODE")}
+                      {...form.register("address.postal_code")}
                     />
                   </div>
 
@@ -624,7 +621,7 @@ export default function AddUserPage() {
                     <Input
                       id="country"
                       placeholder="Enter country"
-                      {...form.register("address.COUNTRY")}
+                      {...form.register("address.country")}
                       defaultValue="Nigeria"
                     />
                   </div>
@@ -644,7 +641,7 @@ export default function AddUserPage() {
                           (lga) => lga.id === value
                         );
                         if (selectedLga) {
-                          form.setValue("address.LGA", selectedLga.name);
+                          form.setValue("address.lga", selectedLga.name);
                         }
                       }}
                       defaultValue={form.watch("lgaId")}

@@ -1,7 +1,7 @@
 import { getTransactionSummary } from "@/actions/dashboard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
-import { DollarSign } from "lucide-react";
+import { Banknote } from "lucide-react";
 
 export async function TransactionsSummary() {
   const data = await getTransactionSummary();
@@ -12,7 +12,7 @@ export async function TransactionsSummary() {
         <CardTitle className="text-sm font-medium">
           Total Transactions
         </CardTitle>
-        <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <Banknote className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">

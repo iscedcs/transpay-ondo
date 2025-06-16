@@ -37,12 +37,13 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { LGA } from "@/types/lga";
-import { VehicleFee, getLGAs } from "@/actions/lga";
+import { LGA, VehicleFee, getLGAs } from "@/actions/lga";
 import { LGAImportModal } from "@/components/lgas/lga-import-modal";
 import Link from "next/link";
 import { DeleteLGADialog } from "./delete-lga-dailogue";
 import { LGABoundariesMap } from "./lga-boundaries-map";
+import CONFIG from "@/config";
+import { formatFees } from "@/lib/utils";
 
 export default function AllLGAsPage() {
   const [lgas, setLgas] = useState<LGA[]>([]);
@@ -115,15 +116,6 @@ export default function AllLGAsPage() {
     fetchLGAs(1, size);
   };
 
-  // Format fee data
-  const formatFees = (fees: VehicleFee[]) => {
-    if (!Array.isArray(fees) || fees.length === 0) return "No fees set";
-
-    return fees
-      .map((fee) => `${fee.vehicleCategory}: ₦${fee.fee.toLocaleString()}`)
-      .join(", ");
-  };
-
   // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -193,7 +185,9 @@ export default function AllLGAsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalCount}</div>
-            <p className="text-xs text-muted-foreground">Across all states</p>
+            <p className="text-xs text-muted-foreground">
+              Across all {CONFIG.stateName}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -354,11 +348,10 @@ export default function AllLGAsPage() {
                       <TableCell>
                         <div className="max-w-xs">
                           <Badge variant="outline" className="text-xs">
-                            {Array.isArray(lga.fee) ? lga.fee.length : 0}{" "}
-                            categories
+                            {JSON.parse(lga.fee).length} categories
                           </Badge>
                           <div className="text-xs text-muted-foreground mt-1 truncate">
-                            {formatFees(Array.isArray(lga.fee) ? lga.fee : [])}
+                            {formatFees(JSON.parse(lga.fee) as VehicleFee[])}
                           </div>
                         </div>
                       </TableCell>

@@ -41,8 +41,7 @@ export const getComplianceRate = async () => {
   }
   const data = await res.json();
 
-  const compliance_rate = data.data;
-  console.log({ compliance_rate });
+  const compliance_rate = data;
   if (!compliance_rate) {
     console.log("Compliance rate not found in the response data");
     return {
@@ -52,7 +51,12 @@ export const getComplianceRate = async () => {
       complianceRate: 0,
     };
   }
-  return compliance_rate;
+  return {
+    totalVehicles: compliance_rate.totalVehicles || 0,
+    owingVehicles: compliance_rate.owingVehicles || 0,
+    compliantVehicles: compliance_rate.compliantVehicles || 0,
+    complianceRate: compliance_rate.complianceRate || 0,
+  };
 };
 
 export const getTransactionSummary = async () => {
@@ -87,7 +91,7 @@ export const getTransactionSummary = async () => {
   }
   const data = await res.json();
 
-  const transaction_summary = data.data;
+  const transaction_summary = data;
   if (!transaction_summary) {
     console.log("Transaction summary not found in the response data");
     return {
@@ -130,8 +134,7 @@ export const getOutstandingFees = async () => {
   }
   const data = await res.json();
 
-  const owing_summary = data.data;
-  console.log({ owing_summary });
+  const owing_summary = data;
   if (!owing_summary) {
     console.log("Owing summary not found in the response data");
     return {
@@ -139,7 +142,10 @@ export const getOutstandingFees = async () => {
       totalCount: 0,
     };
   }
-  return owing_summary;
+  return {
+    totalAmount: Number(owing_summary.totalAmount) || 0,
+    totalCount: owing_summary.total_count || 0,
+  };
 };
 
 export const getMonthlyRevenueChange = async () => {
@@ -177,17 +183,21 @@ export const getMonthlyRevenueChange = async () => {
   }
   const data = await res.json();
 
-  const monthly_revenue_change = data.data;
-  console.log({ monthly_revenue_change });
+  const monthly_revenue_change = data;
   if (!monthly_revenue_change) {
     console.log("Monthly revenue change not found in the response data");
     return {
       currentMonthRevenue: 0,
       lastMonthRevenue: 0,
-      change: "EQUAL",
+      change: "SAME",
     };
   }
-  return monthly_revenue_change;
+  return {
+    currentMonthRevenue:
+      Number(monthly_revenue_change.currentMonthRevenue) || 0,
+    lastMonthRevenue: Number(monthly_revenue_change.lastMonthRevenue) || 0,
+    change: String(monthly_revenue_change.change) || "EQUAL",
+  };
 };
 
 export const getUsersByRole = async () => {
@@ -254,33 +264,137 @@ export const getUsersByRole = async () => {
 };
 
 export async function fetchVehicleTypes() {
-  await new Promise((resolve) => setTimeout(resolve, 700));
-  return [
-    { type: "Sedan", count: 350 },
-    { type: "SUV", count: 280 },
-    { type: "Truck", count: 150 },
-    { type: "Bus", count: 120 },
-    { type: "Motorcycle", count: 100 },
-  ];
+  const session = await auth();
+  if (!session || !session.user) {
+    console.log("No session or user found");
+    return [
+      { type: "TRICYCLE", count: 0 },
+      { type: "BUS_INTRASTATE", count: 0 },
+    ];
+  }
+  const token = session?.user.access_token;
+  if (!token) {
+    console.log("No access token found in the session");
+    return [
+      { type: "TRICYCLE", count: 0 },
+      { type: "BUS_INTRASTATE", count: 0 },
+    ];
+  }
+  const URL = `${API}${URLS.dashboard.superadmin.vehicle_category_count}`;
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+  const res = await fetch(URL, { headers, cache: "no-store" });
+  if (!res.ok) {
+    console.error("Failed to fetch vehicle category:", res.statusText);
+    return [
+      { type: "TRICYCLE", count: 0 },
+      { type: "BUS_INTRASTATE", count: 0 },
+    ];
+  }
+  const data = await res.json();
+
+  const vehicle_category_count = data.data;
+  if (!vehicle_category_count) {
+    console.log("users by role not found in the response data");
+    return [
+      { type: "TRICYCLE", count: 0 },
+      { type: "BUS_INTRASTATE", count: 0 },
+    ];
+  }
+  return vehicle_category_count;
 }
 
 export async function fetchLGARevenue() {
-  await new Promise((resolve) => setTimeout(resolve, 1300));
-  return [
-    { lgaName: "Warri South", totalRevenue: 400000 },
-    { lgaName: "Ndokwa East", totalRevenue: 120000 },
-    { lgaName: "Ughelli North", totalRevenue: 280000 },
-    { lgaName: "Sapele", totalRevenue: 180000 },
-  ];
+  const session = await auth();
+  if (!session || !session.user) {
+    console.log("No session or user found");
+    return [
+      { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
+      { lga: "OREDO", count: 1, percentage: 50 },
+    ];
+  }
+  const token = session?.user.access_token;
+  if (!token) {
+    console.log("No access token found in the session");
+    return [
+      { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
+      { lga: "OREDO", count: 1, percentage: 50 },
+    ];
+  }
+  const URL = `${API}${URLS.dashboard.superadmin.lga_revenue_all}`;
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+  const res = await fetch(URL, { headers, cache: "no-store" });
+  if (!res.ok) {
+    console.error("Failed to fetch vehicle count by lga:", res.statusText);
+    return [
+      { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
+      { lga: "OREDO", count: 1, percentage: 50 },
+    ];
+  }
+  const data = await res.json();
+
+  const lga_revenue_all = data.data;
+  if (!lga_revenue_all) {
+    console.log("vehicle count by lga not found in the response data");
+    return [
+      { lgaName: "Warri South", vehicleCount: 450 },
+      { lgaName: "Ndokwa East", vehicleCount: 320 },
+      { lgaName: "Ughelli North", vehicleCount: 230 },
+      { lgaName: "Sapele", vehicleCount: 180 },
+      { lgaName: "Okpe", vehicleCount: 150 },
+    ];
+  }
+  return lga_revenue_all;
 }
 
 export async function fetchVehicleDistribution() {
-  await new Promise((resolve) => setTimeout(resolve, 1100));
-  return [
-    { lgaName: "Warri South", vehicleCount: 450 },
-    { lgaName: "Ndokwa East", vehicleCount: 320 },
-    { lgaName: "Ughelli North", vehicleCount: 230 },
-    { lgaName: "Sapele", vehicleCount: 180 },
-    { lgaName: "Okpe", vehicleCount: 150 },
-  ];
+  const session = await auth();
+  if (!session || !session.user) {
+    console.log("No session or user found");
+    return [
+      { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
+      { lga: "OREDO", count: 1, percentage: 50 },
+    ];
+  }
+  const token = session?.user.access_token;
+  if (!token) {
+    console.log("No access token found in the session");
+    return [
+      { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
+      { lga: "OREDO", count: 1, percentage: 50 },
+    ];
+  }
+  const URL = `${API}${URLS.dashboard.superadmin.vehicle_count_by_lga}`;
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+  const res = await fetch(URL, { headers, cache: "no-store" });
+  if (!res.ok) {
+    console.error("Failed to fetch vehicle count by lga:", res.statusText);
+    return [
+      { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
+      { lga: "OREDO", count: 1, percentage: 50 },
+    ];
+  }
+  const data = await res.json();
+
+  const vehicle_count_by_lga = data.data;
+  if (!vehicle_count_by_lga) {
+    console.log("vehicle count by lga not found in the response data");
+    return [
+      { lgaName: "Warri South", vehicleCount: 450 },
+      { lgaName: "Ndokwa East", vehicleCount: 320 },
+      { lgaName: "Ughelli North", vehicleCount: 230 },
+      { lgaName: "Sapele", vehicleCount: 180 },
+      { lgaName: "Okpe", vehicleCount: 150 },
+    ];
+  }
+  return vehicle_count_by_lga;
 }
+
