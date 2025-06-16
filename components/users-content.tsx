@@ -146,7 +146,6 @@ export function UsersContent({
 
   // Format address for display
   const formatAddress = (addressString: string | null) => {
-    console.log({ addressString });
     const address = parseAddress(addressString);
     if (!address) return "No address";
     return `${address.text ?? ""} ${address.city ?? ""} ${address.state ?? ""}`;

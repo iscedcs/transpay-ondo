@@ -12,6 +12,14 @@ export interface Sticker {
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
+  vehicle?: {
+    id: string;
+    plateNumber: string;
+    owner?: {
+      firstName: string;
+      lastName: string;
+    };
+  };
 }
 
 export interface StickerStats {
@@ -184,14 +192,26 @@ export async function getAllStickers(
     const limit = options.limit || 10;
     const offset = ((options.page || 1) - 1) * limit;
 
-    const response = await fetch(
-      `${API}/api/barcode/all?limit=${limit}&offset=${offset}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    // Build URL with query parameters
+    const url = new URL(`${API}/api/barcode/all`);
+    url.searchParams.append("limit", limit.toString());
+    url.searchParams.append("offset", offset.toString());
+
+    // Add search parameter if provided
+    if (options.search && options.search.trim()) {
+      url.searchParams.append("search", options.search.trim());
+    }
+
+    // Add status filter if provided and not "all"
+    if (options.status && options.status !== "all") {
+      url.searchParams.append("status", options.status);
+    }
+
+    const response = await fetch(url.toString(), {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -203,49 +223,37 @@ export async function getAllStickers(
       throw new Error(result.message || "Failed to fetch barcodes");
     }
 
-    let filteredStickers = result.data.barcodes;
+    // Extract data from the new API response structure
+    const {
+      barcodes,
+      totalCount,
+      usedCount,
+      availableCount,
+      deletedCount,
+      pagination,
+    } = result.data;
 
-    // Apply client-side filtering for search and status
-    if (options.search) {
-      const searchTerm = options.search.toLowerCase();
-      filteredStickers = filteredStickers.filter((sticker: Sticker) =>
-        sticker.code.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    if (options.status && options.status !== "all") {
-      filteredStickers = filteredStickers.filter((sticker: Sticker) => {
-        switch (options.status) {
-          case "used":
-            return sticker.isUsed && sticker.vehicleId;
-          case "available":
-            return !sticker.isUsed && !sticker.vehicleId && !sticker.deletedAt;
-          case "deleted":
-            return sticker.deletedAt;
-          default:
-            return true;
-        }
-      });
-    }
-
-    // Calculate statistics
+    // Calculate statistics from the API response
     const stats: StickerStats = {
-      total: result.data.totalCount,
-      used: result.data.usedCount,
-      available: result.data.availableCount,
-      deleted: result.data.deletedCount,
+      total: totalCount,
+      used: usedCount,
+      available: availableCount,
+      deleted: deletedCount,
     };
+
+    // Calculate total pages based on total count and limit
+    const totalPages = Math.ceil(totalCount / limit);
 
     return {
       success: true,
       data: {
-        stickers: filteredStickers,
+        stickers: barcodes,
         stats,
         pagination: {
-          total: result.data.count,
+          total: totalCount,
           page: options.page || 1,
-          limit: result.data.pagination.limit,
-          totalPages: Math.ceil(result.data.count / limit),
+          limit: pagination.limit,
+          totalPages,
         },
       },
     };
