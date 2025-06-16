@@ -54,6 +54,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import Link from "next/link";
 
 interface StickersContentProps {
   searchParams: {
@@ -386,18 +387,24 @@ export function StickersContent({ searchParams }: StickersContentProps) {
                       <TableCell>{getStatusBadge(sticker)}</TableCell>
                       <TableCell>
                         {sticker.vehicleId ? (
-                          <div className="flex items-center gap-2">
+                          <Link
+                            href={`/vehicles/${sticker.vehicleId}`}
+                            className="flex items-center gap-2"
+                          >
                             <Car className="h-4 w-4 text-muted-foreground" />
                             <span className="font-mono text-sm">
-                              {sticker.vehicleId}
+                              {sticker.vehicle?.plateNumber}
+                              {" - "}
+                              {sticker.vehicle?.owner?.firstName}{" "}
+                              {sticker.vehicle?.owner?.lastName}
                             </span>
-                          </div>
+                          </Link>
                         ) : (
                           <span className="text-muted-foreground">-</span>
                         )}
                       </TableCell>
                       <TableCell>
-                        <a
+                        <Link
                           href={generateStickerUrl(sticker.code)}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -405,7 +412,7 @@ export function StickersContent({ searchParams }: StickersContentProps) {
                         >
                           <ExternalLink className="h-3 w-3" />
                           View
-                        </a>
+                        </Link>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

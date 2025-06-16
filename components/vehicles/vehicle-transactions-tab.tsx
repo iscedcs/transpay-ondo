@@ -186,6 +186,7 @@ export default function VehicleTransactionsTab({
     paymentTypeFilter,
   ]);
 
+  // console.log({ filteredTransactions });
   // Calculate transaction statistics
   const stats = useMemo(() => {
     if (!vehicle.transactions) {
