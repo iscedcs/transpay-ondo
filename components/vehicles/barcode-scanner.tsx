@@ -32,8 +32,7 @@ export function BarcodeScanner({
   // Extract barcode from URL
   const extractBarcodeFromUrl = (url: string): string | null => {
     try {
-      // Handle transpay-edo.vercel.app URLs
-      if (url.includes("transpay-edo.vercel.app")) {
+      if (url.includes(String(process.env.NEXT_PUBLIC_APP_URL))) {
         const parts = url.split("/");
         const lastPart = parts[parts.length - 1];
         if (lastPart && lastPart.length > 0) {
@@ -240,7 +239,7 @@ export function BarcodeScanner({
           </Label>
           <Input
             id="barcode"
-            placeholder="Enter barcode or URL (e.g., https://transpay-edo.vercel.app/1749218743615)"
+            placeholder={`Enter barcode or URL (e.g., ${process.env.NEXT_PUBLIC_APP_URL}}1749218743615)`}
             value={manualBarcode}
             onChange={(e) => handleManualInput(e.target.value)}
             className="font-mono"

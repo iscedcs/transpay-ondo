@@ -22,6 +22,7 @@ import {
 import { PaymentNotification } from "@prisma/client";
 import { VehicleValues } from "./const";
 import { Address } from "@/actions/users";
+import { VehicleFee } from "@/actions/lga";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -812,3 +813,11 @@ export function parseAddressExtended(addressString: string | null): {
     return {};
   }
 }
+
+export const formatFees = (fees: VehicleFee[]) => {
+  if (!Array.isArray(fees) || fees.length === 0) return "No fees set";
+
+  return fees
+    .map((fee) => `${fee.vehicleCategory}: ₦${fee.fee.toLocaleString()}`)
+    .join(", ");
+};

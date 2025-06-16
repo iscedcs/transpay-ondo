@@ -1707,7 +1707,8 @@ export const LGA = [
 ];
 
 export const API =
-  process.env.BACKEND_URL || "https://shark-app-pxxc6.ondigitalocean.app";
+  process.env.BACKEND_URL ||
+  "https://transpay-api-edo-9ta8i.ondigitalocean.app/";
 export const URLS = {
   activity: {
     all: "/api/activities",
@@ -1826,6 +1827,9 @@ export const URLS = {
   },
   lga: {
     create: "/api/lga/create",
+    users: "/api/lga/users/{id}",
+    vehicles: "/api/lga/vehicles/{id}",
+    scans: "/api/lga/scans/{id}",
   },
 };
 

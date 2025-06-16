@@ -3,7 +3,15 @@
 import type React from "react";
 
 import { useState } from "react";
-import { Settings, Navigation, Eye, EyeOff, Scan } from "lucide-react";
+import {
+  Settings,
+  Navigation,
+  Eye,
+  EyeOff,
+  Scan,
+  ExternalLink,
+  Download,
+} from "lucide-react";
 import {
   Card,
   CardContent,
@@ -15,6 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { BarcodeScanner } from "@/components/barcode-scanner";
 import type { Vehicle } from "@/actions/vehicles";
+import { QRCodeSVG } from "qrcode.react";
+import { VehicleRoutesManager } from "../vehicle-routes-manager";
 
 interface VehicleTechnicalTabProps {
   vehicle: Vehicle;
@@ -30,6 +40,37 @@ export default function VehicleTechnicalTab({
     // This will be handled by the BarcodeScanner component
     // which will make the API call and refresh the page
     setShowBarcodeScanner(false);
+  };
+
+  // Generate QR code URL
+  const qrCodeUrl = vehicle.barcode
+    ? `${process.env.NEXT_PUBLIC_APP_URL}${vehicle.barcode.code}`
+    : null;
+
+  const downloadQRCode = () => {
+    if (!qrCodeUrl) return;
+
+    const svg = document.getElementById("vehicle-qr-code");
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `vehicle-${vehicle.plateNumber}-qr.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
   return (
@@ -75,12 +116,61 @@ export default function VehicleTechnicalTab({
                 Barcode
               </Label>
               {vehicle.barcode ? (
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-mono">{vehicle.barcode.code}</p>
-                  <Badge variant="outline" className="text-xs">
-                    {/* @ts-expect-error: garri */}
-                    {new Date(vehicle.barcode.isUsed).toLocaleDateString()}
-                  </Badge>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-mono">{vehicle.barcode.code}</p>
+                    <Badge variant="outline" className="text-xs">
+                      {new Date(
+                        String(vehicle.barcode.isUsed?.split("T")[0])
+                      ).toLocaleDateString()}
+                    </Badge>
+                  </div>
+
+                  {/* QR Code Display */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex flex-col items-center space-y-2">
+                      <div className="p-2 bg-white rounded-lg border">
+                        <QRCodeSVG
+                          id="vehicle-qr-code"
+                          value={qrCodeUrl!}
+                          size={120}
+                          level="M"
+                          includeMargin={true}
+                        />
+                      </div>
+                      <div className="flex gap-1">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(qrCodeUrl!, "_blank")}
+                          className="text-xs"
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          Open
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={downloadQRCode}
+                          className="text-xs"
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          Download
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <Label className="text-xs font-medium text-muted-foreground">
+                        QR Code URL
+                      </Label>
+                      <p className="text-xs font-mono text-blue-600 break-all">
+                        {qrCodeUrl}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Scan this QR code to access vehicle information
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -138,6 +228,9 @@ export default function VehicleTechnicalTab({
           </div>
         </CardContent>
       </Card>
+
+      {/* Vehicle Routes Management */}
+      <VehicleRoutesManager vehicleId={vehicle.id} />
 
       {/* Tracker Information */}
       <Card>

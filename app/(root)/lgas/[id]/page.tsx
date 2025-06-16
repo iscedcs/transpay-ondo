@@ -23,18 +23,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { LGABoundaryMap } from "@/components/lgas/lga-boundary-map";
-import {
-  getLGAAgents,
-  getLGAVehicles,
-  getLGAScans,
-  getLGARoutes,
-} from "@/lib/lga-data";
-import { STATE_CONFIG } from "@/lib/constants";
 import { getMe } from "@/actions/users";
 import { ADMIN_ROLES } from "@/lib/const";
-import { getLGAById } from "@/actions/lga";
-import { cn } from "@/lib/utils";
+import {
+  VehicleFee,
+  getLGAById,
+  getLGARoutes,
+  getLGAScans,
+  getLGAUsers,
+  getLGAVehicles,
+} from "@/actions/lga";
+import { cn, formatFees } from "@/lib/utils";
+import CONFIG from "@/config";
+import PolygonMapViewer from "@/components/polygon-map-viewer";
 
 export default async function LGAPage({
   params,
@@ -57,40 +58,29 @@ export default async function LGAPage({
     notFound();
   }
 
-  // Admin users can only view LGAs in their state
-  // if (currentUser.role === "admin" && lga.stateId !== "1") {
-  //   redirect("/dashboard?error=unauthorized");
-  // }
-
   // Load all LGA data
-  const [agents, vehicles, scans, routes] = await Promise.all([
-    getLGAAgents(lga.id),
+  const [users_res, vehicles_res, scans_res, routes_res] = await Promise.all([
+    getLGAUsers(lga.id),
     getLGAVehicles(lga.id),
     getLGAScans(lga.id),
     getLGARoutes(lga.id),
   ]);
+  const users = users_res.data;
+  const vehicles = vehicles_res.data;
+  const scans = scans_res.data;
+  const routes = routes_res.data;
 
   const canEdit = ADMIN_ROLES.includes(currentUser.role);
   const canDelete = ADMIN_ROLES.includes(currentUser.role);
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-NG", {
-      style: "currency",
-      currency: STATE_CONFIG.currency,
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat("en-NG").format(num);
-  };
-
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "active":
+        return "default";
       case "compliant":
         return "default";
       case "suspended":
+        return "destructive";
       case "non_compliant":
         return "destructive";
       case "grace_period":
@@ -107,11 +97,13 @@ export default async function LGAPage({
       case "violation":
         return "destructive";
       case "warning":
-        return "secondary";
+        return "outline";
       default:
         return "outline";
     }
   };
+
+  const optionalLocations = scans;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -128,9 +120,9 @@ export default async function LGAPage({
             <div>
               <h1 className="text-2xl font-bold">{lga.name}</h1>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline">{lga.state}</Badge>
-                <Badge variant="secondary">
-                  {formatCurrency(lga.fee)} levy
+                <Badge variant="outline">Edo State</Badge>
+                <Badge>
+                  {formatFees(JSON.parse(lga.fee) as VehicleFee[])} levy
                 </Badge>
               </div>
             </div>
@@ -154,11 +146,9 @@ export default async function LGAPage({
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {formatNumber(agents.length)}
-              </div>
+              <div className="text-2xl font-bold">{users.length}</div>
               <p className="text-xs text-muted-foreground">
-                {agents.filter((a) => a.status === "active").length} active
+                {users.filter((a) => a.status === "active").length} active
               </p>
             </CardContent>
           </Card>
@@ -171,9 +161,7 @@ export default async function LGAPage({
               <Car className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {formatNumber(vehicles.length)}
-              </div>
+              <div className="text-2xl font-bold">{vehicles.length}</div>
               <p className="text-xs text-muted-foreground">
                 {vehicles.filter((v) => v.status === "compliant").length}{" "}
                 compliant
@@ -189,11 +177,9 @@ export default async function LGAPage({
               <Scan className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {formatNumber(scans.length)}
-              </div>
+              <div className="text-2xl font-bold">{scans.length}</div>
               <p className="text-xs text-muted-foreground">
-                {scans.filter((s) => s.result === "compliant").length} passed
+                {scans.filter((s) => s.declaredRouteHit).length} passed
               </p>
             </CardContent>
           </Card>
@@ -206,11 +192,9 @@ export default async function LGAPage({
               <Route className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {formatNumber(routes.length)}
-              </div>
+              <div className="text-2xl font-bold">{routes.length}</div>
               <p className="text-xs text-muted-foreground">
-                {routes.filter((r) => r.status === "active").length} active
+                {routes.length} active
               </p>
             </CardContent>
           </Card>
@@ -240,14 +224,16 @@ export default async function LGAPage({
                     <div className="text-sm font-medium text-muted-foreground">
                       State
                     </div>
-                    <div className="text-lg font-semibold">{lga.state}</div>
+                    <div className="text-lg font-semibold">
+                      {CONFIG.stateName}
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm font-medium text-muted-foreground">
                       Daily Levy Fee
                     </div>
                     <div className="text-lg font-semibold">
-                      {formatCurrency(lga.fee)}
+                      {formatFees(JSON.parse(lga.fee) as VehicleFee[])}
                     </div>
                   </div>
                   <div>
@@ -295,10 +281,10 @@ export default async function LGAPage({
               <TabsContent value="agents">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Assigned Agents ({agents.length})</CardTitle>
+                    <CardTitle>Assigned Agents ({users.length})</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    {agents.length === 0 ? (
+                    {users.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         No agents assigned to this LGA
                       </div>
@@ -310,27 +296,25 @@ export default async function LGAPage({
                             <TableHead>Email</TableHead>
                             <TableHead>Phone</TableHead>
                             <TableHead>Status</TableHead>
-                            <TableHead>Assigned</TableHead>
+                            <TableHead>Role</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {agents.map((agent) => (
-                            <TableRow key={agent.id}>
+                          {users.map((user) => (
+                            <TableRow key={user.id}>
                               <TableCell className="font-medium">
-                                {agent.name}
+                                {user.firstName} {user.lastName}
                               </TableCell>
-                              <TableCell>{agent.email}</TableCell>
-                              <TableCell>{agent.phone || "-"}</TableCell>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>{user.phone || "-"}</TableCell>
                               <TableCell>
                                 <Badge
-                                  variant={getStatusBadgeVariant(agent.status)}
+                                  variant={getStatusBadgeVariant(user.status)}
                                 >
-                                  {agent.status}
+                                  {user.status}
                                 </Badge>
                               </TableCell>
-                              <TableCell>
-                                {agent.assignedAt.toLocaleDateString()}
-                              </TableCell>
+                              <TableCell>{user.role}</TableCell>
                             </TableRow>
                           ))}
                         </TableBody>
@@ -371,7 +355,10 @@ export default async function LGAPage({
                                 {vehicle.plateNumber}
                               </TableCell>
                               <TableCell>{vehicle.category}</TableCell>
-                              <TableCell>{vehicle.ownerName}</TableCell>
+                              <TableCell>
+                                {vehicle.owner.firstName}{" "}
+                                {vehicle.owner.lastName}
+                              </TableCell>
                               <TableCell>
                                 <Badge
                                   variant={getStatusBadgeVariant(
@@ -382,11 +369,12 @@ export default async function LGAPage({
                                 </Badge>
                               </TableCell>
                               <TableCell>
-                                {vehicle.lastPayment?.toLocaleDateString() ||
-                                  "-"}
+                                {vehicle.wallet.lastTransactionDate.split(
+                                  "T"
+                                )[0] || "-"}
                               </TableCell>
                               <TableCell>
-                                {vehicle.registeredAt.toLocaleDateString()}
+                                {vehicle.createdAt.split("T")[0]}
                               </TableCell>
                             </TableRow>
                           ))}
@@ -414,7 +402,6 @@ export default async function LGAPage({
                             <TableHead>Agent</TableHead>
                             <TableHead>Vehicle</TableHead>
                             <TableHead>Type</TableHead>
-                            <TableHead>Result</TableHead>
                             <TableHead>Location</TableHead>
                             <TableHead>Timestamp</TableHead>
                           </TableRow>
@@ -422,26 +409,20 @@ export default async function LGAPage({
                         <TableBody>
                           {scans.map((scan) => (
                             <TableRow key={scan.id}>
-                              <TableCell>{scan.agentName}</TableCell>
+                              <TableCell>
+                                {scan.user.firstName} {scan.user.lastName}
+                              </TableCell>
                               <TableCell className="font-medium">
-                                {scan.plateNumber}
+                                {scan.vehicle.plateNumber}
                               </TableCell>
-                              <TableCell>{scan.scanType}</TableCell>
+                              <TableCell>{scan.vehicle.category}</TableCell>
                               <TableCell>
-                                <Badge
-                                  variant={getScanResultBadgeVariant(
-                                    scan.result
-                                  )}
-                                >
-                                  {scan.result}
-                                </Badge>
+                                {scan.latitude.toFixed(4)},{" "}
+                                {scan.longitude.toFixed(4)}
+                                {" - "} {scan.detectedLga.name}
                               </TableCell>
                               <TableCell>
-                                {scan.location.lat.toFixed(4)},{" "}
-                                {scan.location.lng.toFixed(4)}
-                              </TableCell>
-                              <TableCell>
-                                {scan.timestamp.toLocaleString()}
+                                {scan.createdAt.split("T")[0]}
                               </TableCell>
                             </TableRow>
                           ))}
@@ -469,43 +450,30 @@ export default async function LGAPage({
                             <TableHead>Route Name</TableHead>
                             <TableHead>Start Point</TableHead>
                             <TableHead>End Point</TableHead>
-                            <TableHead>Distance</TableHead>
                             <TableHead>Vehicle Types</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Created</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {routes.map((route) => (
-                            <TableRow key={route.id}>
+                          {routes.map((route, index) => (
+                            <TableRow key={index}>
                               <TableCell className="font-medium">
-                                {route.name}
+                                {route.route.map((r) => r.lga.name).join(" - ")}
                               </TableCell>
-                              <TableCell>{route.startPoint}</TableCell>
-                              <TableCell>{route.endPoint}</TableCell>
-                              <TableCell>{route.distance} km</TableCell>
+                              <TableCell>{route.route[0].lga.name}</TableCell>
+                              <TableCell>
+                                {route.route[route.route.length - 1].lga.name}
+                              </TableCell>
                               <TableCell>
                                 <div className="flex gap-1">
-                                  {route.vehicleTypes.map((type) => (
-                                    <Badge
-                                      key={type}
-                                      variant="outline"
-                                      className="text-xs"
-                                    >
-                                      {type}
-                                    </Badge>
-                                  ))}
+                                  <Badge variant="outline" className="text-xs">
+                                    {route.vehicle.category}
+                                  </Badge>
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <Badge
-                                  variant={getStatusBadgeVariant(route.status)}
-                                >
-                                  {route.status}
-                                </Badge>
-                              </TableCell>
-                              <TableCell>
-                                {route.createdAt.toLocaleDateString()}
+                                <Badge>{"ACTIVE"}</Badge>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -521,8 +489,14 @@ export default async function LGAPage({
           {/* Right Column - Map and Actions */}
           <div className="space-y-6">
             {/* Boundary Map */}
-            <LGABoundaryMap boundary={lga.boundary} />
+            {/* <LGABoundaryMap boundary={lga.boundary} /> */}
 
+            <PolygonMapViewer
+              polygonCoordinates={lga.boundary.coordinates[0] as number[][]}
+              locations={optionalLocations}
+              title="LGA Boundary and Scans"
+              height="300px"
+            />
             {/* Quick Stats */}
             <Card>
               <CardHeader>
@@ -533,7 +507,7 @@ export default async function LGAPage({
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Active Agents</span>
                     <span className="font-medium">
-                      {agents.filter((a) => a.status === "active").length}
+                      {users.filter((a) => a.status === "active").length}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -557,7 +531,7 @@ export default async function LGAPage({
                       {
                         scans.filter(
                           (s) =>
-                            new Date(s.timestamp) >
+                            new Date(s.createdAt.split("T")[0]) >
                             new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                         ).length
                       }
@@ -565,9 +539,7 @@ export default async function LGAPage({
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Active Routes</span>
-                    <span className="font-medium">
-                      {routes.filter((r) => r.status === "active").length}
-                    </span>
+                    <span className="font-medium">{routes.length}</span>
                   </div>
                 </div>
 
@@ -622,17 +594,13 @@ export default async function LGAPage({
                     >
                       <div className="w-2 h-2 rounded-full bg-blue-500" />
                       <div className="flex-1">
-                        <div className="font-medium">{scan.plateNumber}</div>
+                        <div className="font-medium">
+                          {scan.vehicle.plateNumber}
+                        </div>
                         <div className="text-muted-foreground">
-                          Scanned by {scan.agentName}
+                          Scanned by {scan.user.firstName} {scan.user.lastName}
                         </div>
                       </div>
-                      <Badge
-                        variant={getScanResultBadgeVariant(scan.result)}
-                        className="text-xs"
-                      >
-                        {scan.result}
-                      </Badge>
                     </div>
                   ))}
                   {scans.length === 0 && (

@@ -13,9 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, Plus, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { LGA } from "@/types/lga";
 import { toast } from "sonner";
-import { updateLGA } from "@/actions/lga";
+import { LGA, updateLGA } from "@/actions/lga";
 
 // Vehicle categories enum
 const VEHICLE_CATEGORIES = [
