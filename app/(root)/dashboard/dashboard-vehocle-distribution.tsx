@@ -175,7 +175,7 @@ export function VehicleDistribution() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px]">
+        <ChartContainer config={chartConfig} className="aspect-video">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -184,7 +184,7 @@ export function VehicleDistribution() {
                 cy="50%"
                 labelLine={false}
                 label={customLabel}
-                outerRadius={80}
+                outerRadius={100}
                 fill="#8884d8"
                 dataKey="count"
                 stroke="#fff"

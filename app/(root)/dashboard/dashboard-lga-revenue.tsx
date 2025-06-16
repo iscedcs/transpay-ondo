@@ -39,8 +39,8 @@ export function LGARevenue() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={{}} className="h-[300px]">
-          <ResponsiveContainer width="100%" height="100%">
+        <ChartContainer config={{}} className="aspect-video">
+          <ResponsiveContainer>
             <BarChart
               data={data}
               margin={{ top: 20, right: 30, left: 20, bottom: 5 }}

@@ -23,7 +23,7 @@ import { VehicleDistribution } from "./dashboard-vehocle-distribution";
 export default function SuperadminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div className="mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">

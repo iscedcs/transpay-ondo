@@ -1,6 +1,5 @@
 "use client";
 
-import { Role } from "@prisma/client";
 import { z } from "zod";
 
 // Nigerian phone number validation
@@ -43,7 +42,7 @@ export const userEditFormSchema = z
       .min(1, "Phone number is required")
       .regex(phoneRegex, "Please enter a valid Nigerian phone number"),
 
-    role: z.nativeEnum(Role, {
+    role: z.string({
       required_error: "Please select a role",
     }),
 
@@ -59,8 +58,8 @@ export const userEditFormSchema = z
     identificationNumber: z
       .string()
       .optional()
-      // @ts-expect-error: TypeScript doesn't recognize the context in refine
-      .refine((val, ctx) => {
+      // @ts-expect-error: Refine is used to conditionally validate based on identification type
+      .refine((val: any, ctx: any) => {
         if (!val) return true; // Optional for edit
         const identificationType = ctx.parent.identification;
         if (identificationType === "NIN") {
@@ -71,13 +70,13 @@ export const userEditFormSchema = z
 
     // Address
     address: z.object({
-      STREET: z.string().min(1, "Street address is required"),
-      UNIT: z.string().optional(),
-      CITY: z.string().min(1, "City is required"),
-      STATE: z.string().min(1, "State is required"),
-      POSTAL_CODE: z.string().optional(),
-      COUNTRY: z.string().default("Nigeria"),
-      LGA: z.string().optional(),
+      street: z.string().min(1, "Street address is required"),
+      unit: z.string().optional(),
+      city: z.string().min(1, "City is required"),
+      state: z.string().min(1, "State is required"),
+      postal_code: z.string().optional(),
+      country: z.string().default("Nigeria"),
+      lga: z.string().optional(),
     }),
 
     lgaId: z.string().optional(),
@@ -116,7 +115,6 @@ export const userEditFormSchema = z
       ),
     nok_relationship: z.string().optional(),
     maiden_name: z.string().optional(),
-    profileImage: z.string().optional(),
     blacklisted: z.boolean().default(false),
   })
   .refine(
@@ -135,6 +133,14 @@ export const userEditFormSchema = z
 
 export type UserEditFormValues = z.infer<typeof userEditFormSchema>;
 
+// Form field configurations (reuse from create form)
+export const roleOptions = [
+  { value: "ADMIN", label: "Admin" },
+  { value: "LGA_AGENT", label: "LGA Agent" },
+  { value: "VEHICLE_OWNER", label: "Vehicle Owner" },
+  { value: "SUPERADMIN", label: "Super Admin" },
+];
+
 export const genderOptions = [
   { value: "MALE", label: "Male" },
   { value: "FEMALE", label: "Female" },
@@ -149,7 +155,6 @@ export const maritalStatusOptions = [
 ];
 
 export const identificationOptions = [
-  { value: "BVN", label: "Bank Verification Number (BVN)" },
   { value: "NIN", label: "National Identification Number (NIN)" },
   { value: "DRIVERS_LICENSE", label: "Driver's License" },
   { value: "PASSPORT", label: "International Passport" },
