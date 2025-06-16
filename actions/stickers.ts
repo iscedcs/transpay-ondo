@@ -230,13 +230,10 @@ export async function getAllStickers(
 
     // Calculate statistics
     const stats: StickerStats = {
-      total: result.data.count,
-      used: result.data.barcodes.filter((s: Sticker) => s.isUsed && s.vehicleId)
-        .length,
-      available: result.data.barcodes.filter(
-        (s: Sticker) => !s.isUsed && !s.vehicleId && !s.deletedAt
-      ).length,
-      deleted: result.data.barcodes.filter((s: Sticker) => s.deletedAt).length,
+      total: result.data.totalCount,
+      used: result.data.usedCount,
+      available: result.data.availableCount,
+      deleted: result.data.deletedCount,
     };
 
     return {
