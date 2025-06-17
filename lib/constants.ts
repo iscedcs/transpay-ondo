@@ -42,3 +42,33 @@ export const STATE_CONFIG = {
 export const USER_ROLES = Role;
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+
+export function getVehicleCategories(): string[] {
+  return [
+    "TRICYCLE",
+    "MOTORCYCLE",
+    "CAR",
+    "TRUCK",
+    "BUS",
+    "BUS_INTRASTATE",
+    "BUS_INTERSTATE",
+    "VAN",
+    "TAXI",
+    "COMMERCIAL",
+    "PRIVATE",
+  ];
+}
+
+export function getVehicleTypes(): string[] {
+  return [
+    "PASSENGER",
+    "COMMERCIAL",
+    "FREIGHT",
+    "PUBLIC_TRANSPORT",
+    "PRIVATE",
+    "GOVERNMENT",
+    "EMERGENCY",
+    "BUS_INTRASTATE",
+    "BUS_INTERSTATE",
+  ];
+}

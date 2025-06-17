@@ -127,6 +127,56 @@ const GetVehiclesSchema = z.object({
 
 type GetVehiclesParams = z.infer<typeof GetVehiclesSchema>;
 
+export async function updateVehicle(
+  id: string,
+  vehicleData: Partial<Vehicle>
+): Promise<Vehicle> {
+  try {
+    const session = await auth();
+    if (!session || !session.user) {
+      throw new Error("Unauthorized access: No session found");
+    }
+    const token = session?.user.access_token;
+    if (!token) {
+      throw new Error("Unauthorized access: No token found");
+    }
+    const response = await fetch(`${API}/api/vehicles/update/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        accept: "*/*",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(vehicleData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message ||
+          `Failed to update vehicle: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to update vehicle");
+    }
+
+    // Revalidate the vehicles pages to reflect the changes
+    revalidatePath("/vehicles");
+    revalidatePath(`/vehicles/${id}`);
+
+    return data.data;
+  } catch (error) {
+    console.error("Error updating vehicle:", error);
+    throw new Error(
+      error instanceof Error ? error.message : "Failed to update vehicle"
+    );
+  }
+}
+
 export async function getVehicles(
   params: GetVehiclesParams = { limit: 10, offset: 0 }
 ): Promise<any> {

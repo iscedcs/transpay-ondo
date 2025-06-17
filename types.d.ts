@@ -862,3 +862,11 @@ interface IPaymnetHistory {
      payment_date: string,
      transaction_amount: string
 }[]
+
+interface RoleGateOptions {
+  allowedRole?: users_role_enum[];
+  rejectedRole?: users_role_enum[];
+  displayError?: boolean;
+  redirectToSignIn?: boolean;
+  errorMessage?: string;
+}
