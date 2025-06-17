@@ -23,6 +23,7 @@ import { PaymentNotification } from "@prisma/client";
 import { VehicleValues } from "./const";
 import { Address } from "@/actions/users";
 import { VehicleFee } from "@/actions/lga";
+import { Vehicle } from "@/actions/vehicles";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -821,3 +822,35 @@ export const formatFees = (fees: VehicleFee[]) => {
     .map((fee) => `${fee.vehicleCategory}: ₦${fee.fee.toLocaleString()}`)
     .join(", ");
 };
+
+export function formatVehicleStatus(status: Vehicle["status"]): string {
+  const statusMap = {
+    ACTIVE: "Active",
+    INACTIVE: "Inactive",
+    SUSPENDED: "Suspended",
+    PENDING: "Pending",
+  };
+  return statusMap[status] || status;
+}
+
+export function getStatusColor(
+  status: Vehicle["status"]
+): "default" | "secondary" | "destructive" | "outline" {
+  const colorMap = {
+    ACTIVE: "default" as const,
+    INACTIVE: "secondary" as const,
+    SUSPENDED: "destructive" as const,
+    PENDING: "outline" as const,
+  };
+  return colorMap[status] || "outline";
+}
+
+export function formatCurrencyFull(amount: string | number): string {
+  const numAmount =
+    typeof amount === "string" ? Number.parseFloat(amount) : amount;
+  return new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    minimumFractionDigits: 2,
+  }).format(numAmount);
+}
