@@ -2,7 +2,7 @@ import CarouselSlides from "@/components/layout/carouselSlides";
 import {
   ActivitySquareIcon,
   CarTaxiFront,
-  Map,
+  CreditCard,
   MapPin,
   QrCodeIcon,
   SettingsIcon,
@@ -11,9 +11,7 @@ import {
   aboutIcon,
   adminIcon,
   agentDriverIcon,
-  agentsIcon,
   dashboardIcon,
-  driverIcon,
   homeIcon,
   peopleIcon,
   profileIcon,
@@ -51,19 +49,9 @@ export const SIDEBAR_LINKS = [
     icon: <ActivitySquareIcon className="h-5 w-5" />,
   },
   {
-    title: "Agents",
-    href: "/agents",
-    icon: agentsIcon,
-  },
-  {
     title: "Vehicles",
     href: "/vehicles?page=1&limit=15",
     icon: <CarTaxiFront className="h-5 w-5" />,
-  },
-  {
-    title: "Companies",
-    href: "/companies",
-    icon: driverIcon,
   },
   {
     title: "Scan",
@@ -81,19 +69,14 @@ export const SIDEBAR_LINKS = [
     icon: revenueIcon,
   },
   {
-    title: "Map",
-    href: "/map",
-    icon: <Map className="h-5 w-5" />,
-  },
-  // {
-  // 	title: 'Property',
-  // 	href: '/property',
-  // 	icon: <HomeIcon className='h-4 w-4' />,
-  // },
-  {
     title: "Settings",
     href: "/settings",
     icon: <SettingsIcon className="h-5 w-5" />,
+  },
+  {
+    title: "Fund Vehicle",
+    href: "/fund-vehicle",
+    icon: <CreditCard className="h-5 w-5" />,
   },
 ];
 export const SIDEBAR_LINKS_ADMIN = [
@@ -102,52 +85,12 @@ export const SIDEBAR_LINKS_ADMIN = [
     href: "/dashboard",
     icon: dashboardIcon,
   },
-  {
-    title: "Agents",
-    href: "/agents",
-    icon: agentsIcon,
-  },
-  {
-    title: "Vehicles",
-    href: "/vehicles?page=1&limit=15",
-    icon: driverIcon,
-  },
-  {
-    title: "Companies",
-    href: "/companies",
-    icon: driverIcon,
-  },
-  {
-    title: "Scan",
-    href: "/scan",
-    icon: scanIcon,
-  },
-  {
-    title: "Search",
-    href: "/search",
-    icon: searchIcon,
-  },
 ];
 export const SIDEBAR_LINKS_AGENT = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: dashboardIcon,
-  },
-  {
-    title: "Vehicles",
-    href: "/vehicles?page=1&limit=15",
-    icon: driverIcon,
-  },
-  {
-    title: "Scan",
-    href: "/scan",
-    icon: scanIcon,
-  },
-  {
-    title: "Search",
-    href: "/search",
-    icon: searchIcon,
   },
 ];
 export const SIDEBAR_LINKS_GREEN = [
@@ -156,27 +99,12 @@ export const SIDEBAR_LINKS_GREEN = [
     href: "/dashboard",
     icon: dashboardIcon,
   },
-  {
-    title: "Vehicles",
-    href: "/vehicles",
-    icon: driverIcon,
-  },
-  // {
-  //      title: "Scan",
-  //      href: "/scan",
-  //      icon: scanIcon,
-  // },
 ];
 export const SIDEBAR_NO_USER = [
   {
     title: "Scan",
     href: "/scan",
     icon: scanIcon,
-  },
-  {
-    title: "Search",
-    href: "/search",
-    icon: searchIcon,
   },
 ];
 export const MANAGE_SIDEBAR_LINKS = [
