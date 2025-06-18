@@ -19,8 +19,9 @@ import {
 import {
   SIDEBAR_LINKS,
   SIDEBAR_LINKS_ADMIN,
-  SIDEBAR_LINKS_AGENT,
   SIDEBAR_LINKS_EIRS_ADMIN,
+  SIDEBAR_LINKS_LGA_AGENT,
+  SIDEBAR_LINKS_LGA_C_AGENT,
 } from "@/lib/const";
 import { Role } from "@prisma/client";
 
@@ -94,9 +95,11 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           {(user.role === Role.LGA_AGENT
-            ? SIDEBAR_LINKS_AGENT
+            ? SIDEBAR_LINKS_LGA_AGENT
             : user.role === Role.EIRS_ADMIN
             ? SIDEBAR_LINKS_EIRS_ADMIN
+            : user.role === Role.LGA_C_AGENT
+            ? SIDEBAR_LINKS_LGA_C_AGENT
             : user.role === Role.ADMIN
             ? SIDEBAR_LINKS_ADMIN
             : SIDEBAR_LINKS

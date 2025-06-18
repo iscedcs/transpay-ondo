@@ -3,9 +3,9 @@
 import {
   SIDEBAR_LINKS,
   SIDEBAR_LINKS_ADMIN,
-  SIDEBAR_LINKS_AGENT,
   SIDEBAR_LINKS_EIRS_ADMIN,
-  SIDEBAR_LINKS_GREEN,
+  SIDEBAR_LINKS_LGA_AGENT,
+  SIDEBAR_LINKS_LGA_C_AGENT,
   SIDEBAR_NO_USER,
 } from "@/lib/const";
 import { useSession } from "next-auth/react";
@@ -37,9 +37,11 @@ export default function Sidebar() {
     <div className="no-scrollbar fixed z-10 hidden h-full w-52 justify-between overflow-y-scroll text-background bg-secondary px-5 md:flex">
       <div className="flex h-full w-full flex-col gap-3 pt-20">
         {(ROLE?.toLowerCase() === "agent"
-          ? SIDEBAR_LINKS_AGENT
-          : ROLE?.toLowerCase() === "green_engine"
-          ? SIDEBAR_LINKS_GREEN
+          ? SIDEBAR_LINKS_LGA_AGENT
+          : ROLE === Role.LGA_C_AGENT
+          ? SIDEBAR_LINKS_LGA_C_AGENT
+          : ROLE === Role.LGA_AGENT
+          ? SIDEBAR_LINKS_LGA_C_AGENT
           : ROLE === Role.EIRS_ADMIN
           ? SIDEBAR_LINKS_EIRS_ADMIN
           : ROLE === Role.ADMIN
