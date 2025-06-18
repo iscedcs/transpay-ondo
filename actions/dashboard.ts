@@ -1,7 +1,10 @@
 "use server";
 
 import { auth } from "@/auth";
+import { RBAC } from "@/lib/auth";
 import { API, URLS } from "@/lib/const";
+import { User, getMe } from "./users";
+import { db } from "@/lib/db";
 
 export const getComplianceRate = async () => {
   const session = await auth();
@@ -398,3 +401,317 @@ export async function fetchVehicleDistribution() {
   return vehicle_count_by_lga;
 }
 
+export interface DashboardStats {
+  totalVehicles: number;
+  activeVehicles: number;
+  recentScans: number;
+  pendingTasks: number;
+  recentActivities: any[];
+  vehiclesByStatus: {
+    active: number;
+    inactive: number;
+    owing: number;
+    cleared: number;
+  };
+}
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const user: User = await getMe();
+  const isComplianceAgent = RBAC.isComplianceAgent(user.role as any);
+  const isLGARole = RBAC.isLGARole(user.role as any);
+
+  try {
+    // Base query conditions
+    const vehicleWhere: any = {
+      deletedAt: null,
+    };
+
+    // For LGA roles, filter by their LGA
+    if (isLGARole && user.lgaId) {
+      vehicleWhere.registeredLgaId = user.lgaId;
+    }
+
+    // For vehicle owners, filter by their vehicles
+    if (user.role === "VEHICLE_OWNER") {
+      vehicleWhere.ownerId = user.id;
+    }
+
+    // Get vehicle statistics
+    const [totalVehicles, vehiclesByStatus] = await Promise.all([
+      db.vehicle.count({ where: vehicleWhere }),
+      db.vehicle.groupBy({
+        by: ["status"],
+        where: vehicleWhere,
+        _count: true,
+      }),
+    ]);
+
+    const statusCounts = vehiclesByStatus.reduce((acc, item) => {
+      acc[item.status.toLowerCase()] = item._count;
+      return acc;
+    }, {} as any);
+
+    const activeVehicles = statusCounts.active || 0;
+
+    // Get recent scans for the user
+    const recentScansCount = await db.scan.count({
+      where: {
+        userId: user.id,
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+        },
+      },
+    });
+
+    // Get recent activities for the user
+    const recentActivities = await db.auditTrail.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+      include: {
+        Vehicle: {
+          select: {
+            plateNumber: true,
+          },
+        },
+      },
+    });
+
+    // For compliance agents, get pending tasks (vehicles needing compliance checks)
+    let pendingTasks = 0;
+    if (isComplianceAgent && user.lgaId) {
+      // Count vehicles that haven't been scanned recently or need compliance checks
+      pendingTasks = await db.vehicle.count({
+        where: {
+          registeredLgaId: user.lgaId,
+          deletedAt: null,
+          status: "ACTIVE",
+          // Add your compliance logic here
+          // For example, vehicles not scanned in the last 30 days
+          Scan: {
+            none: {
+              createdAt: {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
+            },
+          },
+        },
+      });
+    }
+
+    return {
+      totalVehicles,
+      activeVehicles,
+      recentScans: recentScansCount,
+      pendingTasks,
+      recentActivities,
+      vehiclesByStatus: {
+        active: statusCounts.active || 0,
+        inactive: statusCounts.inactive || 0,
+        owing: statusCounts.owing || 0,
+        cleared: statusCounts.cleared || 0,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error);
+    throw new Error("Failed to fetch dashboard statistics");
+  }
+}
+
+export async function getRecentScans(limit = 10) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  try {
+    const scans = await db.scan.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+      include: {
+        Vehicle: {
+          select: {
+            plateNumber: true,
+            color: true,
+            category: true,
+          },
+        },
+        LGA: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return scans;
+  } catch (error) {
+    console.error("Error fetching recent scans:", error);
+    throw new Error("Failed to fetch recent scans");
+  }
+}
+
+export async function getLGAAgentDashboardStats(): Promise<DashboardStats> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const user: User = await getMe();
+
+  // Ensure user is LGA_AGENT and has an assigned LGA
+  if (user.role !== "LGA_AGENT" || !user.lgaId) {
+    throw new Error("Access denied: LGA Agent role required with assigned LGA");
+  }
+
+  try {
+    // Filter all queries by the agent's assigned LGA
+    const vehicleWhere = {
+      deletedAt: null,
+      registeredLgaId: user.lgaId, // Only vehicles in their LGA
+    };
+
+    // Get vehicle statistics for their LGA only
+    const [totalVehicles, vehiclesByStatus, activeVehicles] = await Promise.all(
+      [
+        db.vehicle.count({ where: vehicleWhere }),
+        db.vehicle.groupBy({
+          by: ["status"],
+          where: vehicleWhere,
+          _count: true,
+        }),
+        db.vehicle.count({
+          where: {
+            ...vehicleWhere,
+            status: "ACTIVE",
+          },
+        }),
+      ]
+    );
+
+    const statusCounts = vehiclesByStatus.reduce((acc, item) => {
+      acc[item.status.toLowerCase()] = item._count;
+      return acc;
+    }, {} as any);
+
+    // Get recent scans performed by this agent only
+    const recentScansCount = await db.scan.count({
+      where: {
+        userId: user.id, // Only scans by this agent
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+        },
+      },
+    });
+
+    // Get recent activities performed by this agent only
+    const recentActivities = await db.auditTrail.findMany({
+      where: {
+        userId: user.id, // Only activities by this agent
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 5,
+      include: {
+        Vehicle: {
+          select: {
+            plateNumber: true,
+          },
+        },
+      },
+    });
+
+    // Count vehicles created this month by this agent
+    const thisMonth = new Date();
+    thisMonth.setDate(1);
+    thisMonth.setHours(0, 0, 0, 0);
+
+    const vehiclesCreatedThisMonth = await db.vehicle.count({
+      where: {
+        ...vehicleWhere,
+        createdAt: {
+          gte: thisMonth,
+        },
+      },
+    });
+
+    return {
+      totalVehicles,
+      activeVehicles,
+      recentScans: recentScansCount,
+      pendingTasks: vehiclesCreatedThisMonth, // Using this as "vehicles created this month"
+      recentActivities,
+      vehiclesByStatus: {
+        active: statusCounts.active || 0,
+        inactive: statusCounts.inactive || 0,
+        owing: statusCounts.owing || 0,
+        cleared: statusCounts.cleared || 0,
+      },
+    };
+  } catch (error) {
+    console.error("Error fetching LGA agent dashboard stats:", error);
+    throw new Error("Failed to fetch dashboard statistics");
+  }
+}
+
+export async function getLGAAgentRecentScans(limit = 10) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const user: User = await getMe();
+
+  if (user.role !== "LGA_AGENT" || !user.lgaId) {
+    throw new Error("Access denied: LGA Agent role required with assigned LGA");
+  }
+
+  try {
+    const scans = await db.scan.findMany({
+      where: {
+        userId: user.id, // Only scans by this agent
+        Vehicle: {
+          registeredLgaId: user.lgaId, // Only vehicles in their LGA
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+      include: {
+        Vehicle: {
+          select: {
+            plateNumber: true,
+            color: true,
+            category: true,
+          },
+        },
+        LGA: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return scans;
+  } catch (error) {
+    console.error("Error fetching LGA agent recent scans:", error);
+    throw new Error("Failed to fetch recent scans");
+  }
+}

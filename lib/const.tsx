@@ -168,18 +168,48 @@ export const SIDEBAR_LINKS_EIRS_ADMIN = [
     icon: <CreditCard className="h-5 w-5" />,
   },
 ];
-export const SIDEBAR_LINKS_AGENT = [
+export const SIDEBAR_LINKS_LGA_AGENT = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: dashboardIcon,
   },
+  {
+    title: "Vehicles",
+    href: "/vehicles?page=1&limit=15",
+    icon: <CarTaxiFront className="h-5 w-5" />,
+  },
+  {
+    title: "Scan",
+    href: "/scan",
+    icon: scanIcon,
+  },
+  {
+    title: "Search",
+    href: "/search",
+    icon: searchIcon,
+  },
 ];
-export const SIDEBAR_LINKS_GREEN = [
+export const SIDEBAR_LINKS_LGA_C_AGENT = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: dashboardIcon,
+  },
+  {
+    title: "Vehicles",
+    href: "/vehicles?page=1&limit=15",
+    icon: <CarTaxiFront className="h-5 w-5" />,
+  },
+  {
+    title: "Scan",
+    href: "/scan",
+    icon: scanIcon,
+  },
+  {
+    title: "Search",
+    href: "/search",
+    icon: searchIcon,
   },
 ];
 export const SIDEBAR_NO_USER = [
