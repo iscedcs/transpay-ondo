@@ -7,15 +7,20 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Camera,
   X,
   Scan,
   AlertTriangle,
   ExternalLink,
-  Flashlight,
+  Copy,
+  CheckCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import QrScanner from "qr-scanner";
+import { QRCodeCanvas } from "qrcode.react";
+import { useRouter } from "next/navigation";
 
 interface QRCodeScannerProps {
   onSuccess: (url: string, vehicleId?: string) => void;
@@ -23,23 +28,37 @@ interface QRCodeScannerProps {
 }
 
 export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
+  const router = useRouter();
   const [isScanning, setIsScanning] = useState(false);
   const [manualInput, setManualInput] = useState("");
-  const [lastScannedUrl, setLastScannedUrl] = useState("");
+  const [result, setResult] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasFlashlight, setHasFlashlight] = useState(false);
-  const [flashlightOn, setFlashlightOn] = useState(false);
+  const [scanCount, setScanCount] = useState(0);
+  const [scannedHistory, setScannedHistory] = useState<string[]>([]);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const scanIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const scannerRef = useRef<QrScanner | null>(null);
+
+  // Load scanned history from localStorage on mount
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("qr-scan-history");
+    if (savedHistory) {
+      try {
+        const history = JSON.parse(savedHistory);
+        setScannedHistory(history);
+      } catch (error) {
+        console.error("Error loading scan history:", error);
+      }
+    }
+  }, []);
 
   // Extract vehicle ID from URL
   const extractVehicleId = (url: string): string | undefined => {
     try {
+      // Handle transpay-edo.vercel.app URLs
       if (
         url.includes("transpay-edo.vercel.app") ||
-        url.includes("transpayedo.com")
+        url.includes("transpaytms.com")
       ) {
         const parts = url.split("/");
         const lastPart = parts[parts.length - 1];
@@ -54,28 +73,37 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
     }
   };
 
-  // Validate and process scanned URL
-  const processScannedData = (data: string) => {
+  // Handle successful QR scan
+  const handleScanResult = (scannedResult: QrScanner.ScanResult) => {
+    const data = scannedResult.data;
+
     try {
-      // Prevent duplicate scans
-      if (data === lastScannedUrl) {
-        return;
-      }
+      // Validate URL
+      new URL(data);
 
-      setLastScannedUrl(data);
-
-      // Try to create URL object to validate
-      const url = new URL(data);
       const vehicleId = extractVehicleId(data);
 
-      toast.success("QR Code Scanned!", {
-        description: "Redirecting to vehicle information...",
-      });
+      setResult(data);
+      setDialogOpen(true);
+      setIsScanning(false);
+      setScanCount((prev) => prev + 1);
 
+      // Update scan history
+      const updatedHistory = [data, ...scannedHistory].slice(0, 50); // Keep only last 50 scans
+      setScannedHistory(updatedHistory);
+      localStorage.setItem("qr-scan-history", JSON.stringify(updatedHistory));
+
+      // Call success callback
       onSuccess(data, vehicleId);
 
-      // Stop scanning after successful scan
-      stopScanning();
+      // Stop scanner after 10 scans or destroy it
+      if (scanCount + 1 >= 10) {
+        stopScanning();
+      }
+
+      toast.success("QR Code Scanned!", {
+        description: "Vehicle information detected successfully",
+      });
     } catch (error) {
       const errorMessage = "Invalid QR code format";
       setError(errorMessage);
@@ -87,115 +115,58 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
     }
   };
 
-  // Start camera for scanning
+  // Start QR scanning
   const startScanning = async () => {
     try {
       setError(null);
+      setResult(null);
+      setDialogOpen(false);
       setIsScanning(true);
-      setLastScannedUrl("");
+      setScanCount(0);
 
-      const constraints = {
-        video: {
-          facingMode: "environment", // Use back camera
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-      };
+      const videoElement = document.getElementById(
+        "qr-video"
+      ) as HTMLVideoElement;
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      streamRef.current = stream;
-
-      // Check if flashlight is available
-      const videoTrack = stream.getVideoTracks()[0];
-      const capabilities = videoTrack.getCapabilities();
-      setHasFlashlight("torch" in capabilities);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-
-        // Start QR code detection
-        startQRDetection();
+      if (!videoElement) {
+        throw new Error("Video element not found");
       }
+
+      // Create QR scanner instance with proper constructor
+      scannerRef.current = new QrScanner(videoElement, handleScanResult, {
+        onDecodeError: (error) => {
+          // Silently handle decode errors (normal when no QR code is visible)
+          console.debug("QR decode error:", error);
+        },
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+        preferredCamera: "environment", // Use back camera
+      });
+
+      // Start scanning
+      await scannerRef.current.start();
+      console.log("QR Scanner started successfully");
     } catch (error) {
-      console.error("Error accessing camera:", error);
+      console.error("Error starting QR scanner:", error);
       setError(
-        "Unable to access camera. Please check permissions or enter URL manually."
+        `Unable to start camera: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
       );
       setIsScanning(false);
       onError("Camera access denied");
     }
   };
 
-  // Toggle flashlight
-  const toggleFlashlight = async () => {
-    if (!streamRef.current) return;
-
-    try {
-      const videoTrack = streamRef.current.getVideoTracks()[0];
-      await videoTrack.applyConstraints({
-        // @ts-expect-error: don't know the error
-        advanced: [{ torch: !flashlightOn }],
-      });
-      setFlashlightOn(!flashlightOn);
-    } catch (error) {
-      console.error("Error toggling flashlight:", error);
-    }
-  };
-
-  // Start QR code detection using canvas
-  const startQRDetection = () => {
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-    }
-
-    scanIntervalRef.current = setInterval(() => {
-      if (videoRef.current && videoRef.current.readyState === 4) {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-
-        if (context) {
-          canvas.width = videoRef.current.videoWidth;
-          canvas.height = videoRef.current.videoHeight;
-          context.drawImage(videoRef.current, 0, 0);
-
-          // Try to detect QR code using browser's built-in detector
-          if ("BarcodeDetector" in window) {
-            const detector = new (window as any).BarcodeDetector({
-              formats: ["qr_code"],
-            });
-            detector
-              .detect(canvas)
-              .then((barcodes: any[]) => {
-                if (barcodes.length > 0) {
-                  processScannedData(barcodes[0].rawValue);
-                }
-              })
-              .catch((error: any) => {
-                // Silently handle detection errors
-                console.debug("QR detection error:", error);
-              });
-          }
-        }
-      }
-    }, 500); // Check every 500ms
-  };
-
-  // Stop camera and detection
+  // Stop QR scanning
   const stopScanning = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
+    if (scannerRef.current) {
+      scannerRef.current.stop();
+      scannerRef.current.destroy();
+      scannerRef.current = null;
     }
-
-    if (scanIntervalRef.current) {
-      clearInterval(scanIntervalRef.current);
-      scanIntervalRef.current = null;
-    }
-
     setIsScanning(false);
-    setFlashlightOn(false);
-    setLastScannedUrl("");
+    setError(null);
   };
 
   // Handle manual input
@@ -205,8 +176,43 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
       return;
     }
 
-    processScannedData(manualInput.trim());
+    // Create a mock scan result for manual input
+    const mockScanResult = { data: manualInput.trim() } as QrScanner.ScanResult;
+    handleScanResult(mockScanResult);
     setManualInput("");
+  };
+
+  // Handle history item click
+  const handleHistoryClick = (item: string) => {
+    const mockScanResult = { data: item } as QrScanner.ScanResult;
+    handleScanResult(mockScanResult);
+  };
+
+  // Copy result to clipboard
+  const copyToClipboard = () => {
+    if (result) {
+      navigator.clipboard.writeText(result);
+      toast.success("Copied!", {
+        description: "QR code result copied to clipboard",
+      });
+    }
+  };
+
+  // Navigate to scanned URL
+  const navigateToResult = () => {
+    if (result) {
+      // For internal URLs, use router.push, for external URLs use window.open
+      if (
+        result.includes("transpay-edo.vercel.app") ||
+        result.includes("transpaytms.com")
+      ) {
+        const path = new URL(result).pathname;
+        router.push(path);
+      } else {
+        window.open(result, "_blank");
+      }
+      setDialogOpen(false);
+    }
   };
 
   // Cleanup on unmount
@@ -234,46 +240,28 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
             </Alert>
           )}
 
-          {!isScanning ? (
-            <Button
-              onClick={startScanning}
-              className="w-full flex items-center gap-2"
-            >
-              <Scan className="h-4 w-4" />
-              Start QR Scanner
-            </Button>
-          ) : (
-            <div className="space-y-4">
-              <div className="relative">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-64 bg-black rounded-lg object-cover"
-                />
-                <div className="absolute inset-0 border-2 border-dashed border-white/50 rounded-lg flex items-center justify-center">
-                  <div className="w-48 h-48 border-2 border-white rounded-lg"></div>
-                </div>
+          <div className="w-full max-w-lg mx-auto">
+            <Card className="w-full aspect-square overflow-hidden">
+              <video
+                id="qr-video"
+                className="h-full w-full object-cover"
+                autoPlay
+                playsInline
+                muted
+              />
+            </Card>
 
-                {/* Flashlight toggle */}
-                {hasFlashlight && (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={toggleFlashlight}
-                  >
-                    <Flashlight
-                      className={`h-4 w-4 ${
-                        flashlightOn ? "text-yellow-500" : ""
-                      }`}
-                    />
-                  </Button>
-                )}
-              </div>
-
-              <div className="flex gap-2">
+            <div className="flex gap-2 mt-4">
+              {!isScanning ? (
+                <Button
+                  onClick={startScanning}
+                  className="flex-1 flex items-center gap-2"
+                  disabled={scanCount >= 10}
+                >
+                  <Scan className="h-4 w-4" />
+                  Start QR Scanner
+                </Button>
+              ) : (
                 <Button
                   onClick={stopScanning}
                   variant="outline"
@@ -282,12 +270,20 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
                   <X className="h-4 w-4 mr-2" />
                   Stop Scanner
                 </Button>
-              </div>
-
-              <p className="text-sm text-muted-foreground text-center">
-                Position the QR code within the frame to scan automatically
-              </p>
+              )}
             </div>
+
+            {scanCount > 0 && (
+              <p className="text-sm text-muted-foreground text-center mt-2">
+                Scanned: {scanCount}/10 codes
+              </p>
+            )}
+          </div>
+
+          {isScanning && (
+            <p className="text-sm text-muted-foreground text-center">
+              Position the QR code within the camera view to scan automatically
+            </p>
           )}
         </CardContent>
       </Card>
@@ -307,7 +303,7 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
             <Label htmlFor="manual-url">Enter QR Code URL</Label>
             <Input
               id="manual-url"
-              placeholder="https://transpayedo.com/1749218743615"
+              placeholder="https://transpay-edo.vercel.app/1749218743615"
               value={manualInput}
               onChange={(e) => setManualInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleManualSubmit()}
@@ -315,10 +311,102 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
           </div>
           <Button onClick={handleManualSubmit} className="w-full">
             <ExternalLink className="h-4 w-4 mr-2" />
-            Open URL
+            Process URL
           </Button>
         </CardContent>
       </Card>
+
+      {/* Scan History */}
+      {scannedHistory.length > 0 && (
+        <>
+          <Separator />
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Scans</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {scannedHistory.slice(0, 10).map((item: any, index) => {
+                  // Handle both string and object formats
+                  const url =
+                    typeof item === "string"
+                      ? item
+                      : item.url || item.data || String(item);
+                  const timestamp =
+                    typeof item === "object" && item.timestamp
+                      ? new Date(item.timestamp).toLocaleString()
+                      : null;
+
+                  return (
+                    <div
+                      key={index}
+                      className="text-sm p-2 bg-muted rounded cursor-pointer hover:bg-muted/80"
+                      onClick={() => handleHistoryClick(url)}
+                    >
+                      <div className="font-mono text-xs truncate">{url}</div>
+                      {timestamp && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {timestamp}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {/* Success Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogTitle className="sr-only">
+          QR Code Scanned Successfully
+        </DialogTitle>
+        <DialogContent className="max-w-md">
+          <div className="flex flex-col items-center gap-4 p-4">
+            <div className="h-16 w-16 text-green-500">
+              <CheckCircle className="h-full w-full" />
+            </div>
+
+            <div className="text-xl font-semibold text-center">
+              QR Code Scanned Successfully
+            </div>
+
+            {result && (
+              <div className="w-full">
+                <Card className="p-3 border border-primary overflow-hidden mb-4">
+                  <QRCodeCanvas value={result} size={200} className="mx-auto" />
+                </Card>
+
+                <div className="text-center mb-4">
+                  <div className="text-sm text-muted-foreground">Result:</div>
+                  <div className="text-sm font-mono break-all">{result}</div>
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-2 w-full">
+              <Button
+                onClick={copyToClipboard}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                Copy URL
+              </Button>
+
+              <Button
+                onClick={navigateToResult}
+                className="flex items-center gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Open Vehicle
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

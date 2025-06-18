@@ -14,6 +14,9 @@ export function checkUserAccess(user: User, requiredRoles: string[]) {
 export function canManageUsers(userRole: string): boolean {
   return ADMIN_ROLES.includes(userRole);
 }
+export function canViewAdmin(userRole: string): boolean {
+  return ADMIN_ROLES.includes(userRole);
+}
 
 export function getAvailableRolesForUser(userRole: string): string[] {
   switch (userRole) {
@@ -118,46 +121,66 @@ export async function requireAuth(config: AuthConfig = {}) {
  * Role-based access control utility
  */
 export class RBAC {
-  /**
-   * Check if user can access admin features
-   */
   static canAccessAdmin(userRole: UserRole | null): boolean {
     return isAuthorized(userRole, ["SUPERADMIN", "ADMIN"]);
   }
 
-  /**
-   * Check if user can manage users
-   */
   static canManageUsers(userRole: UserRole | null): boolean {
     return isAuthorized(userRole, ["SUPERADMIN", "ADMIN"]);
   }
 
-  /**
-   * Check if user can manage LGAs
-   */
   static canManageLGAs(userRole: UserRole | null): boolean {
-    return isAuthorized(userRole, ["SUPERADMIN", "ADMIN", "LGA_AGENT"]);
+    return isAuthorized(userRole, ["SUPERADMIN", "ADMIN", "LGA_ADMIN"]);
   }
 
-  /**
-   * Check if user can manage vehicles
-   */
-  static canManageVehicles(userRole: UserRole | null): boolean {
-    return isAuthorized(userRole, ["SUPERADMIN", "ADMIN", "LGA_AGENT"]);
+  static canCreateVehicles(userRole: UserRole | null): boolean {
+    return isAuthorized(userRole, [
+      "SUPERADMIN",
+      "ADMIN",
+      "LGA_ADMIN",
+      "LGA_AGENT",
+    ]);
   }
 
-  /**
-   * Check if user can view own vehicles only
-   */
+  static canViewVehicles(userRole: UserRole | null): boolean {
+    return isAuthorized(userRole, [
+      "SUPERADMIN",
+      "ADMIN",
+      "LGA_ADMIN",
+      "LGA_AGENT",
+      "LGA_C_AGENT",
+    ]);
+  }
+
+  static canEditVehicles(userRole: UserRole | null): boolean {
+    return isAuthorized(userRole, [
+      "SUPERADMIN",
+      "ADMIN",
+      "LGA_ADMIN",
+      "LGA_AGENT",
+    ]);
+  }
+
+  static canScanVehicles(userRole: UserRole | null): boolean {
+    return isAuthorized(userRole, [
+      "SUPERADMIN",
+      "ADMIN",
+      "LGA_ADMIN",
+      "LGA_AGENT",
+      "LGA_C_AGENT",
+    ]);
+  }
+
   static canViewOwnVehicles(userRole: UserRole | null): boolean {
     return isAuthorized(userRole, ["VEHICLE_OWNER"]);
   }
 
-  /**
-   * Check if user is super admin
-   */
-  static isSuperAdmin(userRole: UserRole | null): boolean {
-    return isAuthorized(userRole, ["SUPERADMIN"]);
+  static isComplianceAgent(userRole: UserRole | null): boolean {
+    return userRole === "LGA_C_AGENT";
+  }
+
+  static isLGARole(userRole: UserRole | null): boolean {
+    return isAuthorized(userRole, ["LGA_ADMIN", "LGA_AGENT", "LGA_C_AGENT"]);
   }
 }
 
@@ -169,8 +192,60 @@ export function getUserPermissions(userRole: UserRole | null) {
     canAccessAdmin: RBAC.canAccessAdmin(userRole),
     canManageUsers: RBAC.canManageUsers(userRole),
     canManageLGAs: RBAC.canManageLGAs(userRole),
-    canManageVehicles: RBAC.canManageVehicles(userRole),
+    canCreateVehicles: RBAC.canCreateVehicles(userRole),
+    canViewVehicles: RBAC.canViewVehicles(userRole),
+    canEditVehicles: RBAC.canEditVehicles(userRole),
+    canScanVehicles: RBAC.canScanVehicles(userRole),
     canViewOwnVehicles: RBAC.canViewOwnVehicles(userRole),
-    isSuperAdmin: RBAC.isSuperAdmin(userRole),
+    isComplianceAgent: RBAC.isComplianceAgent(userRole),
+    isLGARole: RBAC.isLGARole(userRole),
   };
+}
+
+/**
+ * Get navigation items based on user role
+ */
+export function getNavigationItems(userRole: UserRole | null) {
+  const permissions = getUserPermissions(userRole);
+
+  const items = [];
+
+  // Dashboard - available to all authenticated users
+  items.push({ href: "/", label: "Dashboard", icon: "LayoutDashboard" });
+
+  // Vehicles - different access levels
+  if (permissions.canViewVehicles) {
+    items.push({ href: "/vehicles", label: "Vehicles", icon: "Car" });
+  }
+
+  // Users - admin only
+  if (permissions.canManageUsers) {
+    items.push({ href: "/users", label: "Users", icon: "Users" });
+  }
+
+  // LGAs - admin and LGA roles
+  if (permissions.canManageLGAs) {
+    items.push({ href: "/lgas", label: "LGAs", icon: "MapPin" });
+  }
+
+  // Scan - LGA roles and compliance agents
+  if (permissions.canScanVehicles) {
+    items.push({ href: "/scan", label: "Scan", icon: "QrCode" });
+  }
+
+  // Search - available to most roles
+  if (permissions.canViewVehicles || permissions.canViewOwnVehicles) {
+    items.push({ href: "/search", label: "Search", icon: "Search" });
+  }
+
+  // Activities - all authenticated users can view their own activities
+  items.push({ href: "/activities", label: "Activities", icon: "Activity" });
+
+  // Admin specific items
+  if (permissions.canAccessAdmin) {
+    items.push({ href: "/admin", label: "Admin", icon: "Shield" });
+    items.push({ href: "/stickers", label: "Stickers", icon: "Tag" });
+  }
+
+  return items;
 }
