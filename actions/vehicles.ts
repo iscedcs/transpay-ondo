@@ -127,6 +127,60 @@ const GetVehiclesSchema = z.object({
 
 type GetVehiclesParams = z.infer<typeof GetVehiclesSchema>;
 
+// Vehicle stats response interface
+export interface VehicleStatsResponse {
+  success: boolean
+  message: string
+  data: {
+    total: number
+    active: number
+    blacklisted: number
+    suspended: number
+    pending: number
+    deleted: number
+  }
+}
+
+/**
+ * Server action to fetch vehicle statistics
+ * @returns Promise with vehicle stats data
+ */
+export async function getVehicleStats(): Promise<VehicleStatsResponse> {
+  try {
+    const session = await auth();
+    if (!session || !session.user) {
+      throw new Error("Unauthorized access: No session found");
+    }
+    const token = session?.user.access_token;
+    if (!token) {
+      throw new Error("Unauthorized access: No token found");
+    }
+    // Fetch data from the API
+    const response = await fetch(`${API}/api/vehicles/stats`, {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      cache: "no-store", // Ensure we get fresh data
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch vehicle stats: ${response.status} ${response.statusText}`)
+    }
+
+    const data: VehicleStatsResponse = await response.json()
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to fetch vehicle stats")
+    }
+
+    return data
+  } catch (error) {
+    console.error("Error fetching vehicle stats:", error)
+    throw new Error(error instanceof Error ? error.message : "Failed to fetch vehicle stats")
+  }
+}
+
 export async function updateVehicle(
   id: string,
   vehicleData: Partial<Vehicle>

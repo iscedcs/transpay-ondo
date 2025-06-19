@@ -5,6 +5,7 @@ import { RBAC } from "@/lib/auth";
 import { API, URLS } from "@/lib/const";
 import { User, getMe } from "./users";
 import { db } from "@/lib/db";
+import { Role } from "@prisma/client";
 
 export const getComplianceRate = async () => {
   const session = await auth();
@@ -713,5 +714,334 @@ export async function getLGAAgentRecentScans(limit = 10) {
   } catch (error) {
     console.error("Error fetching LGA agent recent scans:", error);
     throw new Error("Failed to fetch recent scans");
+  }
+}
+
+export async function getLGAAdminDashboardStats(): Promise<
+  DashboardStats & {
+    totalAgents: number;
+    activeAgents: number;
+    totalRevenue: number;
+    monthlyRevenue: number;
+  }
+> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getMe();
+
+  // Ensure user is LGA_ADMIN and has an assigned LGA
+  if (user.role !== "LGA_ADMIN" || !user.lgaId) {
+    throw new Error("Access denied: LGA Admin role required with assigned LGA");
+  }
+
+  try {
+    // Filter all queries by the admin's assigned LGA
+    const vehicleWhere = {
+      deletedAt: null,
+      registeredLgaId: user.lgaId, // Only vehicles in their LGA
+    };
+
+    const userWhere = {
+      deletedAt: null,
+      lgaId: user.lgaId, // Only users in their LGA
+      role: {
+        in: ["LGA_AGENT", "LGA_C_AGENT"], // Only agents
+      } as { in: Role[] },
+    };
+
+    // Get vehicle statistics for their LGA
+    const [totalVehicles, vehiclesByStatus, activeVehicles] = await Promise.all(
+      [
+        db.vehicle.count({ where: vehicleWhere }),
+        db.vehicle.groupBy({
+          by: ["status"],
+          where: vehicleWhere,
+          _count: true,
+        }),
+        db.vehicle.count({
+          where: {
+            ...vehicleWhere,
+            status: "ACTIVE",
+          },
+        }),
+      ]
+    );
+
+    const statusCounts = vehiclesByStatus.reduce((acc, item) => {
+      acc[item.status.toLowerCase()] = item._count;
+      return acc;
+    }, {} as any);
+
+    // Get agent statistics
+    const [totalAgents, activeAgents] = await Promise.all([
+      db.user.count({ where: userWhere }),
+      db.user.count({
+        where: {
+          ...userWhere,
+          status: "ACTIVE",
+        },
+      }),
+    ]);
+
+    // Get recent scans by all agents in this LGA
+    const recentScansCount = await db.scan.count({
+      where: {
+        User: {
+          lgaId: user.lgaId, // Scans by agents in this LGA
+        },
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
+        },
+      },
+    });
+
+    // Get recent activities - all combinations as requested
+    const recentActivities = await db.auditTrail.findMany({
+      where: {
+        OR: [
+          // Activities by agents in this LGA
+          {
+            User: {
+              lgaId: user.lgaId,
+            },
+          },
+          // Activities on vehicles in this LGA
+          {
+            Vehicle: {
+              registeredLgaId: user.lgaId,
+            },
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 10,
+      include: {
+        User: {
+          select: {
+            firstName: true,
+            lastName: true,
+            role: true,
+          },
+        },
+        Vehicle: {
+          select: {
+            plateNumber: true,
+          },
+        },
+      },
+    });
+
+    // Calculate revenue from transactions in this LGA
+    const thisMonth = new Date();
+    thisMonth.setDate(1);
+    thisMonth.setHours(0, 0, 0, 0);
+
+    const [totalRevenue, monthlyRevenue] = await Promise.all([
+      db.vehicleTransaction.aggregate({
+        where: {
+          lgaId: user.lgaId,
+          status: "SUCCESS",
+        },
+        _sum: {
+          amount: true,
+        },
+      }),
+      db.vehicleTransaction.aggregate({
+        where: {
+          lgaId: user.lgaId,
+          status: "SUCCESS",
+          createdAt: {
+            gte: thisMonth,
+          },
+        },
+        _sum: {
+          amount: true,
+        },
+      }),
+    ]);
+
+    // Count vehicles created this month in this LGA
+    const vehiclesCreatedThisMonth = await db.vehicle.count({
+      where: {
+        ...vehicleWhere,
+        createdAt: {
+          gte: thisMonth,
+        },
+      },
+    });
+
+    return {
+      totalVehicles,
+      activeVehicles,
+      recentScans: recentScansCount,
+      pendingTasks: vehiclesCreatedThisMonth,
+      recentActivities,
+      vehiclesByStatus: {
+        active: statusCounts.active || 0,
+        inactive: statusCounts.inactive || 0,
+        owing: statusCounts.owing || 0,
+        cleared: statusCounts.cleared || 0,
+      },
+      totalAgents,
+      activeAgents,
+      totalRevenue: Number(totalRevenue._sum.amount || 0),
+      monthlyRevenue: Number(monthlyRevenue._sum.amount || 0),
+    };
+  } catch (error) {
+    console.error("Error fetching LGA admin dashboard stats:", error);
+    throw new Error("Failed to fetch dashboard statistics");
+  }
+}
+
+export async function getLGAAdminAgentPerformance() {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getMe();
+
+  if (user.role !== "LGA_ADMIN" || !user.lgaId) {
+    throw new Error("Access denied: LGA Admin role required with assigned LGA");
+  }
+
+  try {
+    // Get all agents in this LGA with their performance metrics
+    const agents = await db.user.findMany({
+      where: {
+        lgaId: user.lgaId,
+        role: {
+          in: ["LGA_AGENT", "LGA_C_AGENT"],
+        },
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        lastLogin: true,
+      },
+    });
+
+    // Get performance data for each agent
+    const agentPerformance = await Promise.all(
+      agents.map(async (agent) => {
+        const [scansCount, vehiclesCreated, activitiesCount] =
+          await Promise.all([
+            db.scan.count({
+              where: {
+                userId: agent.id,
+                createdAt: {
+                  gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+                },
+              },
+            }),
+            db.vehicle.count({
+              where: {
+                // TODO: fix this
+                // owner: {
+                //   createdBy: agent.id, // Vehicles created by this agent
+                // },
+                ownerId: agent.id,
+                registeredLgaId: user.lgaId,
+                createdAt: {
+                  gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+                },
+              },
+            }),
+            db.auditTrail.count({
+              where: {
+                userId: agent.id,
+                createdAt: {
+                  gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+                },
+              },
+            }),
+          ]);
+
+        return {
+          ...agent,
+          performance: {
+            scansCount,
+            vehiclesCreated,
+            activitiesCount,
+          },
+        };
+      })
+    );
+
+    return agentPerformance;
+  } catch (error) {
+    console.error("Error fetching agent performance:", error);
+    throw new Error("Failed to fetch agent performance data");
+  }
+}
+
+export async function getLGAAdminActivities(limit = 20) {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await getMe();
+
+  if (user.role !== "LGA_ADMIN" || !user.lgaId) {
+    throw new Error("Access denied: LGA Admin role required with assigned LGA");
+  }
+
+  try {
+    const activities = await db.auditTrail.findMany({
+      where: {
+        OR: [
+          // Activities by agents in this LGA
+          {
+            User: {
+              lgaId: user.lgaId,
+            },
+          },
+          // Activities on vehicles in this LGA
+          {
+            Vehicle: {
+              registeredLgaId: user.lgaId,
+            },
+          },
+        ],
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+      include: {
+        User: {
+          select: {
+            firstName: true,
+            lastName: true,
+            role: true,
+            email: true,
+          },
+        },
+        Vehicle: {
+          select: {
+            plateNumber: true,
+            color: true,
+            category: true,
+          },
+        },
+      },
+    });
+
+    return activities;
+  } catch (error) {
+    console.error("Error fetching LGA admin activities:", error);
+    throw new Error("Failed to fetch activities");
   }
 }

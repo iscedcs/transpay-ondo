@@ -4,13 +4,12 @@ import {
   SIDEBAR_LINKS,
   SIDEBAR_LINKS_ADMIN,
   SIDEBAR_LINKS_EIRS_ADMIN,
+  SIDEBAR_LINKS_LGA_ADMIN,
   SIDEBAR_LINKS_LGA_AGENT,
   SIDEBAR_LINKS_LGA_C_AGENT,
   SIDEBAR_NO_USER,
 } from "@/lib/const";
 import { useSession } from "next-auth/react";
-import { ModeToggle } from "../dark-mode-toggle";
-import { Separator } from "../ui/separator";
 import { NavbarButton } from "./navbar-button";
 import { Role } from "@prisma/client";
 
@@ -38,8 +37,8 @@ export default function Sidebar() {
       <div className="flex h-full w-full flex-col gap-3 pt-20">
         {(ROLE?.toLowerCase() === "agent"
           ? SIDEBAR_LINKS_LGA_AGENT
-          : ROLE === Role.LGA_C_AGENT
-          ? SIDEBAR_LINKS_LGA_C_AGENT
+          : ROLE === Role.LGA_ADMIN
+          ? SIDEBAR_LINKS_LGA_ADMIN
           : ROLE === Role.LGA_AGENT
           ? SIDEBAR_LINKS_LGA_C_AGENT
           : ROLE === Role.EIRS_ADMIN
@@ -57,8 +56,8 @@ export default function Sidebar() {
             icon={link.icon}
           />
         ))}
-        <Separator />
-        <ModeToggle />
+        {/* <Separator />
+        <ModeToggle /> */}
       </div>
     </div>
   );

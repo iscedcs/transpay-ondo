@@ -838,7 +838,7 @@ export function getStatusColor(
 ): "default" | "secondary" | "destructive" | "outline" {
   const colorMap = {
     ACTIVE: "default" as const,
-    INACTIVE: "secondary" as const,
+    INACTIVE: "outline" as const,
     SUSPENDED: "destructive" as const,
     PENDING: "outline" as const,
   };

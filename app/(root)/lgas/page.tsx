@@ -45,35 +45,8 @@ import { LGABoundariesMap } from "./lga-boundaries-map";
 import CONFIG from "@/config";
 import { formatFees } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import { isAuthorized } from "@/lib/auth";
-import { Role } from "@prisma/client";
-import { useRouter } from "next/navigation";
 
 export default function AllLGAsPage() {
-  const session = useSession();
-  const user = session.data?.user;
-  const router = useRouter();
-
-  useEffect(() => {
-    // If no user, redirect to sign-in
-    if (!user) {
-      router.push("/sign-in");
-      return;
-    }
-
-    // Check authorization
-    const authorized = isAuthorized(user.role as Role, [
-      "SUPERADMIN",
-      "ADMIN",
-      "EIRS_ADMIN",
-    ]);
-
-    if (!authorized) {
-      router.push("/unauthorized");
-      return;
-    }
-  }, [user, router]);
-
   const [lgas, setLgas] = useState<LGA[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +59,8 @@ export default function AllLGAsPage() {
   const [deleteDialogLGA, setDeleteDialogLGA] = useState<LGA | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [showMap, setShowMap] = useState(false);
+
+  const session = useSession();
 
   // Fetch LGAs data
   const fetchLGAs = async (
@@ -174,7 +149,7 @@ export default function AllLGAsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="p-5 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>

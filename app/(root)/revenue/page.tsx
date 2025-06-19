@@ -1,61 +1,74 @@
-import SplitPayment from "@/components/pages/activities/revenue/split-payment";
-import RevenueAmountCard from "@/components/role/super-admin/revenue-amount-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { DATE_RANGE } from "@/lib/const";
-import { format, subMonths } from "date-fns";
 import { Suspense } from "react";
+import { requireAuth } from "@/lib/auth";
+import RevenueContent from "@/components/revenue/revenue-content";
+import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
+export default async function RevenuePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  // Require authentication with proper roles
+  const user = await requireAuth({
+    allowedRoles: ["SUPERADMIN", "ADMIN", "EIRS_ADMIN", "LGA_ADMIN"],
+  });
 
-interface PageProps {
-     searchParams: Promise<{ [key: string]: string | undefined }>;
+  const params = await searchParams;
+
+  return (
+    <div className="mx-auto p-5 space-y-6">
+      <div className="flex flex-col space-y-2">
+        <h1 className="text-2xl md:text-3xl font-bold">Revenue Dashboard</h1>
+        <p className="text-muted-foreground">
+          {user.role === "LGA_ADMIN"
+            ? "Monitor your LGA's revenue performance"
+            : "Monitor state-wide and LGA-specific revenue performance"}
+        </p>
+      </div>
+
+      <Suspense fallback={<RevenuePageSkeleton />}>
+        <RevenueContent user={user} searchParams={params} />
+      </Suspense>
+    </div>
+  );
 }
-export default async function Revenue({
-     searchParams,
-}: PageProps) {
-     // const payments = await allPayments();
-     const today = new Date();
-     const oneMonthAgo = subMonths(today, 1);
 
-     const start =
-          ( await searchParams)["startDate"] ?? format(oneMonthAgo, "yyyy-MM-dd");
-     const end = ( await searchParams)["endDate"] ?? format(today, "yyyy-MM-dd");
-     const duration = ( await searchParams)["d"] ?? "1M";
-     return (
-          <div className="flex h-full w-full flex-col gap-3 p-5">
-               <div className="flex items-center justify-between">
-                    <div className="shrink-0 grow-0">Revenue & Stats</div>
-                    {/* <SelectDuration d={duration} /> */}
-               </div>
-               <div className="flex flex-col gap-5">
-                    <div className="grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-4">
-                         {DATE_RANGE.map(({ type, title, description }, b) => (
-                              <Suspense
-                                   key={b}
-                                   fallback={
-                                        <Skeleton className="flex h-24 w-full flex-col justify-between rounded-2xl bg-secondary p-3 shadow-md" />
-                                   }
-                              >
-                                   <RevenueAmountCard
-                                        type={type}
-                                        title={`${title} Revenue`}
-                                        desc={description}
-                                   />
-                              </Suspense>
-                         ))}
-                    </div>
+function RevenuePageSkeleton() {
+  return (
+    <div className="space-y-6 p-5">
+      {/* Stats Cards Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="p-6">
+            <Skeleton className="h-4 w-24 mb-2" />
+            <Skeleton className="h-8 w-32 mb-1" />
+            <Skeleton className="h-3 w-20" />
+          </Card>
+        ))}
+      </div>
 
-                    <SplitPayment />
-                    {/* <div className="mb-20 flex flex-col gap-3 rounded-3xl bg-secondary p-5">
-                         <RevenueChartContainer
-                              start={start}
-                              end={end}
-                              title="Revenue Chart"
-                         />
-                    </div> */}
-                    {/* <TransactionChart
-                         transactions={payments.success?.data ?? []}
-                    /> */}
-               </div>
-          </div>
-     );
+      {/* Charts Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <Skeleton className="h-6 w-48 mb-4" />
+          <Skeleton className="h-64 w-full" />
+        </Card>
+        <Card className="p-6">
+          <Skeleton className="h-6 w-48 mb-4" />
+          <Skeleton className="h-64 w-full" />
+        </Card>
+      </div>
+
+      {/* Table Skeleton */}
+      <Card className="p-6">
+        <Skeleton className="h-6 w-32 mb-4" />
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 w-full" />
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
 }

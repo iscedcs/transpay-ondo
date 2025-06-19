@@ -168,6 +168,43 @@ export const SIDEBAR_LINKS_EIRS_ADMIN = [
     icon: <CreditCard className="h-5 w-5" />,
   },
 ];
+export const SIDEBAR_LINKS_LGA_ADMIN = [
+  {
+    title: "Dashboard",
+    href: "/dashboard",
+    icon: dashboardIcon,
+  },
+  {
+    title: "Users",
+    href: "/users",
+    icon: adminIcon,
+  },
+  {
+    title: "Vehicles",
+    href: "/vehicles?page=1&limit=15",
+    icon: <CarTaxiFront className="h-5 w-5" />,
+  },
+  {
+    title: "Scan",
+    href: "/scan",
+    icon: scanIcon,
+  },
+  {
+    title: "Search",
+    href: "/search",
+    icon: searchIcon,
+  },
+  {
+    title: "Revenue",
+    href: "/revenue",
+    icon: revenueIcon,
+  },
+  {
+    title: "Fund Vehicle",
+    href: "/fund-vehicle",
+    icon: <CreditCard className="h-5 w-5" />,
+  },
+];
 export const SIDEBAR_LINKS_LGA_AGENT = [
   {
     title: "Dashboard",
@@ -2444,11 +2481,16 @@ export const MONTHLY = [
     value: "december",
   },
 ];
-export const ADMIN_ROLES: string[] = [Role.SUPERADMIN, Role.ADMIN];
+export const ADMIN_ROLES: string[] = [
+  Role.SUPERADMIN,
+  Role.ADMIN,
+  Role.LGA_ADMIN,
+];
 export const READONLY_ADMIN_ROLES: string[] = [
   Role.SUPERADMIN,
   Role.ADMIN,
   Role.EIRS_ADMIN,
+  Role.LGA_ADMIN,
 ];
 export const SUPER_ADMIN_ROLES: string[] = [Role.SUPERADMIN];
 
