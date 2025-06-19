@@ -20,6 +20,7 @@ import {
   SIDEBAR_LINKS,
   SIDEBAR_LINKS_ADMIN,
   SIDEBAR_LINKS_EIRS_ADMIN,
+  SIDEBAR_LINKS_LGA_ADMIN,
   SIDEBAR_LINKS_LGA_AGENT,
   SIDEBAR_LINKS_LGA_C_AGENT,
 } from "@/lib/const";
@@ -96,6 +97,8 @@ export function UserNav() {
         <DropdownMenuGroup>
           {(user.role === Role.LGA_AGENT
             ? SIDEBAR_LINKS_LGA_AGENT
+            : user.role === Role.LGA_ADMIN
+            ? SIDEBAR_LINKS_LGA_ADMIN
             : user.role === Role.EIRS_ADMIN
             ? SIDEBAR_LINKS_EIRS_ADMIN
             : user.role === Role.LGA_C_AGENT

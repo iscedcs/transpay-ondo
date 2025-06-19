@@ -30,10 +30,11 @@ import { Separator } from "@/components/ui/separator";
 import { getLGAs } from "@/actions/lga";
 import { toast } from "sonner";
 import { createUser } from "@/actions/users";
-import { USER_ROLES } from "@/lib/constants";
+import { assignableRoles } from "@/lib/constants";
 import { formatRoleName } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { ADMIN_ROLES } from "@/lib/const";
+import { Role } from "@prisma/client";
 
 // Define the form schema with Zod
 const userFormSchema = z
@@ -133,6 +134,14 @@ export default function AddUserPage() {
       maiden_name: "",
     },
   });
+  const rolesToOmit = [
+    Role.SUPERADMIN,
+    Role.ADMIN,
+    Role.EIRS_ADMIN,
+    Role.EIRS_AGENT,
+    Role.LGA_ADMIN,
+    Role.POS,
+  ];
 
   // Fetch LGAs on component mount
   useEffect(() => {
@@ -150,56 +159,6 @@ export default function AddUserPage() {
 
     fetchLGAData();
   }, []);
-
-  // Handle NIN verification
-  // const handleVerifyNIN = async () => {
-  //   if (!nin || nin.length < 11) {
-  //     setVerificationError("Please enter a valid NIN (at least 11 characters)");
-  //     return;
-  //   }
-
-  //   setIsVerifying(true);
-  //   setVerificationError(null);
-
-  //   try {
-  //     const userData = await fetchUserByNIN(nin);
-
-  //     if (userData) {
-  //       // Populate form with fetched data
-  //       form.setValue("firstName", userData.firstName || "");
-  //       form.setValue("lastName", userData.lastName || "");
-  //       form.setValue("email", userData.email || "");
-  //       form.setValue("phone", userData.phone || "");
-  //       form.setValue("identificationNumber", nin);
-
-  //       if (userData.address) {
-  //         const address = userData.address;
-
-  //         form.setValue("address", {
-  //           street: address.street || "",
-  //           UNIT: address.UNIT || "",
-  //           CITY: address.CITY || "",
-  //           STATE: address.STATE || "",
-  //           POSTAL_CODE: address.POSTAL_CODE || "",
-  //           COUNTRY: address.COUNTRY || "Nigeria",
-  //           LGA: address.LGA || "",
-  //         });
-  //       }
-
-  //       toast.success("Success", {
-  //         description: "User information retrieved successfully",
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.error("NIN verification failed:", error);
-  //     setVerificationError(
-  //       "Failed to verify NIN. You can proceed with manual entry."
-  //     );
-  //   } finally {
-  //     setIsVerifying(false);
-  //   }
-  // };
-  console.log(form.getValues("address"));
 
   // Handle form submission
   const onSubmit = async (data: UserFormValues) => {
@@ -399,11 +358,13 @@ export default function AddUserPage() {
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.keys(USER_ROLES).map((role) => (
-                          <SelectItem value={role} key={role}>
-                            {formatRoleName(role)}
-                          </SelectItem>
-                        ))}
+                        {assignableRoles[String(session.data?.user.role)].map(
+                          (role) => (
+                            <SelectItem value={role} key={role}>
+                              {formatRoleName(role)}
+                            </SelectItem>
+                          )
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

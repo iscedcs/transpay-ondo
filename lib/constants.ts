@@ -72,3 +72,39 @@ export function getVehicleTypes(): string[] {
     "BUS_INTERSTATE",
   ];
 }
+
+export const assignableRoles: Record<string, string[]> = {
+  SUPERADMIN: [
+    "ADMIN",
+    "EIRS_ADMIN",
+    "EIRS_AGENT",
+    "LGA_ADMIN",
+    "LGA_AGENT",
+    "LGA_C_AGENT",
+    "VEHICLE_OWNER",
+    "POS",
+  ],
+  ADMIN: [
+    "EIRS_ADMIN",
+    "EIRS_AGENT",
+    "LGA_ADMIN",
+    "LGA_AGENT",
+    "LGA_C_AGENT",
+    "VEHICLE_OWNER",
+    "POS",
+  ],
+  EIRS_ADMIN: [
+    "EIRS_AGENT",
+    "LGA_ADMIN",
+    "LGA_AGENT",
+    "LGA_C_AGENT",
+    "VEHICLE_OWNER",
+    "POS",
+  ],
+  LGA_ADMIN: ["LGA_AGENT", "LGA_C_AGENT", "VEHICLE_OWNER"],
+  EIRS_AGENT: ["VEHICLE_OWNER"],
+  LGA_AGENT: ["VEHICLE_OWNER"],
+  LGA_C_AGENT: [],
+  VEHICLE_OWNER: [],
+  POS: [],
+};
