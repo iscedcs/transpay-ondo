@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SearchPage() {
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="p-5 space-y-6">
       <div className="flex flex-col gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Search Vehicles</h1>
@@ -24,7 +24,7 @@ export default function SearchPage() {
 
 function SearchPageSkeleton() {
   return (
-    <div className="space-y-6">
+    <div className="p-5 space-y-6">
       <Card>
         <CardHeader>
           <Skeleton className="h-6 w-48" />

@@ -5,8 +5,8 @@ import { FundVehicleFlow } from "@/components/fund-vehicle-flow";
 
 export default function FundVehiclePage() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="p-5">
+      <div className="">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Fund Vehicle</h1>
           <p className="text-muted-foreground mt-2">
