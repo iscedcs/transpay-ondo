@@ -94,7 +94,7 @@ export async function generateMetadata({ params }: VehicleEditPageProps) {
     if (!!response.success) {
       const vehicle = response.data;
       return {
-        title: `Edit ${vehicle} - Vehicle Management`,
+        title: `Edit ${vehicle.plateNumber} - Vehicle Management`,
         description: `Edit vehicle information for ${vehicle.plateNumber}`,
       };
     }

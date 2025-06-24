@@ -1860,7 +1860,7 @@ export const URLS = {
     search: "/api/vehicles/search", // add vehicle to blacklist
     asin: "/api/vehicles/verify", // verify vehicle using ASIN
     fareflex: "/api/vehicles/imei", // add fareflex to vehicle
-    sticker: "/api/vehicles/sticker", // add fareflex to vehicle
+    sticker: "/api/barcode/attach-vehicle", // add fareflex to vehicle
     request: "/api/sticker-requests/sticker-request", // sticker-request
     payment: "/api/vehicles/payment-history", // payment-history
   },

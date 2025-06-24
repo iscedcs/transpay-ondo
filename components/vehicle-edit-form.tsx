@@ -47,11 +47,7 @@ const vehicleEditSchema = z.object({
   status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED", "PENDING"]),
   registeredLgaId: z.string().min(1, "Registered LGA is required"),
   vin: z.string().optional(),
-  stateCode: z.string().optional(),
   image: z.string().optional(),
-  fairFlexImei: z.string().optional(),
-  vCode: z.string().optional(),
-  securityCode: z.string().optional(),
   startDate: z.string().optional(),
   groupId: z.string().optional(),
 });
@@ -89,11 +85,7 @@ export function VehicleEditForm({ vehicle, lgas }: VehicleEditFormProps) {
       status: vehicle.status || "ACTIVE",
       registeredLgaId: vehicle.registeredLgaId || "",
       vin: vehicle.vin || "",
-      stateCode: vehicle.stateCode || "",
       image: vehicle.image || "",
-      fairFlexImei: vehicle.fairFlexImei || "",
-      vCode: vehicle.vCode || "",
-      securityCode: vehicle.securityCode || "",
       startDate: vehicle.startDate
         ? new Date(vehicle.startDate).toISOString().split("T")[0]
         : "",
@@ -125,11 +117,14 @@ export function VehicleEditForm({ vehicle, lgas }: VehicleEditFormProps) {
 
         const result = await updateVehicle(vehicle.id, updateData);
 
-        if (result) {
-          toast.success("Vehicle updated successfully");
-          router.push(`/vehicles/${vehicle.id}`);
-          router.refresh();
+        if (!result.success) {
+          toast.error(result.error);
+          return;
         }
+
+        toast.success("Vehicle updated successfully");
+        router.push(`/vehicles/${vehicle.id}`);
+        router.refresh();
       } catch (error) {
         console.log("Error updating vehicle:", error);
         toast.error(
@@ -366,46 +361,6 @@ export function VehicleEditForm({ vehicle, lgas }: VehicleEditFormProps) {
                 id="vin"
                 {...register("vin")}
                 placeholder="Vehicle Identification Number"
-              />
-            </div>
-
-            {/* State Code */}
-            <div className="space-y-2">
-              <Label htmlFor="stateCode">State Code (Optional)</Label>
-              <Input
-                id="stateCode"
-                {...register("stateCode")}
-                placeholder="State registration code"
-              />
-            </div>
-
-            {/* FairFlex IMEI */}
-            <div className="space-y-2">
-              <Label htmlFor="fairFlexImei">FairFlex IMEI</Label>
-              <Input
-                id="fairFlexImei"
-                {...register("fairFlexImei")}
-                placeholder="FairFlex device IMEI"
-              />
-            </div>
-
-            {/* V Code */}
-            <div className="space-y-2">
-              <Label htmlFor="vCode">V Code</Label>
-              <Input
-                id="vCode"
-                {...register("vCode")}
-                placeholder="Vehicle code"
-              />
-            </div>
-
-            {/* Security Code */}
-            <div className="space-y-2">
-              <Label htmlFor="securityCode">Security Code</Label>
-              <Input
-                id="securityCode"
-                {...register("securityCode")}
-                placeholder="Security code"
               />
             </div>
 
