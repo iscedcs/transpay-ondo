@@ -24,11 +24,11 @@ export default async function VehicleEditPage({
       getLGAs(),
     ]);
 
-    if (!vehicleResponse) {
+    if (!vehicleResponse.success) {
       notFound();
     }
 
-    const vehicle = vehicleResponse;
+    const vehicle = vehicleResponse.data;
     const lgas = lgasResponse.success ? lgasResponse.data : [];
 
     return (
@@ -91,10 +91,10 @@ export async function generateMetadata({ params }: VehicleEditPageProps) {
 
   try {
     const response = await getVehicleById(id);
-    if (!!response) {
-      const vehicle = response;
+    if (!!response.success) {
+      const vehicle = response.data;
       return {
-        title: `Edit ${vehicle.plateNumber} - Vehicle Management`,
+        title: `Edit ${vehicle} - Vehicle Management`,
         description: `Edit vehicle information for ${vehicle.plateNumber}`,
       };
     }
