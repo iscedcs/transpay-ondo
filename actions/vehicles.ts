@@ -149,10 +149,6 @@ export interface VehicleStatsResponse {
   };
 }
 
-/**
- * Server action to fetch vehicle statistics
- * @returns Promise with vehicle stats data
- */
 export async function getVehicleStats(): Promise<VehicleStatsResponse> {
   try {
     const session = await auth();
@@ -196,15 +192,18 @@ export async function getVehicleStats(): Promise<VehicleStatsResponse> {
 export async function updateVehicle(
   id: string,
   vehicleData: Partial<Vehicle>
-): Promise<Vehicle> {
+): Promise<
+  { success: true; data: Vehicle } | { success: false; error: string }
+> {
   try {
     const session = await auth();
     if (!session || !session.user) {
-      throw new Error("Unauthorized access: No session found");
+      return { success: false, error: "Unauthorized access: No session found" };
     }
+
     const token = session?.user.access_token;
     if (!token) {
-      throw new Error("Unauthorized access: No token found");
+      return { success: false, error: "Unauthorized access: No token found" };
     }
     const response = await fetch(`${API}/api/vehicles/update/${id}`, {
       method: "PUT",
@@ -218,28 +217,35 @@ export async function updateVehicle(
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(
-        errorData.message ||
-          `Failed to update vehicle: ${response.status} ${response.statusText}`
-      );
+      return {
+        success: false,
+        error:
+          errorData.message ||
+          `Failed to update vehicle: ${response.status} ${response.statusText}`,
+      };
     }
 
     const data = await response.json();
 
     if (!data.success) {
-      throw new Error(data.message || "Failed to update vehicle");
+      return {
+        success: false,
+        error: data.message || "Failed to update vehicle",
+      };
     }
 
     // Revalidate the vehicles pages to reflect the changes
     revalidatePath("/vehicles");
     revalidatePath(`/vehicles/${id}`);
 
-    return data.data;
+    return { success: true, data: data.data };
   } catch (error) {
-    console.log("Error updating vehicle:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to update vehicle"
-    );
+    console.error("Error updating vehicle:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update vehicle",
+    };
   }
 }
 

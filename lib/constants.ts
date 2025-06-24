@@ -1,4 +1,4 @@
-import { Role } from "@prisma/client";
+import { Role, TransactionCategories } from "@prisma/client";
 
 // State Configuration - Easy to modify for different states
 export const STATE_CONFIG = {
@@ -44,19 +44,7 @@ export const USER_ROLES = Role;
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export function getVehicleCategories(): string[] {
-  return [
-    "TRICYCLE",
-    "MOTORCYCLE",
-    "CAR",
-    "TRUCK",
-    "BUS",
-    "BUS_INTRASTATE",
-    "BUS_INTERSTATE",
-    "VAN",
-    "TAXI",
-    "COMMERCIAL",
-    "PRIVATE",
-  ];
+  return Object.keys(TransactionCategories);
 }
 
 export function getVehicleTypes(): string[] {

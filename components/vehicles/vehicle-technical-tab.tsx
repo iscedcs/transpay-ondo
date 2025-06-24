@@ -8,7 +8,6 @@ import {
   Navigation,
   Eye,
   EyeOff,
-  Scan,
   ExternalLink,
   Download,
 } from "lucide-react";
@@ -21,10 +20,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BarcodeScanner } from "@/components/barcode-scanner";
 import type { Vehicle } from "@/actions/vehicles";
 import { QRCodeSVG } from "qrcode.react";
 import { VehicleRoutesManager } from "../vehicle-routes-manager";
+import BarcodeAdder from "../layout/barcode-adder";
 
 interface VehicleTechnicalTabProps {
   vehicle: Vehicle;
@@ -34,14 +33,6 @@ export default function VehicleTechnicalTab({
   vehicle,
 }: VehicleTechnicalTabProps) {
   const [showSensitiveInfo, setShowSensitiveInfo] = useState(false);
-  const [showBarcodeScanner, setShowBarcodeScanner] = useState(false);
-
-  const handleBarcodeAdded = (barcode: string) => {
-    // This will be handled by the BarcodeScanner component
-    // which will make the API call and refresh the page
-    setShowBarcodeScanner(false);
-  };
-
   // Generate QR code URL
   const qrCodeUrl = vehicle.barcode
     ? `${process.env.NEXT_PUBLIC_APP_URL}${vehicle.barcode.code}`
@@ -177,15 +168,7 @@ export default function VehicleTechnicalTab({
                   <p className="text-sm text-muted-foreground">
                     No barcode assigned
                   </p>
-                  <Button
-                    onClick={() => setShowBarcodeScanner(true)}
-                    size="sm"
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    <Scan className="h-4 w-4" />
-                    Add Barcode
-                  </Button>
+                  <BarcodeAdder id={vehicle.id} />
                 </div>
               )}
             </div>
@@ -282,17 +265,6 @@ export default function VehicleTechnicalTab({
           )}
         </CardContent>
       </Card>
-
-      {/* Barcode Scanner Modal */}
-      {showBarcodeScanner && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <BarcodeScanner
-            vehicleId={vehicle.id}
-            onSuccess={handleBarcodeAdded}
-            onCancel={() => setShowBarcodeScanner(false)}
-          />
-        </div>
-      )}
     </div>
   );
 }
