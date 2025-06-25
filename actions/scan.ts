@@ -11,29 +11,32 @@ interface ScanRequest {
   longitude: number;
 }
 
-interface ScanResponse {
-  success: boolean;
-  message: string;
-  scan: {
-    id: string;
-    vehicleId: string;
-    userId: string;
-    latitude: number;
-    longitude: number;
-    detectedLgaId: string | null;
-    declaredRouteHit: boolean;
-    extraCharge: number;
-    createdAt: string;
-  };
-  vehicle: Vehicle;
-  agent: User;
-  tracker: any;
-  charged: {
-    base: number;
-    lga: number;
-    total: number;
-  };
-}
+type ScanResponse =
+  | {
+      success: true;
+      data: {
+        scan: {
+          id: string;
+          vehicleId: string;
+          userId: string;
+          latitude: number;
+          longitude: number;
+          detectedLgaId: string | null;
+          declaredRouteHit: boolean;
+          extraCharge: number;
+          createdAt: string;
+        };
+        vehicle: Vehicle;
+        agent: User;
+        tracker: any;
+        charged: {
+          base: number;
+          lga: number;
+          total: number;
+        };
+      };
+    }
+  | { success: false; error: string };
 
 interface User {
   id: string;
@@ -121,11 +124,9 @@ interface LGA {
   fee: string;
 }
 
-interface VehicleResponse {
-  success: boolean;
-  message: string;
-  data: Vehicle;
-}
+type VehicleResponse =
+  | { success: true; data: Vehicle }
+  | { success: false; error: string };
 
 export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
   try {
@@ -141,16 +142,24 @@ export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return {
+        success: false,
+        error: `HTTP error! status: ${response.status}`,
+      };
     }
 
     const result = await response.json();
+    console.log(result);
+
+    if (!result.success) {
+      return { success: false, error: result.message };
+    }
 
     // Revalidate relevant paths
     revalidatePath("/activities");
     revalidatePath(`/vehicles/${result.vehicle?.id}`);
 
-    return result;
+    return { success: true, data: result };
   } catch (error) {
     console.log("Error scanning vehicle:", error);
     throw new Error("Failed to scan vehicle");
@@ -172,21 +181,22 @@ export async function getVehicleByBarcode(
       if (response.status === 404) {
         return {
           success: false,
-          message: "Vehicle not found",
-          data: null as any,
+          error: "Vehicle not found",
         };
       }
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return {
+        success: false,
+        error: "Vehicle not found",
+      };
     }
 
-    const result = await response.json();
-    return result;
+    const { data } = await response.json();
+    return { success: true, data };
   } catch (error) {
     console.log("Error fetching vehicle by barcode:", error);
     return {
       success: false,
-      message: "Failed to fetch vehicle",
-      data: null as any,
+      error: "Failed to fetch vehicle",
     };
   }
 }

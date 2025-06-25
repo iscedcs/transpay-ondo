@@ -23,11 +23,10 @@ import Image from "next/image";
 
 interface ScanResultsProps {
   scanResult: any;
-  qrId: string;
 }
 
-export function ScanResults({ scanResult, qrId }: ScanResultsProps) {
-  const { scan, vehicle, agent, charged } = scanResult;
+export function ScanResults({ scanResult }: ScanResultsProps) {
+  const { scan, vehicle, agent, charged } = scanResult.data;
 
   const formatCurrency = (amount: number | string) => {
     const num = typeof amount === "string" ? Number.parseFloat(amount) : amount;

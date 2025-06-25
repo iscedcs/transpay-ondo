@@ -33,7 +33,7 @@ async function QRPage({ params }: QRPageProps) {
     } else {
       const result = await getVehicleByBarcode(qrid);
 
-      if (!result.success || !result.data) {
+      if (!result.success) {
         return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
             <Card className="w-full max-w-md mx-4">

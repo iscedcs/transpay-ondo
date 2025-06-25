@@ -44,7 +44,7 @@ interface PublicVehicleViewProps {
 
 export function PublicVehicleView({ vehicle, qrId }: PublicVehicleViewProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
-
+ console.log({ vehicle });
   // Format date
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not set";

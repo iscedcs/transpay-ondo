@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ReactNode, useEffect } from "react";
 import { toast } from "sonner";
 
-const POLL_INTERVAL = 3000; // 30 seconds
+const POLL_INTERVAL = 30000; // 30 seconds
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
   const { data: session, status, update } = useSession();

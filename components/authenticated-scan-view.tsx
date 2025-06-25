@@ -66,8 +66,15 @@ export function AuthenticatedScanView({
         scanResult: result,
       }));
 
+      if (!result.success) {
+        toast.error("Scan Failed", {
+          description: result.error,
+        });
+        return;
+      }
+
       toast.success("Scan Successful", {
-        description: result.message || "Vehicle scanned successfully",
+        description: "Vehicle scanned successfully",
       });
     } catch (error) {
       const errorMessage =
@@ -95,7 +102,7 @@ export function AuthenticatedScanView({
   };
 
   if (scanState.scanResult) {
-    return <ScanResults scanResult={scanState.scanResult} qrId={qrId} />;
+    return <ScanResults scanResult={scanState.scanResult} />;
   }
 
   return (
