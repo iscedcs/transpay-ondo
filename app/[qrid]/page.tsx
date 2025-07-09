@@ -6,6 +6,9 @@ import { PublicVehicleView } from "@/components/public-vehicle-view";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { auth } from "@/auth";
+import { getStickerByCode } from "@/actions/stickers";
+import CounterfeitError from "@/components/counterfeit-error";
+import UnattachedSticker from "@/components/unattached-sticker";
 
 interface QRPageProps {
   params: Promise<{ qrid: string }>;
@@ -16,6 +19,14 @@ async function QRPage({ params }: QRPageProps) {
 
   if (!qrid) {
     notFound();
+  }
+
+  try {
+    const sticker = await (await getStickerByCode(qrid)).data
+    if (!sticker) return <CounterfeitError qrid={qrid} />
+    if (!sticker.isUsed) return <UnattachedSticker sticker={sticker} />
+  } catch (error) {
+    return <CounterfeitError qrid={qrid} />
   }
 
   try {
@@ -61,7 +72,6 @@ async function QRPage({ params }: QRPageProps) {
       );
     }
   } catch (error) {
-    console.log("Error loading QR page:", error);
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
         <Card className="w-full max-w-md mx-4">
