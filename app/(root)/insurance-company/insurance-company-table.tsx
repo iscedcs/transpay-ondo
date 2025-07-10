@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { MoreHorizontal, Eye, CheckCircle, XCircle, Clock, FileText, DollarSign } from "lucide-react"
+import { MoreHorizontal, Eye, CheckCircle, XCircle, Clock, FileText, DollarSign, Currency } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import type { InsuranceClaim } from "../insurance/types"
 
@@ -140,7 +140,7 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
                   )}
                   {claim.status === "APPROVED" && (
                     <DropdownMenuItem>
-                      <DollarSign className="h-4 w-4 mr-2" />
+                      <Currency className="h-4 w-4 mr-2" />
                       Mark as Paid
                     </DropdownMenuItem>
                   )}
@@ -177,7 +177,7 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
 
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <Currency className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Claim Amount:</span>
                   <span className="font-medium">{formatCurrency(claim.claimAmount)}</span>
                 </div>

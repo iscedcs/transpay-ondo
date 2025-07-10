@@ -9,6 +9,7 @@ import {
   DollarSign,
   AlertTriangle,
   CheckCircle,
+  Currency,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -132,7 +133,7 @@ export function InsuranceTable({ vehicles }: InsuranceTableProps) {
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm">
-                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  <Currency className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Daily Cost:</span>
                   <span className="font-medium">
                     {formatCurrency(vehicle.dailyCost)}

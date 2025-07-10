@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { CreditCard, Calendar, MapPin, User, Hash, DollarSign, Smartphone, Building } from "lucide-react"
+import { CreditCard, Calendar, MapPin, User, Hash, DollarSign, Smartphone, Building, Currency } from "lucide-react"
 import { format } from "date-fns"
 import type { Transaction } from "@/types/transactions"
 
@@ -54,7 +54,7 @@ export function TransactionDetailCard({ transaction }: TransactionDetailCardProp
       case "bank_transfer":
         return <Building className="h-4 w-4" />
       case "cash":
-        return <DollarSign className="h-4 w-4" />
+        return <Currency className="h-4 w-4" />
       default:
         return <CreditCard className="h-4 w-4" />
     }

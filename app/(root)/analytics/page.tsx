@@ -15,6 +15,7 @@ import {
      Bus,
      Car,
      CreditCard,
+     Currency,
      DollarSign,
      TrendingDown,
      TrendingUp,
@@ -76,7 +77,7 @@ export default function AnalyticsPage() {
                               <CardTitle className="text-sm font-medium">
                                    Total Revenue
                               </CardTitle>
-                              <DollarSign className="h-4 w-4 text-muted-foreground" />
+                              <Currency className="h-4 w-4 text-muted-foreground" />
                          </CardHeader>
                          <CardContent>
                               <div className="text-2xl font-bold">

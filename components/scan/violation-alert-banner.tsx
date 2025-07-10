@@ -1,7 +1,7 @@
 "use client"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, DollarSign } from "lucide-react"
+import { AlertTriangle, Currency, DollarSign } from "lucide-react"
 import type { ScanResponse } from "@/types/scan"
 
 interface ViolationAlertBannerProps {
@@ -16,7 +16,7 @@ export function ViolationAlertBanner({ violation }: ViolationAlertBannerProps) {
       case "expired_registration":
         return <AlertTriangle className="h-4 w-4" />
       case "unpaid_levy":
-        return <DollarSign className="h-4 w-4" />
+        return <Currency className="h-4 w-4" />
       default:
         return <AlertTriangle className="h-4 w-4" />
     }

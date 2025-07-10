@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { MapPin, DollarSign, Calendar, Layers, X } from "lucide-react";
+import { MapPin, DollarSign, Calendar, Layers, X, Currency } from "lucide-react";
 import dynamic from "next/dynamic";
 import { LGA, VehicleFee } from "@/actions/lga";
 
@@ -349,7 +349,7 @@ export function LGABoundariesMap({ lgas, loading }: LGABoundariesMapProps) {
               {/* Vehicle Fees */}
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-green-600" />
+                  <Currency className="h-4 w-4 text-green-600" />
                   <span className="text-sm font-medium">Vehicle Fees</span>
                 </div>
                 <div className="bg-gray-50 p-3 rounded-lg max-h-32 overflow-y-auto">

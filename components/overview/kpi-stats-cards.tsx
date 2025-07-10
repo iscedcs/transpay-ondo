@@ -7,6 +7,7 @@ import {
   DollarSign,
   Scan,
   Users,
+  Currency,
 } from "lucide-react";
 import Link from "next/link";
 import type { KPIStats } from "@/types/overview";
@@ -57,7 +58,7 @@ export function KPIStatsCards({ stats, user }: KPIStatsCardsProps) {
         title: "Outstanding Levies",
         value: formatCurrency(stats.outstandingLevies),
         subtitle: "Pending collections",
-        icon: <DollarSign className="h-4 w-4" />,
+        icon: <Currency className="h-4 w-4" />,
         trend: <TrendingDown className="h-4 w-4 text-red-600" />,
         link: "/dashboard/vehicles?filter=overdue",
       },
