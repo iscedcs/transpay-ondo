@@ -1,4 +1,4 @@
-import { getMe } from "@/actions/users";
+import { getMe, getUserById } from "@/actions/users";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
@@ -13,6 +13,11 @@ export default async function DashboardPage() {
     redirect("/sign-in");
   }
   const user = await getMe();
+  console.log({user})
+
+  if (user.status === 'BLOCKED') {
+    redirect('/blocked')
+  }
   if (!user) {
     redirect("/sign-in");
   }

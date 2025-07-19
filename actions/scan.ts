@@ -142,6 +142,7 @@ export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
     });
 
     if (!response.ok) {
+      console.log({response})
       return {
         success: false,
         error: `HTTP error! status: ${response.status}`,
@@ -150,8 +151,9 @@ export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
 
     const result = await response.json();
     console.log(result);
-
+    
     if (!result.success) {
+      console.log(result);
       return { success: false, error: result.message };
     }
 

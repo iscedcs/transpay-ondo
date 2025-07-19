@@ -1,23 +1,10 @@
 "use client";
-import { useState } from "react";
-import {
-  Car,
-  MapPin,
-  Calendar,
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  Share2,
-  Copy,
-  MessageCircle,
-  Mail,
-} from "lucide-react";
+import { Vehicle } from "@/actions/vehicles";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -34,7 +21,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Vehicle } from "@/actions/vehicles";
+import { Separator } from "@/components/ui/separator";
+import {
+  AlertTriangle,
+  Calendar,
+  Car,
+  CheckCircle,
+  Copy,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Share2,
+  Shield,
+} from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface PublicVehicleViewProps {
@@ -44,7 +44,6 @@ interface PublicVehicleViewProps {
 
 export function PublicVehicleView({ vehicle, qrId }: PublicVehicleViewProps) {
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
- console.log({ vehicle });
   // Format date
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not set";
@@ -359,7 +358,8 @@ export function PublicVehicleView({ vehicle, qrId }: PublicVehicleViewProps) {
                     <div>
                       <p className="text-sm text-gray-500">Vehicle Type</p>
                       <p className="font-medium">
-                        {vehicle.color} {vehicle.type.replace(/_/g, " ")}
+                        {vehicle.color}{" "}
+                        {vehicle.type && vehicle.type.replace(/_/g, " ")}
                       </p>
                     </div>
                   </div>

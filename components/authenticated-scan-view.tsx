@@ -59,6 +59,7 @@ export function AuthenticatedScanView({
         latitude: loc.latitude,
         longitude: loc.longitude,
       });
+      console.log({result})
 
       setScanState((prev) => ({
         ...prev,
@@ -77,6 +78,7 @@ export function AuthenticatedScanView({
         description: "Vehicle scanned successfully",
       });
     } catch (error) {
+      console.log({error})
       const errorMessage =
         error instanceof Error ? error.message : "Failed to scan vehicle";
       setScanState((prev) => ({

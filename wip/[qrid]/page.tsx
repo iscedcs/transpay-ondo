@@ -2,27 +2,27 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { Vehicle, getVehicleByBarcode } from "@/actions/vehicles";
+import { PublicVehicleView } from "@/components/public-vehicle-view";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatCurrency } from "@/lib/utils";
 import {
-  Shield,
   AlertTriangle,
+  ArrowLeft,
   CheckCircle,
   Clock,
   CreditCard,
+  Shield,
   Wallet,
-  ArrowLeft,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Vehicle, getVehicleByBarcode } from "@/actions/vehicles";
 import { useSession } from "next-auth/react";
-import { formatCurrency } from "@/lib/utils";
-import { PublicVehicleView } from "@/components/public-vehicle-view";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function QrIdPage() {
   const params = useParams();
@@ -133,8 +133,6 @@ export default function QrIdPage() {
       </div>
     );
   }
-
-  console.log({ vehicle });
 
   // Public View (Default)
   if (!userRole) {

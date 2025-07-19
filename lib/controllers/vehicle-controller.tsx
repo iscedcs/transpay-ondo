@@ -31,8 +31,6 @@ export const getVehicles = async (page?: string, limit?: string) => {
   const vehicles: Vehicle[] = result.data;
   const meta: { total: number; total_pages: number; page: number } =
     result.meta;
-
-  console.log({ vehicle: result.data[0] });
   try {
     return {
       rows: vehicles,

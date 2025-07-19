@@ -1,19 +1,18 @@
-import { Car, MapPin, User, Shield, Settings } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { type Vehicle } from "@/actions/vehicles";
-import VehicleWalletSummary from "./vehicle-wallet-summary";
-import VehicleQuickActions from "./vehicle-quick-actions";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { formatCategoryName } from "@/lib/utils";
+import { Car, MapPin, Settings, Shield, User } from "lucide-react";
+import VehicleQuickActions from "./vehicle-quick-actions";
+import VehicleWalletSummary from "./vehicle-wallet-summary";
 
 interface VehicleSidebarProps {
   vehicle: Vehicle;
 }
 
 export default function VehicleSidebar({ vehicle }: VehicleSidebarProps) {
-  console.log({ vehicle });
   // Format date
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not set";

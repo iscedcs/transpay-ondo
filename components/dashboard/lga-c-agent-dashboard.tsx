@@ -108,7 +108,7 @@ export function LGACAgentDashboard() {
             Monitor vehicle compliance in your LGA
           </p>
         </div>
-        <Badge variant="secondary" className="px-3 py-1">
+        <Badge variant="outline" className="px-3 py-1">
           <Shield className="mr-1 h-3 w-3" />
           Compliance Agent
         </Badge>
