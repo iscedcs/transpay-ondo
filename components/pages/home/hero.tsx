@@ -1,9 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { Easing, motion } from "framer-motion";
 import { Pacifico } from "next/font/google";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
 
 const pacifico = Pacifico({
   subsets: ["latin"],
@@ -44,7 +44,8 @@ function ElegantShape({
         ease: [0.23, 0.86, 0.39, 0.96],
         opacity: { duration: 1.2 },
       }}
-      className={cn("absolute", className)}>
+      className={cn("absolute", className)}
+    >
       <motion.div
         animate={{
           y: [0, 15, 0],
@@ -58,7 +59,8 @@ function ElegantShape({
           width,
           height,
         }}
-        className="relative">
+        className="relative"
+      >
         <div
           className={cn(
             "absolute inset-0 rounded-full",
@@ -92,7 +94,7 @@ export default function HeroGeometric({
       transition: {
         duration: 1,
         delay: 0.5 + i * 0.2,
-        ease: [0.25, 0.4, 0.25, 1],
+        ease: [0.25, 0.4, 0.25, 1] as unknown as Easing[],
       },
     }),
   };
@@ -155,7 +157,8 @@ export default function HeroGeometric({
             variants={fadeUpVariants}
             initial="hidden"
             animate="visible"
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12">
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.08] mb-8 md:mb-12"
+          >
             <Image src="/logo2.png" alt="Transpay UI" width={20} height={20} />
             <span className="text-sm text-white/60 tracking-wide">{badge}</span>
           </motion.div>
@@ -164,7 +167,8 @@ export default function HeroGeometric({
             custom={1}
             variants={fadeUpVariants}
             initial="hidden"
-            animate="visible">
+            animate="visible"
+          >
             <h1 className="text-4xl sm:text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-tight">
               <span className="bg-clip-text text-transparent bg-gradient-to-b from-white to-white/80">
                 {title1}
@@ -173,7 +177,8 @@ export default function HeroGeometric({
               <span
                 className={cn(
                   "bg-clip-text text-transparent text-3xl bg-gradient-to-r from-[#2d2d2d] via-white/90 to-[#ffcc00] "
-                )}>
+                )}
+              >
                 {title2}
               </span>
             </h1>
@@ -183,7 +188,8 @@ export default function HeroGeometric({
             custom={2}
             variants={fadeUpVariants}
             initial="hidden"
-            animate="visible">
+            animate="visible"
+          >
             <p className="text-base sm:text-lg md:text-xl text-white/40 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto px-4">
               Ensuring safe and easy collection of levies using simple yet
               secure systems.
