@@ -1,13 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Loader2, Save, ArrowLeft, Eye, EyeOff, RefreshCw } from "lucide-react";
+import { getLGAs } from "@/actions/lga";
+import { createUser } from "@/actions/users";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -16,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -24,17 +20,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from "@/components/ui/separator";
-import { getLGAs } from "@/actions/lga";
-import { toast } from "sonner";
-import { createUser } from "@/actions/users";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ADMIN_ROLES } from "@/lib/const";
 import { assignableRoles } from "@/lib/constants";
 import { formatRoleName } from "@/lib/utils";
-import { useSession } from "next-auth/react";
-import { ADMIN_ROLES } from "@/lib/const";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Role } from "@prisma/client";
+import { ArrowLeft, Eye, EyeOff, Loader2, Save } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 // Define the form schema with Zod
 const userFormSchema = z
@@ -219,7 +218,7 @@ export default function AddUserPage() {
       </div>
 
       {/* NIN Verification Card */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle>Identity Verification</CardTitle>
           <CardDescription>
@@ -265,7 +264,7 @@ export default function AddUserPage() {
             </Alert>
           )}
         </CardContent>
-      </Card>
+      </Card> */}
 
       {/* User Form */}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -407,7 +406,7 @@ export default function AddUserPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="NIN">NIN</SelectItem>
-                        <SelectItem value="DRIVERS_LICENSE">
+                        {/* <SelectItem value="DRIVERS_LICENSE">
                           Driver's License
                         </SelectItem>
                         <SelectItem value="PASSPORT">
@@ -415,7 +414,7 @@ export default function AddUserPage() {
                         </SelectItem>
                         <SelectItem value="VOTERS_CARD">
                           Voter's Card
-                        </SelectItem>
+                        </SelectItem> */}
                       </SelectContent>
                     </Select>
                   </div>
