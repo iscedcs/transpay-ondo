@@ -1,9 +1,8 @@
-
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
+import ProtectedRoute from "@/components/auth/protected-wrapper";
 import Navbar from "@/components/layout/navbar";
 import Sidebar from "@/components/layout/sidebar";
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Transpay - Dashboard",
@@ -11,25 +10,20 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardLayout({
-     children,
+  children,
 }: {
-     children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-     const session = (await auth()) ?? null;
-     // if (!session || session?.user.id){
-     //      redirect('/sign-in')
-     //      // await signOut()
-     // }
-
-     return (
-          <div className="">
-               <Navbar />
-               <div className="">
-                    <Sidebar />
-                    <div className={`${session ? "md:ml-52" : ""} pt-20`}>
-                         {children}
-                    </div>
-               </div>
-          </div>
-     );
+  const session = (await auth()) ?? null;
+  return (
+    <ProtectedRoute>
+      <div className="">
+        <Navbar />
+        <div className="">
+          <Sidebar />
+          <div className={`${session ? "md:ml-52" : ""} pt-20`}>{children}</div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
 }
