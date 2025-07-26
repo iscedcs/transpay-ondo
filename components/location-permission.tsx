@@ -38,11 +38,12 @@ export function LocationPermission({
 
         // Check for precision: accuracy should be <= 50 meters
         if (accuracy > 50) {
-          onError(
-            `Location is not precise enough (accuracy: ${Math.round(
-              accuracy
-            )}m). Please try again in an open space with GPS enabled.`
-          );
+          // onError(
+          //   `Location is not precise enough (accuracy: ${Math.round(
+          //     accuracy
+          //   )}m). Please try again with GPS enabled.`
+          // );
+          onError(`Please try again with GPS enabled.`);
           setIsGettingLocation(false);
           return;
         }
@@ -114,11 +115,6 @@ export function LocationPermission({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-gray-600">
-          We need your current location to verify vehicle compliance and apply
-          appropriate charges.
-        </p>
-
         <div className="space-y-3">
           <Button
             onClick={getCurrentLocation}
@@ -193,12 +189,9 @@ export function LocationPermission({
 
         <div className="flex items-start space-x-2 p-3 bg-blue-50 rounded-md">
           <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-800">
+          <div className="text-xs text-blue-800">
             <p className="font-medium">Why do we need your location?</p>
-            <p>
-              Location data helps us verify vehicle compliance with LGA
-              boundaries and apply correct charges.
-            </p>
+            <p>Location data helps us verify compliance with LGA.</p>
           </div>
         </div>
       </CardContent>
