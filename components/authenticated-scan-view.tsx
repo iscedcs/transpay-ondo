@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
 import { scanVehicle } from "@/actions/scan";
 import { LocationPermission } from "@/components/location-permission";
 import { ScanResults } from "@/components/scan-results";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MapPin, Shield } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface AuthenticatedScanViewProps {
@@ -59,7 +59,7 @@ export function AuthenticatedScanView({
         latitude: loc.latitude,
         longitude: loc.longitude,
       });
-      console.log({result})
+      console.log({ result });
 
       setScanState((prev) => ({
         ...prev,
@@ -78,7 +78,7 @@ export function AuthenticatedScanView({
         description: "Vehicle scanned successfully",
       });
     } catch (error) {
-      console.log({error})
+      console.log({ error });
       const errorMessage =
         error instanceof Error ? error.message : "Failed to scan vehicle";
       setScanState((prev) => ({
@@ -104,6 +104,7 @@ export function AuthenticatedScanView({
   };
 
   if (scanState.scanResult) {
+    console.log(scanState.scanResult);
     return <ScanResults scanResult={scanState.scanResult} />;
   }
 

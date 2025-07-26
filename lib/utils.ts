@@ -853,3 +853,36 @@ export function formatCurrencyFull(amount: string | number): string {
     minimumFractionDigits: 2,
   }).format(numAmount);
 }
+
+/**
+ * Checks if a string is a valid timestamp in milliseconds.
+ *
+ * @param value - The string or number to validate.
+ * @param minYear - Optional minimum year for validation (default: 2000).
+ * @param maxYear - Optional maximum year for validation (default: 2100).
+ * @returns true if valid, false otherwise.
+ */
+export function isValidMillisecondTimestamp(
+  value: string | number,
+  minYear = 2000,
+  maxYear = 2100
+): boolean {
+  // Convert to number
+  const timestamp = typeof value === "string" ? Number(value) : value;
+
+  // Must be a finite number and 13 digits long (typical millisecond timestamp)
+  if (!Number.isFinite(timestamp) || timestamp.toString().length !== 13) {
+    return false;
+  }
+
+  const date = new Date(timestamp);
+
+  // Check if it's a valid date
+  if (isNaN(date.getTime())) return false;
+
+  // Ensure the date falls within a reasonable range
+  const minTime = new Date(`${minYear}-01-01`).getTime();
+  const maxTime = new Date(`${maxYear}-12-31`).getTime();
+
+  return timestamp >= minTime && timestamp <= maxTime;
+}

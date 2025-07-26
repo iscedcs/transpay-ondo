@@ -1,16 +1,16 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import type React from "react";
-import { ArrowLeft } from "lucide-react";
-import { buttonVariants } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { getVehicleById } from "@/actions/vehicles";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { buttonVariants } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import VehicleDetailTabs from "@/components/vehicles/vehicle-detail-tabs";
 import VehicleHeader from "@/components/vehicles/vehicle-header";
 import VehicleSidebar from "@/components/vehicles/vehicle-sidebar";
-import VehicleDetailTabs from "@/components/vehicles/vehicle-detail-tabs";
+import { cn } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import type React from "react";
+import { Suspense } from "react";
 
 interface VehiclePageProps {
   params: Promise<{
@@ -34,7 +34,7 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
   // Handle error state
   if (error) {
     return (
-      <div className="container mx-auto py-8">
+      <div className="px-4">
         <div className="flex items-center gap-4 mb-6">
           <Link
             href="/vehicles"
@@ -60,7 +60,7 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="px-4 space-y-6">
       {/* Header */}
       <Suspense fallback={<HeaderSkeleton />}>
         <VehicleHeader vehicle={vehicle.data} />

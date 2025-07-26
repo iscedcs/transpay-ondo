@@ -1,14 +1,15 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
 import { getVehicleByBarcode } from "@/actions/scan";
+import { getStickerByCode } from "@/actions/stickers";
+import { auth } from "@/auth";
 import { AuthenticatedScanView } from "@/components/authenticated-scan-view";
+import CounterfeitError from "@/components/counterfeit-error";
 import { PublicVehicleView } from "@/components/public-vehicle-view";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { auth } from "@/auth";
-import { getStickerByCode } from "@/actions/stickers";
-import CounterfeitError from "@/components/counterfeit-error";
 import UnattachedSticker from "@/components/unattached-sticker";
+import { isValidMillisecondTimestamp } from "@/lib/utils";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 interface QRPageProps {
   params: Promise<{ qrid: string }>;
@@ -21,12 +22,16 @@ async function QRPage({ params }: QRPageProps) {
     notFound();
   }
 
+  if (!isValidMillisecondTimestamp(qrid)) {
+    notFound();
+  }
+
   try {
-    const sticker = await (await getStickerByCode(qrid)).data
-    if (!sticker) return <CounterfeitError qrid={qrid} />
-    if (!sticker.isUsed) return <UnattachedSticker sticker={sticker} />
+    const sticker = await (await getStickerByCode(qrid)).data;
+    if (!sticker) return <CounterfeitError qrid={qrid} />;
+    if (!sticker.isUsed) return <UnattachedSticker sticker={sticker} />;
   } catch (error) {
-    return <CounterfeitError qrid={qrid} />
+    return <CounterfeitError qrid={qrid} />;
   }
 
   try {

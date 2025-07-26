@@ -141,17 +141,17 @@ export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
       body: JSON.stringify(data),
     });
 
+    const result = await response.json();
+    console.log({ result });
+
     if (!response.ok) {
-      console.log({response})
+      console.log({ response });
       return {
         success: false,
         error: `HTTP error! status: ${response.status}`,
       };
     }
 
-    const result = await response.json();
-    console.log(result);
-    
     if (!result.success) {
       console.log(result);
       return { success: false, error: result.message };
