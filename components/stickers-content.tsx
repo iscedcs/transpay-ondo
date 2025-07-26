@@ -211,7 +211,7 @@ export function StickersContent({ searchParams }: StickersContentProps) {
   };
 
   const generateStickerUrl = (code: string) => {
-    return `${process.env.NEXT_PUBLIC_APP_URL}/${code}`;
+    return `${process.env.NEXT_PUBLIC_APP_URL}${code}`;
   };
 
   if (loading) {

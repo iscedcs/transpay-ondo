@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Send } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -219,9 +220,9 @@ export function UnblockRequestForm() {
             />
             <Label htmlFor="terms" className="text-sm">
               I agree to the{" "}
-              <a href="/terms" className="text-blue-600 hover:underline">
+              <Link href="/terms" className="text-blue-600 hover:underline">
                 terms and conditions
-              </a>{" "}
+              </Link>{" "}
               and confirm that all information provided is accurate.
             </Label>
           </div>

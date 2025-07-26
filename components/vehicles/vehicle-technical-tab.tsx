@@ -2,15 +2,9 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import {
-  Settings,
-  Navigation,
-  Eye,
-  EyeOff,
-  ExternalLink,
-  Download,
-} from "lucide-react";
+import type { Vehicle } from "@/actions/vehicles";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -18,12 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { Vehicle } from "@/actions/vehicles";
+import {
+  Download,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  Navigation,
+  Settings,
+} from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { VehicleRoutesManager } from "../vehicle-routes-manager";
+import { useState } from "react";
 import BarcodeAdder from "../layout/barcode-adder";
+import { VehicleRoutesManager } from "../vehicle-routes-manager";
 
 interface VehicleTechnicalTabProps {
   vehicle: Vehicle;
