@@ -1,11 +1,11 @@
 "use server";
 
-import { z } from "zod";
 import { auth } from "@/auth";
 import { API, URLS } from "@/lib/const";
 import { db } from "@/lib/db";
 import { $Enums, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 // Types for the User data
 
@@ -29,6 +29,7 @@ export interface User {
   lastName: string;
   email: string;
   phone: string;
+  status: "ACTIVE" | "BLOCKED";
   role: string; // Adjust roles as necessary
   blacklisted: boolean;
   address: string; // JSON string format
@@ -388,11 +389,11 @@ export const getMe = async () => {
       return { error: "Failed to fetch user data" };
     }
     const data = await res.json();
-    const user = data.data;
+    const user: User = data.data;
     if (!user) {
       return { error: "User not found" };
     }
-    return user;
+    return { user };
   } catch (error) {
     console.log("Error fetching user data:", error);
     return { error: "Something went wrong while fetching user data" };

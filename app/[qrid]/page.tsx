@@ -1,7 +1,8 @@
+// app/scan/[qrid]/page.tsx
 import { getVehicleByBarcode } from "@/actions/scan";
 import { getStickerByCode } from "@/actions/stickers";
 import { auth } from "@/auth";
-import { AuthenticatedScanView } from "@/components/authenticated-scan-view";
+import { AuthenticatedScanWrapper } from "@/components/authenticated-scan-wrapper";
 import CounterfeitError from "@/components/counterfeit-error";
 import { PublicVehicleView } from "@/components/public-vehicle-view";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,89 +12,46 @@ import { isValidMillisecondTimestamp } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-interface QRPageProps {
+export default async function QRPage({
+  params,
+}: {
   params: Promise<{ qrid: string }>;
-}
+}) {
+  const qrid = (await params).qrid;
 
-async function QRPage({ params }: QRPageProps) {
-  const { qrid } = await params;
+  if (!isValidMillisecondTimestamp(qrid)) notFound();
 
-  if (!qrid) {
-    notFound();
-  }
+  const sticker = await (await getStickerByCode(qrid)).data;
+  if (!sticker) return <CounterfeitError qrid={qrid} />;
+  if (!sticker.isUsed) return <UnattachedSticker sticker={sticker} />;
 
-  if (!isValidMillisecondTimestamp(qrid)) {
-    notFound();
-  }
+  const session = await auth();
+  const user = session?.user;
 
-  try {
-    const sticker = await (await getStickerByCode(qrid)).data;
-    if (!sticker) return <CounterfeitError qrid={qrid} />;
-    if (!sticker.isUsed) return <UnattachedSticker sticker={sticker} />;
-  } catch (error) {
-    return <CounterfeitError qrid={qrid} />;
-  }
-
-  try {
-    const session = await auth();
-    const user = session?.user;
-
-    if (user?.id) {
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-          <div className="container mx-auto px-4 py-8">
-            <AuthenticatedScanView qrId={qrid} user={user} />
-          </div>
-        </div>
-      );
-    } else {
-      const result = await getVehicleByBarcode(qrid);
-
-      if (!result.success) {
-        return (
-          <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-            <Card className="w-full max-w-md mx-4">
-              <CardContent className="p-8 text-center">
-                <div className="text-6xl mb-4">🚫</div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                  Vehicle Not Found
-                </h1>
-                <p className="text-gray-600 mb-4">
-                  The QR code you scanned doesn't match any registered vehicle.
-                </p>
-                <p className="text-sm text-gray-500">QR Code: {qrid}</p>
-              </CardContent>
-            </Card>
-          </div>
-        );
-      }
-
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-          <div className="container mx-auto px-4 py-8">
-            <PublicVehicleView vehicle={result.data} qrId={qrid} />
-          </div>
-        </div>
-      );
-    }
-  } catch (error) {
+  if (user?.id) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-red-50 to-red-100 flex items-center justify-center">
-        <Card className="w-full max-w-md mx-4">
-          <CardContent className="p-8 text-center">
-            <div className="text-6xl mb-4">⚠️</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Something Went Wrong
-            </h1>
-            <p className="text-gray-600 mb-4">
-              We couldn't load the vehicle information. Please try again.
-            </p>
-            <p className="text-sm text-gray-500">QR Code: {qrid}</p>
-          </CardContent>
-        </Card>
+      <Suspense fallback={<LoadingSkeleton />}>
+        <AuthenticatedScanWrapper qrid={qrid} user={user} />
+      </Suspense>
+    );
+  }
+
+  const result = await getVehicleByBarcode(qrid);
+  if (!result.success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-center p-8">
+        <p>No matching vehicle found for this QR code</p>
       </div>
     );
   }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8">
+        <PublicVehicleView vehicle={result.data} qrId={qrid} />
+      </div>
+    </div>
+  );
 }
 
 function LoadingSkeleton() {
@@ -118,13 +76,5 @@ function LoadingSkeleton() {
         </Card>
       </div>
     </div>
-  );
-}
-
-export default function QRPageWithSuspense({ params }: QRPageProps) {
-  return (
-    <Suspense fallback={<LoadingSkeleton />}>
-      <QRPage params={params} />
-    </Suspense>
   );
 }

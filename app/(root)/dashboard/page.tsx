@@ -12,24 +12,28 @@ export default async function DashboardPage() {
   if (!session?.user.id) {
     redirect("/sign-in");
   }
-  const user = await getMe();
+  const userRequest = await getMe();
 
-  if (user.status === "BLOCKED") {
-    redirect("/blocked");
-  }
-  if (!user) {
+  if (!userRequest.user) {
     redirect("/sign-in");
   }
 
-  if (user.role === Role.LGA_ADMIN) {
+  if (userRequest.user.status === "BLOCKED") {
+    redirect("/blocked");
+  }
+  if (!userRequest.user) {
+    redirect("/sign-in");
+  }
+
+  if (userRequest.user.role === Role.LGA_ADMIN) {
     return <LGAAdminDashboard />;
   }
 
-  if (user.role === Role.LGA_C_AGENT) {
+  if (userRequest.user.role === Role.LGA_C_AGENT) {
     return <LGACAgentDashboard />;
   }
 
-  if (user.role === Role.LGA_AGENT) {
+  if (userRequest.user.role === Role.LGA_AGENT) {
     return <LGAAgentDashboard />;
   }
 
