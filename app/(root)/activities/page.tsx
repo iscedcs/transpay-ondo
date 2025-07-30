@@ -13,7 +13,6 @@ import { getActivityStats } from "@/actions/activities";
 import { ActivitiesContent } from "@/components/activities-content";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
-import { canViewAdmin } from "@/lib/auth";
 
 export default async function ActivitiesPage({
   searchParams,
@@ -25,9 +24,9 @@ export default async function ActivitiesPage({
     redirect("/sign-in");
   }
 
-  if (!canViewAdmin(session.user.role)) {
-    redirect("/unauthorized");
-  }
+  // if (!canViewAdmin(session.user.role)) {
+  //   redirect("/unauthorized");
+  // }
 
   // if (!ADMIN_ROLES.includes(String(session?.user.role))) {
   //   redirect{'/unauthorized'}
