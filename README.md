@@ -10,7 +10,7 @@ With multi-channel payments, real‑time vehicle visibility, a user‑friendly d
 - **Cashless, integrated payment collection** for intra‑state and urban commercial transport.
 - **Real‑time vehicle monitoring** for Edo State Transport Authority to improve route management and reduce fare evasion.
 - **Analytics and dashboards** geared toward improving decision‑making and collection efficiency.
-- Designed for the **local transport ecosystem**—compatible with regional authorities, government databases, and state infrastructure.
+- Designed for the **local transport ecosystem** —compatible with regional authorities, government databases, and state infrastructure.
 
 ## Learn More
 
