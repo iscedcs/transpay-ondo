@@ -1,8 +1,8 @@
+import { getUserById } from "@/actions/users";
+import { auth } from "@/auth";
+import { UserDetailContent } from "@/components/user-detail-content";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getUserById } from "@/actions/users";
-import { UserDetailContent } from "@/components/user-detail-content";
-import { auth } from "@/auth";
 
 interface UserPageProps {
   params: Promise<{
@@ -52,12 +52,13 @@ export async function generateMetadata({
 
 export default async function UserPage({ params }: UserPageProps) {
   const session = await auth();
+  const result = await getUserById((await params).id);
+
   if (!session?.user) {
     redirect("/sign-in");
   }
-  const result = await getUserById((await params).id);
 
   if (!result) notFound();
 
-  return <UserDetailContent user={result} />;
+  return <UserDetailContent sessionUser={session?.user} user={result} />;
 }

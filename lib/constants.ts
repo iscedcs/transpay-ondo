@@ -70,7 +70,7 @@ export const assignableRoles: Record<string, string[]> = {
     "LGA_AGENT",
     "LGA_C_AGENT",
     "VEHICLE_OWNER",
-    "POS",
+    "POS_AGENT",
   ],
   ADMIN: [
     "EIRS_ADMIN",
@@ -79,7 +79,7 @@ export const assignableRoles: Record<string, string[]> = {
     "LGA_AGENT",
     "LGA_C_AGENT",
     "VEHICLE_OWNER",
-    "POS",
+    "POS_AGENT",
   ],
   EIRS_ADMIN: [
     "EIRS_AGENT",
@@ -87,12 +87,12 @@ export const assignableRoles: Record<string, string[]> = {
     "LGA_AGENT",
     "LGA_C_AGENT",
     "VEHICLE_OWNER",
-    "POS",
+    "POS_AGENT",
   ],
   LGA_ADMIN: ["LGA_AGENT", "LGA_C_AGENT", "VEHICLE_OWNER"],
   EIRS_AGENT: ["VEHICLE_OWNER"],
   LGA_AGENT: ["VEHICLE_OWNER"],
   LGA_C_AGENT: [],
   VEHICLE_OWNER: [],
-  POS: [],
+  POS_AGENT: [],
 };

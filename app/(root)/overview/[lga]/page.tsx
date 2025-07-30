@@ -1,18 +1,18 @@
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import { checkUserAccess } from "@/lib/auth";
+import { getMe } from "@/actions/users";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { AgentActivityCard } from "@/components/overview/agent-activity-card";
+import { LGAActivityTrend } from "@/components/overview/lga-activity-trend";
 import { LGAHeader } from "@/components/overview/lga-header";
 import { LGAStatsCards } from "@/components/overview/lga-stats-cards";
 import { LGAVehicleStatusChart } from "@/components/overview/lga-vehicle-status-chart";
-import { LGAActivityTrend } from "@/components/overview/lga-activity-trend";
 import { RecentVehicleTable } from "@/components/overview/recent-vehicle-table";
-import { AgentActivityCard } from "@/components/overview/agent-activity-card";
-import { getLGAOverviewData } from "@/lib/overview-data";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getMe } from "@/actions/users";
+import { checkUserAccess } from "@/lib/auth";
+import { getLGAOverviewData } from "@/lib/overview-data";
 import { Role } from "@prisma/client";
+import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 // Loading components
 function LGAStatsLoading() {
@@ -44,7 +44,7 @@ function ChartLoading() {
 }
 
 async function LGAOverviewContent({ lgaId }: { lgaId: string }) {
-  const user = await getMe();
+  const user: any = (await getMe()).user;
 
   // Check access permissions
   const allowedRoles = [Role.SUPERADMIN, Role.ADMIN, Role.LGA_ADMIN];
@@ -83,7 +83,7 @@ export default async function LGAOverviewPage({
     lga: string;
   }>;
 }) {
-  const user = await getMe();
+  const user: any = (await getMe()).user;
   const lgaId = (await params).lga;
 
   // Convert kebab-case to title case for display

@@ -2,23 +2,9 @@
 
 import type React from "react";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  ArrowLeft,
-  Edit,
-  Trash2,
-  Shield,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  User,
-  FileText,
-  Users,
-  Eye,
-  EyeOff,
-} from "lucide-react";
+import type { User as UserType } from "@/actions/users";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -27,11 +13,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { User as UserType } from "@/actions/users";
+import { ADMIN_ROLES, READONLY_ADMIN_ROLES } from "@/lib/const";
 import {
   cn,
   formatAddress,
@@ -39,22 +23,37 @@ import {
   formatRoleName,
   parseAddress,
 } from "@/lib/utils";
+import {
+  ArrowLeft,
+  Calendar,
+  Edit,
+  Eye,
+  EyeOff,
+  FileText,
+  Mail,
+  MapPin,
+  Phone,
+  Shield,
+  Trash2,
+  User,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { ADMIN_ROLES, READONLY_ADMIN_ROLES } from "@/lib/const";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 interface UserDetailContentProps {
   user: UserType;
+  sessionUser: any;
 }
 
-export function UserDetailContent({ user }: UserDetailContentProps) {
-  const session = useSession();
+export function UserDetailContent({
+  user,
+  sessionUser,
+}: UserDetailContentProps) {
   const router = useRouter();
-  if (!session.data?.user) {
-    router.push("/sign-in");
-  }
 
-  if (!READONLY_ADMIN_ROLES.includes(String(session.data?.user.role))) {
+  if (!READONLY_ADMIN_ROLES.includes(String(sessionUser.role))) {
     router.push("/unauthorized");
   }
   const [showSensitiveInfo, setShowSensitiveInfo] = useState(false);
@@ -108,7 +107,7 @@ export function UserDetailContent({ user }: UserDetailContentProps) {
             <p className="text-muted-foreground">User Profile & Information</p>
           </div>
         </div>
-        {ADMIN_ROLES.includes(String(session.data?.user.role)) && (
+        {ADMIN_ROLES.includes(String(sessionUser.role)) && (
           <div className="flex gap-2">
             <Link
               href={`/users/${user.id}/edit`}

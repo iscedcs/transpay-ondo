@@ -1,22 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import {
-  CreditCard,
-  ArrowDownUp,
-  Search,
-  Calendar,
-  Filter,
-  Download,
-  ChevronDown,
-  ArrowUpDown,
-  Check,
-  X,
-  AlertCircle,
-  Clock,
-  ArrowUp,
-  ArrowDown,
-} from "lucide-react";
+import type { Vehicle } from "@/actions/vehicles";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -24,20 +10,34 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import type { Vehicle } from "@/actions/vehicles";
 import { formatCurrency } from "@/lib/utils";
+import {
+  AlertCircle,
+  ArrowDown,
+  ArrowDownUp,
+  ArrowUp,
+  ArrowUpDown,
+  Calendar,
+  Check,
+  ChevronDown,
+  Clock,
+  CreditCard,
+  Download,
+  Filter,
+  Search,
+  X,
+} from "lucide-react";
+import { useMemo, useState } from "react";
 
 interface VehicleTransactionsTabProps {
   vehicle: Vehicle;
@@ -186,7 +186,6 @@ export default function VehicleTransactionsTab({
     paymentTypeFilter,
   ]);
 
-  // console.log({ filteredTransactions });
   // Calculate transaction statistics
   const stats = useMemo(() => {
     if (!vehicle.transactions) {

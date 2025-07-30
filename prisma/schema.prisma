@@ -205,9 +205,11 @@ model User {
   createdBy                                          String?
   lgaId                                              String?
   status                                             UserStatus           @default(ACTIVE)
+  image                                              String?
   ApiKey                                             ApiKey[]
   AuditTrail                                         AuditTrail[]
   PasswordReset                                      PasswordReset?
+  PaymentOrder                                       PaymentOrder[]
   Scan                                               Scan[]
   LGA                                                LGA?                 @relation(fields: [lgaId], references: [id])
   UserUnblockRequest                                 UserUnblockRequest[]
@@ -512,6 +514,8 @@ model Webhook {
   createdAt            DateTime            @default(now())
   updatedAt            DateTime
   deletedAt            DateTime?
+  orderId              String?
+  PaymentOrder         PaymentOrder?       @relation(fields: [orderId], references: [id])
   VehicleTransaction   VehicleTransaction? @relation(fields: [transactionId], references: [id])
 
   @@index([event, createdAt(sort: Desc)])
@@ -528,6 +532,37 @@ model BarCodes {
   Vehicle   Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
   @@index([code])
+}
+
+model PaymentOrder {
+  id                   String    @id
+  transactionReference String    @unique
+  transactionIds       String[]
+  userId               String?
+  accountName          String
+  accountNumber        String
+  bankCode             String
+  bankName             String
+  accountReference     String?
+  createdDate          String
+  currency             String?
+  customerName         String?
+  paymentReference     String?
+  amount               Float
+  acceptExactPayment   Boolean?  @default(true)
+  period               String?
+  duration             Int?
+  paymentStatus        String    @default("PENDING")
+  amountPaid           Float?
+  channel              String?
+  paymentStartDate     String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime
+  User                 User?     @relation(fields: [userId], references: [id])
+  Webhook              Webhook[]
+
+  @@index([createdDate])
+  @@index([transactionReference])
 }
 
 enum DriverStatus {
@@ -549,9 +584,9 @@ enum Role {
   EIRS_AGENT
   LGA_ADMIN
   LGA_AGENT
+  POS_AGENT
   LGA_C_AGENT
   VEHICLE_OWNER
-  POS
 }
 
 enum StickerRequestStatus {
@@ -574,6 +609,7 @@ enum TransactionCategories {
 enum TransactionTypes {
   BASE_FEE
   LGA_FEE
+  FUNDING
 }
 
 enum VehicleFineStatus {
@@ -601,6 +637,7 @@ enum TransactionStatus {
   OWING
   SUCCESS
   FAILED
+  PENDING
 }
 
 enum UserStatus {

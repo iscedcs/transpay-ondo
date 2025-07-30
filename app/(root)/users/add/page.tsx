@@ -100,6 +100,37 @@ export default function AddUserPage() {
     null
   );
   const [activeTab, setActiveTab] = useState("basic");
+  const tabFields = {
+    basic: [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "role",
+      "identification",
+      "identificationNumber",
+      "password",
+      "confirmPassword",
+      "gender",
+    ],
+    address: ["address.text", "address.city", "address.state", "lgaId"],
+  };
+
+  const handleNext = async (
+    event: React.MouseEvent<HTMLButtonElement>,
+    currentTab: keyof typeof tabFields,
+    nextTab: string
+  ) => {
+    event.preventDefault(); // Prevent form submit or navigation
+
+    // @ts-expect-error: ignore this error, it always happens
+    const valid = await form.trigger(tabFields[currentTab]);
+    if (valid) {
+      setActiveTab(nextTab);
+    } else {
+      toast.error("Please complete all required fields before proceeding.");
+    }
+  };
 
   // Initialize form with default values
   const form = useForm<UserFormValues>({
@@ -139,7 +170,7 @@ export default function AddUserPage() {
     Role.EIRS_ADMIN,
     Role.EIRS_AGENT,
     Role.LGA_ADMIN,
-    Role.POS,
+    Role.POS_AGENT,
   ];
 
   // Fetch LGAs on component mount
@@ -196,7 +227,7 @@ export default function AddUserPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="px-4 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -295,7 +326,7 @@ export default function AddUserPage() {
                       {...form.register("firstName")}
                     />
                     {form.formState.errors.firstName && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.firstName.message}
                       </p>
                     )}
@@ -309,7 +340,7 @@ export default function AddUserPage() {
                       {...form.register("lastName")}
                     />
                     {form.formState.errors.lastName && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.lastName.message}
                       </p>
                     )}
@@ -324,7 +355,7 @@ export default function AddUserPage() {
                       {...form.register("email")}
                     />
                     {form.formState.errors.email && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.email.message}
                       </p>
                     )}
@@ -338,7 +369,7 @@ export default function AddUserPage() {
                       {...form.register("phone")}
                     />
                     {form.formState.errors.phone && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.phone.message}
                       </p>
                     )}
@@ -430,7 +461,7 @@ export default function AddUserPage() {
                       defaultValue={nin}
                     />
                     {form.formState.errors.identificationNumber && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.identificationNumber.message}
                       </p>
                     )}
@@ -465,7 +496,7 @@ export default function AddUserPage() {
                       </Button>
                     </div>
                     {form.formState.errors.password && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.password.message}
                       </p>
                     )}
@@ -497,7 +528,7 @@ export default function AddUserPage() {
                       </Button>
                     </div>
                     {form.formState.errors.confirmPassword && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.confirmPassword.message}
                       </p>
                     )}
@@ -508,7 +539,10 @@ export default function AddUserPage() {
                 <Button variant="outline" onClick={() => router.back()}>
                   Cancel
                 </Button>
-                <Button type="button" onClick={() => setActiveTab("address")}>
+                <Button
+                  type="button"
+                  onClick={(e) => handleNext(e, "basic", "address")}
+                >
                   Next: Address & LGA
                 </Button>
               </CardFooter>
@@ -535,7 +569,7 @@ export default function AddUserPage() {
                       {...form.register("address.text")}
                     />
                     {form.formState.errors.address?.text && (
-                      <p className="text-sm text-text">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.address.text.message}
                       </p>
                     )}
@@ -558,7 +592,7 @@ export default function AddUserPage() {
                       {...form.register("address.city")}
                     />
                     {form.formState.errors.address?.city && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.address.city.message}
                       </p>
                     )}
@@ -572,7 +606,7 @@ export default function AddUserPage() {
                       {...form.register("address.state")}
                     />
                     {form.formState.errors.address?.state && (
-                      <p className="text-sm text-destructive">
+                      <p className="text-sm text-destructive-foreground">
                         {form.formState.errors.address.state.message}
                       </p>
                     )}
@@ -646,7 +680,7 @@ export default function AddUserPage() {
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => setActiveTab("additional")}
+                  onClick={(e) => handleNext(e, "address", "additional")}
                 >
                   Next: Additional Details
                 </Button>

@@ -3,9 +3,9 @@
 import { auth } from "@/auth";
 import { RBAC } from "@/lib/auth";
 import { API, URLS } from "@/lib/const";
-import { User, getMe } from "./users";
 import { db } from "@/lib/db";
 import { Role } from "@prisma/client";
+import { getMe } from "./users";
 
 export const getComplianceRate = async () => {
   const session = await auth();
@@ -422,7 +422,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     throw new Error("Unauthorized");
   }
 
-  const user: User = await getMe();
+  const user = (await getMe()).user;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
   const isComplianceAgent = RBAC.isComplianceAgent(user.role as any);
   const isLGARole = RBAC.isLGARole(user.role as any);
 
@@ -572,7 +575,10 @@ export async function getLGAAgentDashboardStats(): Promise<DashboardStats> {
     throw new Error("Unauthorized");
   }
 
-  const user: User = await getMe();
+  const user = (await getMe()).user;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
 
   // Ensure user is LGA_AGENT and has an assigned LGA
   if (user.role !== "LGA_AGENT" || !user.lgaId) {
@@ -676,7 +682,10 @@ export async function getLGAAgentRecentScans(limit = 10) {
     throw new Error("Unauthorized");
   }
 
-  const user: User = await getMe();
+  const user = (await getMe()).user;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
 
   if (user.role !== "LGA_AGENT" || !user.lgaId) {
     throw new Error("Access denied: LGA Agent role required with assigned LGA");
@@ -730,7 +739,10 @@ export async function getLGAAdminDashboardStats(): Promise<
     throw new Error("Unauthorized");
   }
 
-  const user = await getMe();
+  const user = (await getMe()).user;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
 
   // Ensure user is LGA_ADMIN and has an assigned LGA
   if (user.role !== "LGA_ADMIN" || !user.lgaId) {
@@ -904,7 +916,10 @@ export async function getLGAAdminAgentPerformance() {
     throw new Error("Unauthorized");
   }
 
-  const user = await getMe();
+  const user = (await getMe()).user;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
 
   if (user.role !== "LGA_ADMIN" || !user.lgaId) {
     throw new Error("Access denied: LGA Admin role required with assigned LGA");
@@ -992,7 +1007,10 @@ export async function getLGAAdminActivities(limit = 20) {
     throw new Error("Unauthorized");
   }
 
-  const user = await getMe();
+  const user = (await getMe()).user;
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
 
   if (user.role !== "LGA_ADMIN" || !user.lgaId) {
     throw new Error("Access denied: LGA Admin role required with assigned LGA");

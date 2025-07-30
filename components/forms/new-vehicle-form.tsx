@@ -1,5 +1,6 @@
 "use client";
 
+import CONFIG from "@/config";
 import {
   BUS_IMAGE_SAMPLE,
   FNTC,
@@ -33,7 +34,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Separator } from "../ui/separator";
-import CONFIG from "@/config";
 import {
   Tooltip,
   TooltipContent,
@@ -221,7 +221,6 @@ export default function CreateVehicleForm() {
         body: JSON.stringify(vehicleData),
       });
       const result = await createVehicleResponse.json();
-      console.log({ result });
 
       if (createVehicleResponse.ok) {
         toast.success("Vehicle Created successfully", {

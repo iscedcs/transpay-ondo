@@ -141,20 +141,12 @@ export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
       body: JSON.stringify(data),
     });
 
-    if (!response.ok) {
-      console.log({response})
+    const result = await response.json();
+    if (result.error) {
       return {
         success: false,
-        error: `HTTP error! status: ${response.status}`,
+        error: `${result.message}`,
       };
-    }
-
-    const result = await response.json();
-    console.log(result);
-    
-    if (!result.success) {
-      console.log(result);
-      return { success: false, error: result.message };
     }
 
     // Revalidate relevant paths
@@ -163,8 +155,15 @@ export async function scanVehicle(data: ScanRequest): Promise<ScanResponse> {
 
     return { success: true, data: result };
   } catch (error) {
-    console.log("Error scanning vehicle:", error);
-    throw new Error("Failed to scan vehicle");
+    // if (
+    //   result.message &&
+    //   result.messasge.includes("Agent is blocked or not found")
+    // ) {
+    return {
+      success: false,
+      error: "Agent is blocked or not found",
+    };
+    // }
   }
 }
 

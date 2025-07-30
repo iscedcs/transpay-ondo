@@ -1,5 +1,5 @@
-import { Suspense } from "react";
-import { notFound, redirect } from "next/navigation";
+import { getLGAById } from "@/actions/lga";
+import { auth } from "@/auth";
 import { LGAEditForm } from "@/components/lga-edit-form";
 import {
   Card,
@@ -9,9 +9,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getLGAById } from "@/actions/lga";
 import { ADMIN_ROLES } from "@/lib/const";
-import { auth } from "@/auth";
+import { notFound, redirect } from "next/navigation";
+import { Suspense } from "react";
 
 interface LGAEditPageProps {
   params: Promise<{ id: string }>;
@@ -22,7 +22,7 @@ async function LGAEditContent({ id }: { id: string }) {
     const lga = await getLGAById(id);
 
     return (
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="px-4 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Edit LGA</h1>
@@ -53,7 +53,7 @@ async function LGAEditContent({ id }: { id: string }) {
 
 function LGAEditSkeleton() {
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="px-4 space-y-6">
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />

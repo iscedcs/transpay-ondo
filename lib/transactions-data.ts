@@ -1,10 +1,10 @@
+import { getMe } from "@/actions/users";
 import type {
+  AuditLogEntry,
   Transaction,
   TransactionFilters,
   TransactionStats,
-  AuditLogEntry,
 } from "@/types/transactions";
-import { getMe } from "@/actions/users";
 
 // Mock transaction data
 const mockTransactions: Transaction[] = [
@@ -129,7 +129,7 @@ export async function getTransactions(
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 500));
 
-  const user = await getMe();
+  const user: any = (await getMe()).user;
   let filteredTransactions = [...mockTransactions];
 
   // Apply role-based filtering
@@ -252,7 +252,7 @@ export async function getTransactionById(
   // Simulate API delay
   await new Promise((resolve) => setTimeout(resolve, 300));
 
-  const user = await getMe();
+  const user: any = (await getMe()).user;
   const transaction = mockTransactions.find((t) => t.id === id);
 
   if (!transaction) return null;

@@ -22,6 +22,7 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
       const expiresAt = new Date(
         Number(session?.user.expires) * 1000
       ).getTime();
+
       const now = Date.now();
       if (now > expiresAt) {
         toast.error("Session expired, please sign in again.");

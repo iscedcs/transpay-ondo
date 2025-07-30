@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { AssignRouteModal } from "@/components/routes/assign-route-modal";
+import { DeleteConfirmationModal } from "@/components/routes/delete-confirmation-modal";
+import { LGARouteSummaryCard } from "@/components/routes/lga-route-summary-card";
 import { PageHeader } from "@/components/routes/page-header";
 import { VehicleRouteTable } from "@/components/routes/vehicle-route-table";
-import { AssignRouteModal } from "@/components/routes/assign-route-modal";
 import { VehicleRouteViewDrawer } from "@/components/routes/vehicle-route-view-drawer";
-import { LGARouteSummaryCard } from "@/components/routes/lga-route-summary-card";
-import { DeleteConfirmationModal } from "@/components/routes/delete-confirmation-modal";
+import { STATE_CONFIG } from "@/lib/constants";
 import {
-  getVehicleRoutes,
   createVehicleRoute,
   deleteVehicleRoute,
   getRoutesForLGA,
+  getVehicleRoutes,
 } from "@/lib/routes-data";
-import { STATE_CONFIG } from "@/lib/constants";
 import type {
-  VehicleRoute,
-  RouteFilters,
   CreateRouteData,
+  RouteFilters,
+  VehicleRoute,
 } from "@/types/routes";
+import { useEffect, useState } from "react";
 
+import { getMe } from "@/actions/users";
 import { Role, User } from "@prisma/client";
 import { toast } from "sonner";
-import { getMe } from "@/actions/users";
 
 export default function RoutesPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -38,7 +38,7 @@ export default function RoutesPage() {
   useEffect(() => {
     const initializePage = async () => {
       try {
-        const user = await getMe();
+        const user: any = (await getMe()).user;
 
         // Check access permissions
         if (

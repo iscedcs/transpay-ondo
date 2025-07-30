@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
-import { Search, Eye, Edit, Trash2, Users } from "lucide-react";
+import { User } from "@/actions/users";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -11,7 +11,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -20,22 +28,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn, formatRoleName, parseAddress } from "@/lib/utils";
-import Link from "next/link";
-import { USER_ROLES } from "@/lib/constants";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useEffect } from "react";
-import { User } from "@/actions/users";
+import { USER_ROLES } from "@/lib/constants";
+import { cn, formatRoleName, parseAddress } from "@/lib/utils";
+import { Edit, Eye, Search, Trash2, Users } from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState, useTransition } from "react";
 
 interface UsersContentProps {
   initialUsers: User[];
@@ -411,7 +410,7 @@ export function UsersContent({
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-destructive hover:text-destructive"
+                              className="text-destructive-foreground hover:text-destructive-foreground"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

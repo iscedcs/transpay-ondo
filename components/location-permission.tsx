@@ -1,93 +1,110 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { MapPin, Loader2, AlertCircle } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, Loader2, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface LocationPermissionProps {
-  onLocationReceived: (location: { latitude: number; longitude: number }) => void
-  onError: (error: string) => void
+  onLocationReceived: (location: {
+    latitude: number;
+    longitude: number;
+  }) => void;
+  onError: (error: string) => void;
 }
 
-export function LocationPermission({ onLocationReceived, onError }: LocationPermissionProps) {
-  const [isGettingLocation, setIsGettingLocation] = useState(false)
-  const [showManualInput, setShowManualInput] = useState(false)
-  const [manualLocation, setManualLocation] = useState({
-    latitude: "",
-    longitude: "",
-  })
+export function LocationPermission({
+  onLocationReceived,
+  onError,
+}: LocationPermissionProps) {
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [showManualInput, setShowManualInput] = useState(false);
+  // const [manualLocation, setManualLocation] = useState({
+  //   latitude: "",
+  //   longitude: "",
+  // })
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      onError("Geolocation is not supported by this browser")
-      setShowManualInput(true)
-      return
+      onError("Geolocation is not supported by this browser");
+      return;
     }
 
-    setIsGettingLocation(true)
+    setIsGettingLocation(true);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const { latitude, longitude } = position.coords
-        onLocationReceived({ latitude, longitude })
-        setIsGettingLocation(false)
+        const { latitude, longitude, accuracy } = position.coords;
+
+        // Check for precision: accuracy should be <= 50 meters
+        if (accuracy > 50) {
+          // onError(
+          //   `Location is not precise enough (accuracy: ${Math.round(
+          //     accuracy
+          //   )}m). Please try again with GPS enabled.`
+          // );
+          onError(`Please try again with GPS enabled.`);
+          setIsGettingLocation(false);
+          return;
+        }
+
+        onLocationReceived({ latitude, longitude });
+        setIsGettingLocation(false);
       },
       (error) => {
-        let errorMessage = "Failed to get location"
+        let errorMessage = "Failed to get location";
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied. Please enable location permissions."
-            break
+            errorMessage =
+              "Location access denied. Please enable location permissions.";
+            break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable."
-            break
+            errorMessage = "Location information unavailable.";
+            break;
           case error.TIMEOUT:
-            errorMessage = "Location request timed out."
-            break
+            errorMessage = "Location request timed out.";
+            break;
         }
 
-        onError(errorMessage)
-        setIsGettingLocation(false)
-        setShowManualInput(true)
+        onError(errorMessage);
+        setIsGettingLocation(false);
+        setShowManualInput(true);
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
-        maximumAge: 60000,
-      },
-    )
-  }
+        maximumAge: 0, // Force a fresh read
+      }
+    );
+  };
 
-  const handleManualSubmit = () => {
-    const lat = Number.parseFloat(manualLocation.latitude)
-    const lng = Number.parseFloat(manualLocation.longitude)
+  // const handleManualSubmit = () => {
+  //   const lat = Number.parseFloat(manualLocation.latitude)
+  //   const lng = Number.parseFloat(manualLocation.longitude)
 
-    if (isNaN(lat) || isNaN(lng)) {
-      onError("Please enter valid latitude and longitude values")
-      return
-    }
+  //   if (isNaN(lat) || isNaN(lng)) {
+  //     onError("Please enter valid latitude and longitude values")
+  //     return
+  //   }
 
-    if (lat < -90 || lat > 90) {
-      onError("Latitude must be between -90 and 90")
-      return
-    }
+  //   if (lat < -90 || lat > 90) {
+  //     onError("Latitude must be between -90 and 90")
+  //     return
+  //   }
 
-    if (lng < -180 || lng > 180) {
-      onError("Longitude must be between -180 and 180")
-      return
-    }
+  //   if (lng < -180 || lng > 180) {
+  //     onError("Longitude must be between -180 and 180")
+  //     return
+  //   }
 
-    onLocationReceived({ latitude: lat, longitude: lng })
-  }
+  //   onLocationReceived({ latitude: lat, longitude: lng })
+  // }
 
   // Auto-request location on mount
   useEffect(() => {
-    getCurrentLocation()
-  }, [])
+    getCurrentLocation();
+  }, []);
 
   return (
     <Card>
@@ -98,12 +115,12 @@ export function LocationPermission({ onLocationReceived, onError }: LocationPerm
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-gray-600">
-          We need your current location to verify vehicle compliance and apply appropriate charges.
-        </p>
-
         <div className="space-y-3">
-          <Button onClick={getCurrentLocation} disabled={isGettingLocation} className="w-full">
+          <Button
+            onClick={getCurrentLocation}
+            disabled={isGettingLocation}
+            className="w-full"
+          >
             {isGettingLocation ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -118,13 +135,17 @@ export function LocationPermission({ onLocationReceived, onError }: LocationPerm
           </Button>
 
           <div className="text-center">
-            <Button variant="ghost" size="sm" onClick={() => setShowManualInput(!showManualInput)}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowManualInput(!showManualInput)}
+            >
               Enter Location Manually
             </Button>
           </div>
         </div>
 
-        {showManualInput && (
+        {/* {showManualInput && (
           <div className="space-y-3 pt-4 border-t">
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -164,16 +185,16 @@ export function LocationPermission({ onLocationReceived, onError }: LocationPerm
               Use Manual Location
             </Button>
           </div>
-        )}
+        )} */}
 
         <div className="flex items-start space-x-2 p-3 bg-blue-50 rounded-md">
           <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-800">
+          <div className="text-xs text-blue-800">
             <p className="font-medium">Why do we need your location?</p>
-            <p>Location data helps us verify vehicle compliance with LGA boundaries and apply correct charges.</p>
+            <p>Location data helps us verify compliance with LGA.</p>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

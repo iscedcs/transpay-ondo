@@ -1,5 +1,8 @@
+import { VehicleFee } from "@/actions/lga";
+import { Address } from "@/actions/users";
+import { Vehicle } from "@/actions/vehicles";
+import { PaymentNotification } from "@prisma/client";
 import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 import {
   addDays,
   addHours,
@@ -19,11 +22,8 @@ import {
   subDays,
   subYears,
 } from "date-fns";
-import { PaymentNotification } from "@prisma/client";
+import { twMerge } from "tailwind-merge";
 import { VehicleValues } from "./const";
-import { Address } from "@/actions/users";
-import { VehicleFee } from "@/actions/lga";
-import { Vehicle } from "@/actions/vehicles";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -676,8 +676,6 @@ export function getNextPaymentDate(
   // Get the fee amount for the vehicle category
   const dailyFee = VehicleValues[vehicleCategory];
 
-  // console.log({ cvofBalance, cvofOwing, vehicleCategory, dailyFee });
-
   if (cvofOwing > 0) {
     // Vehicle is owing, calculate how many days in the past
     const daysOwing = Math.floor(cvofOwing / dailyFee);
@@ -854,4 +852,37 @@ export function formatCurrencyFull(amount: string | number): string {
     currency: "NGN",
     minimumFractionDigits: 2,
   }).format(numAmount);
+}
+
+/**
+ * Checks if a string is a valid timestamp in milliseconds.
+ *
+ * @param value - The string or number to validate.
+ * @param minYear - Optional minimum year for validation (default: 2000).
+ * @param maxYear - Optional maximum year for validation (default: 2100).
+ * @returns true if valid, false otherwise.
+ */
+export function isValidMillisecondTimestamp(
+  value: string | number,
+  minYear = 2000,
+  maxYear = 2100
+): boolean {
+  // Convert to number
+  const timestamp = typeof value === "string" ? Number(value) : value;
+
+  // Must be a finite number and 13 digits long (typical millisecond timestamp)
+  if (!Number.isFinite(timestamp) || timestamp.toString().length !== 13) {
+    return false;
+  }
+
+  const date = new Date(timestamp);
+
+  // Check if it's a valid date
+  if (isNaN(date.getTime())) return false;
+
+  // Ensure the date falls within a reasonable range
+  const minTime = new Date(`${minYear}-01-01`).getTime();
+  const maxTime = new Date(`${maxYear}-12-31`).getTime();
+
+  return timestamp >= minTime && timestamp <= maxTime;
 }

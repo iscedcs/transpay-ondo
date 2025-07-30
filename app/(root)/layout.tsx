@@ -1,5 +1,5 @@
-
-import { auth, signOut } from "@/auth";
+import { getMe } from "@/actions/users";
+import ProtectedRoute from "@/components/auth/protected-wrapper";
 import Navbar from "@/components/layout/navbar";
 import Sidebar from "@/components/layout/sidebar";
 import type { Metadata } from "next";
@@ -11,25 +11,26 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardLayout({
-     children,
+  children,
 }: {
-     children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-     const session = (await auth()) ?? null;
-     // if (!session || session?.user.id){
-     //      redirect('/sign-in')
-     //      // await signOut()
-     // }
+  const user = await getMe();
 
-     return (
-          <div className="">
-               <Navbar />
-               <div className="">
-                    <Sidebar />
-                    <div className={`${session ? "md:ml-52" : ""} pt-20`}>
-                         {children}
-                    </div>
-               </div>
+  if (user.user?.status === "BLOCKED") {
+    redirect("/blocked");
+  }
+  return (
+    <ProtectedRoute>
+      <div className="">
+        <Navbar />
+        <div className="">
+          <Sidebar />
+          <div className={`${user.user ? "md:ml-52" : ""} pt-20`}>
+            {children}
           </div>
-     );
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
 }

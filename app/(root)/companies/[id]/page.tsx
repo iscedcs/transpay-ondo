@@ -25,16 +25,12 @@ import { AlertOctagon, Car, FileText, MapPin } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-
 interface PageProps {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ [key: string]: string | undefined }>;
-};
+}
 
-export async function generateMetadata({
-   params }:
-  PageProps
-) {
+export async function generateMetadata({ params }: PageProps) {
   const id = (await params).id;
   const company = await getCompanyById(id);
   if (!company) return notFound();
@@ -43,8 +39,6 @@ export async function generateMetadata({
     title: `Transpay - ${company.name} Group`,
   };
 }
-
-
 
 export default async function IndividualGoupPage({
   params,
@@ -64,8 +58,6 @@ export default async function IndividualGoupPage({
   const vehicles = await getVehiclesFromCompanies(id, page, limit);
 
   const directors = company.directors;
-  // console.log({ directors });
-  // console.log({ company });
   if (!company) return notFound();
   return (
     <RoleGateServer opts={{ allowedRole: HAS_COMPANY_ACCESS }}>

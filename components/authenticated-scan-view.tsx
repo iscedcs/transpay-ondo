@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { scanVehicle } from "@/actions/scan";
 import { LocationPermission } from "@/components/location-permission";
 import { ScanResults } from "@/components/scan-results";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MapPin, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface AuthenticatedScanViewProps {
@@ -27,7 +28,7 @@ interface ScanState {
   error: string | null;
 }
 
-export function AuthenticatedScanView({
+export default function AuthenticatedScanView({
   qrId,
   user,
 }: AuthenticatedScanViewProps) {
@@ -38,10 +39,12 @@ export function AuthenticatedScanView({
     scanResult: null,
     error: null,
   });
+  const router = useRouter();
 
   const handleLocationReceived = (loc: Location) => {
     setLocation(loc);
     setScanState((prev) => ({ ...prev, hasLocation: true, error: null }));
+    // console.log({ loc });
     // Automatically perform scan once location is acquired
     performScanWithLocation(loc);
   };
@@ -59,8 +62,8 @@ export function AuthenticatedScanView({
         latitude: loc.latitude,
         longitude: loc.longitude,
       });
-      console.log({result})
 
+      // if (result.message)
       setScanState((prev) => ({
         ...prev,
         isScanning: false,
@@ -68,9 +71,13 @@ export function AuthenticatedScanView({
       }));
 
       if (!result.success) {
-        toast.error("Scan Failed", {
-          description: result.error,
-        });
+        if (result.error.includes("blocked")) {
+          toast.error(result.error);
+        } else {
+          toast.error("Scan Failed", {
+            description: result.error,
+          });
+        }
         return;
       }
 
@@ -78,7 +85,7 @@ export function AuthenticatedScanView({
         description: "Vehicle scanned successfully",
       });
     } catch (error) {
-      console.log({error})
+      console.log({ error });
       const errorMessage =
         error instanceof Error ? error.message : "Failed to scan vehicle";
       setScanState((prev) => ({
@@ -104,7 +111,13 @@ export function AuthenticatedScanView({
   };
 
   if (scanState.scanResult) {
-    return <ScanResults scanResult={scanState.scanResult} />;
+    if (!scanState.scanResult.success) {
+      if (scanState.scanResult.error.includes("blocked")) {
+        router.push("/blocked");
+      }
+    } else {
+      return <ScanResults scanResult={scanState.scanResult} />;
+    }
   }
 
   return (

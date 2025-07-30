@@ -1,7 +1,7 @@
+import { decodeJwt } from "jose";
+import { NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { API, URLS } from "./lib/const";
-import { NextAuthConfig } from "next-auth";
-import { decodeJwt } from "jose";
 
 const headers = {
   "api-secret": process.env.API_SECRET || "",
@@ -23,7 +23,6 @@ export default {
           password: credentials?.password,
         };
         const mainUrl = API + apiRoute;
-
         try {
           const res = await fetch(mainUrl, {
             method: "POST",

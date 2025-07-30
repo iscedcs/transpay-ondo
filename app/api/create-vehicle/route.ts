@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
     Authorization: `Bearer ${access_token}`,
   };
   const payload = body;
-  console.log({ payload });
   const url = API + URLS.vehicle.all;
   const response = await fetch(url, {
     method: "POST",
@@ -21,7 +20,6 @@ export async function POST(req: NextRequest) {
   });
   // console.log({response,body, payload})
   const result = await response.json();
-  console.log({ result });
 
   try {
     if (!response.ok) {
@@ -77,7 +75,6 @@ export async function PUT(req: NextRequest) {
     body: JSON.stringify(payload),
   });
   const result = await response.json();
-  console.log({ url, result });
   console.log("PUT API Response:", { url, result, body, payload });
   try {
     if (!response.ok) {

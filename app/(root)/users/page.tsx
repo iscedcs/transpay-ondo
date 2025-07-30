@@ -1,5 +1,5 @@
-import { Suspense } from "react";
-import { Plus, Download } from "lucide-react";
+import { getUsers } from "@/actions/users";
+import { auth } from "@/auth";
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Card,
@@ -8,15 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { getUsers } from "@/actions/users";
+import { Skeleton } from "@/components/ui/skeleton";
 import { UsersContent } from "@/components/users-content";
 import { UsersStats } from "@/components/users-stats";
-import { Skeleton } from "@/components/ui/skeleton";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 import { ADMIN_ROLES, READONLY_ADMIN_ROLES } from "@/lib/const";
+import { cn } from "@/lib/utils";
+import { Download, Plus } from "lucide-react";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 interface UsersPageProps {
   searchParams: Promise<{

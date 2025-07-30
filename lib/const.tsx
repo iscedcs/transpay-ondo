@@ -1,4 +1,5 @@
 import CarouselSlides from "@/components/layout/carouselSlides";
+import { Role } from "@prisma/client";
 import {
   ActivitySquareIcon,
   CarTaxiFront,
@@ -23,7 +24,6 @@ import {
   searchIcon,
   securityIcon,
 } from "./icons";
-import { Role } from "@prisma/client";
 
 export const SIDEBAR_LINKS = [
   {
@@ -2530,11 +2530,7 @@ export const months = [
   "november",
   "december",
 ];
-export const HAS_COMPANY_ACCESS = [
-  Role.SUPERADMIN,
-  // Role.COMPANY_AGENT,
-  Role.ADMIN,
-];
+export const HAS_COMPANY_ACCESS = [Role.SUPERADMIN, Role.ADMIN];
 
 export const PIN_ONE = ["150519", "785675"];
 export const PIN_TWO = ["1505", "7856"];

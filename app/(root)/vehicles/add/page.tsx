@@ -1,18 +1,10 @@
-"use client"
+"use client";
 
-import { FormDescription } from "@/components/ui/form"
+import { FormDescription } from "@/components/ui/form";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { getLGAs } from "@/actions/lga";
+import { createVehicleWithOwner } from "@/actions/vehicles";
+import AvatarUploader from "@/components/shared/avatar-uploader";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,21 +15,53 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { ImageIcon } from "@radix-ui/react-icons"
-import Image from "next/image"
-import { getLGAs } from "@/actions/lga"
-import { CreateVehicleRequest, genderOptions, nextOfKinSchema, ownerFormSchema, vehicleFormSchema } from "../vehicle-form-validation"
-import { maritalStatusOptions } from "../../users/user-edit-form-validation"
-import { createVehicleWithOwner } from "@/actions/vehicles"
-import { VEHICLE_CATEGORIES } from "@/lib/const"
-import AvatarUploader from "@/components/shared/avatar-uploader"
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { VEHICLE_CATEGORIES } from "@/lib/const";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { maritalStatusOptions } from "../../users/user-edit-form-validation";
+import {
+  CreateVehicleRequest,
+  genderOptions,
+  nextOfKinSchema,
+  ownerFormSchema,
+  vehicleFormSchema,
+} from "../vehicle-form-validation";
 
 const AddVehiclePage = () => {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState("owner")
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("owner");
   const [lgas, setLgas] = useState<{ id: string; name: string }[]>([]);
 
   // Fetch LGAs on component mount
@@ -69,13 +93,13 @@ const AddVehiclePage = () => {
       lgaId: "",
       city: "",
       postalCode: "",
-      gender: 'MALE',
-      maritalStatus: 'SINGLE',
+      gender: "MALE",
+      maritalStatus: "SINGLE",
       whatsappNumber: "",
       email: "",
       maidenName: "",
     },
-  })
+  });
 
   const nextOfKinForm = useForm({
     resolver: zodResolver(nextOfKinSchema),
@@ -84,7 +108,7 @@ const AddVehiclePage = () => {
       phone: "",
       relationship: "",
     },
-  })
+  });
 
   const vehicleForm = useForm({
     resolver: zodResolver(vehicleFormSchema),
@@ -97,82 +121,84 @@ const AddVehiclePage = () => {
       vin: "",
       blacklisted: false,
     },
-  })
+  });
 
   const validateOwnerTab = async () => {
-    const isValid = await ownerForm.trigger()
+    const isValid = await ownerForm.trigger();
     if (!isValid) {
-      toast.error("Please complete all required owner information fields")
-      return false
+      toast.error("Please complete all required owner information fields");
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const validateNextOfKinTab = async () => {
-    const isValid = await nextOfKinForm.trigger()
+    const isValid = await nextOfKinForm.trigger();
     if (!isValid) {
-      toast.error("Please complete all required next of kin information fields")
-      return false
+      toast.error(
+        "Please complete all required next of kin information fields"
+      );
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const validateVehicleTab = async () => {
-    const isValid = await vehicleForm.trigger()
+    const isValid = await vehicleForm.trigger();
     if (!isValid) {
-      toast.error("Please complete all required vehicle information fields")
-      return false
+      toast.error("Please complete all required vehicle information fields");
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const handleVehicleImageUpload = async (imageUrl: string) => {
-    vehicleForm.setValue("image", imageUrl)
-    return { success: "Vehicle image uploaded successfully" }
-  }
+    vehicleForm.setValue("image", imageUrl);
+    return { success: "Vehicle image uploaded successfully" };
+  };
 
   const handleTabChange = async (newTab: string) => {
     if (newTab === "nextofkin" && activeTab === "owner") {
-      const isValid = await validateOwnerTab()
-      if (!isValid) return
+      const isValid = await validateOwnerTab();
+      if (!isValid) return;
     }
 
     if (newTab === "vehicle" && activeTab === "nextofkin") {
-      const isValid = await validateNextOfKinTab()
-      if (!isValid) return
+      const isValid = await validateNextOfKinTab();
+      if (!isValid) return;
     }
 
     if (newTab === "review" && activeTab === "vehicle") {
-      const isValid = await validateVehicleTab()
-      if (!isValid) return
+      const isValid = await validateVehicleTab();
+      if (!isValid) return;
     }
 
-    setActiveTab(newTab)
-  }
+    setActiveTab(newTab);
+  };
 
   const onSubmit = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // Validate all forms
       const [ownerValid, nextOfKinValid, vehicleValid] = await Promise.all([
         ownerForm.trigger(),
         nextOfKinForm.trigger(),
         vehicleForm.trigger(),
-      ])
+      ]);
 
       if (!ownerValid || !nextOfKinValid || !vehicleValid) {
-        toast.error("Please complete all required fields")
-        setIsLoading(false)
-        return
+        toast.error("Please complete all required fields");
+        setIsLoading(false);
+        return;
       }
 
       // Get form data
-      const ownerData = ownerForm.getValues()
-      const nextOfKinData = nextOfKinForm.getValues()
-      const vehicleData = vehicleForm.getValues()
+      const ownerData = ownerForm.getValues();
+      const nextOfKinData = nextOfKinForm.getValues();
+      const vehicleData = vehicleForm.getValues();
 
       // Get the selected LGA name for address
-      const selectedLga = lgas.find((lga) => lga.id === ownerData.lgaId)
+      const selectedLga = lgas.find((lga) => lga.id === ownerData.lgaId);
 
       // Prepare vehicle creation request according to API structure
       const vehicleRequest: CreateVehicleRequest = {
@@ -205,47 +231,52 @@ const AddVehiclePage = () => {
         status: vehicleData.status,
         vin: vehicleData.vin,
         blacklisted: vehicleData.blacklisted,
-      }
+      };
 
       // Create vehicle with owner
-      const vehicle = await createVehicleWithOwner(vehicleRequest)
+      const vehicle = await createVehicleWithOwner(vehicleRequest);
 
       if (!vehicle.success) {
         toast.error("Registration Failed", {
           description: vehicle.error || "Failed to register. Please try again.",
-        })
-        setIsLoading(false)
-        return
+        });
+        setIsLoading(false);
+        return;
       }
 
       // Show success message
       toast.success("Registration Successful", {
         description: "Vehicle and owner have been registered successfully!",
-      })
+      });
 
       // Redirect to vehicle details or list
       if (vehicle.data?.id) {
-        router.push(`/vehicles/${vehicle.data.id}`)
+        router.push(`/vehicles/${vehicle.data.id}`);
       } else {
-        router.push("/vehicles")
+        router.push("/vehicles");
       }
-      router.refresh()
+      router.refresh();
     } catch (error) {
-      console.log("Failed to create vehicle:", error)
+      console.log("Failed to create vehicle:", error);
       toast.error("Registration Failed", {
-        description: error instanceof Error ? error.message : "Failed to register. Please try again.",
-      })
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to register. Please try again.",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="container py-10">
+    <div className="px-4">
       <Card>
         <CardHeader>
           <CardTitle>Register Vehicle</CardTitle>
-          <CardDescription>Fill in the details below to register a new vehicle.</CardDescription>
+          <CardDescription>
+            Fill in the details below to register a new vehicle.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={handleTabChange}>
@@ -317,7 +348,11 @@ const AddVehiclePage = () => {
                       <FormItem>
                         <FormLabel>Email Address</FormLabel>
                         <FormControl>
-                          <Input placeholder="johndoe@example.com" type="email" {...field} />
+                          <Input
+                            placeholder="johndoe@example.com"
+                            type="email"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -342,15 +377,20 @@ const AddVehiclePage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Gender</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select a gender" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {genderOptions.map((Gender, i) =>(
-                              <SelectItem key={i} value={Gender.value}>{Gender.label}</SelectItem>
+                            {genderOptions.map((Gender, i) => (
+                              <SelectItem key={i} value={Gender.value}>
+                                {Gender.label}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -364,15 +404,20 @@ const AddVehiclePage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Marital Status</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select marital status" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {maritalStatusOptions.map((MaritalStatus, i) =>(
-                              <SelectItem key={i} value={MaritalStatus.value}>{MaritalStatus.label}</SelectItem>
+                            {maritalStatusOptions.map((MaritalStatus, i) => (
+                              <SelectItem key={i} value={MaritalStatus.value}>
+                                {MaritalStatus.label}
+                              </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -387,7 +432,11 @@ const AddVehiclePage = () => {
                       <FormItem className="md:col-span-2">
                         <FormLabel>Residential Address</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="123 Main Street, City" className="resize-none" {...field} />
+                          <Textarea
+                            placeholder="123 Main Street, City"
+                            className="resize-none"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -399,7 +448,10 @@ const AddVehiclePage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>LGA</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select an LGA" />
@@ -502,22 +554,22 @@ const AddVehiclePage = () => {
                         <FormLabel>Vehicle Category</FormLabel>
                         <FormControl>
                           <Select
-                        onValueChange={(value) =>
-                          vehicleForm.setValue("category", value)
-                        }
-                        defaultValue={vehicleForm.watch("category")}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {VEHICLE_CATEGORIES.map((option) => (
-                            <SelectItem key={option} value={option}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                            onValueChange={(value) =>
+                              vehicleForm.setValue("category", value)
+                            }
+                            defaultValue={vehicleForm.watch("category")}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {VEHICLE_CATEGORIES.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -541,7 +593,9 @@ const AddVehiclePage = () => {
                     name="vin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Vehicle Identification Number (VIN)</FormLabel>
+                        <FormLabel>
+                          Vehicle Identification Number (VIN)
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="VIN" {...field} />
                         </FormControl>
@@ -555,7 +609,10 @@ const AddVehiclePage = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Registered LGA</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select an LGA" />
@@ -611,7 +668,9 @@ const AddVehiclePage = () => {
                       <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                         <div className="space-y-0.5">
                           <FormLabel className="text-sm">Blacklisted</FormLabel>
-                          <FormDescription>Is this vehicle blacklisted?</FormDescription>
+                          <FormDescription>
+                            Is this vehicle blacklisted?
+                          </FormDescription>
                         </div>
                         <FormControl>
                           <Input
@@ -633,7 +692,8 @@ const AddVehiclePage = () => {
                   <h3 className="text-lg font-semibold">Owner Information</h3>
                   <div className="grid gap-2">
                     <p>
-                      <strong>Name:</strong> {ownerForm.getValues().firstName} {ownerForm.getValues().lastName}
+                      <strong>Name:</strong> {ownerForm.getValues().firstName}{" "}
+                      {ownerForm.getValues().lastName}
                     </p>
                     <p>
                       <strong>Phone:</strong> {ownerForm.getValues().phone}
@@ -642,7 +702,9 @@ const AddVehiclePage = () => {
                       <strong>Email:</strong> {ownerForm.getValues().email}
                     </p>
                     <p>
-                      <strong>Address:</strong> {ownerForm.getValues().residentialAddress}, {ownerForm.getValues().city}
+                      <strong>Address:</strong>{" "}
+                      {ownerForm.getValues().residentialAddress},{" "}
+                      {ownerForm.getValues().city}
                     </p>
                   </div>
                 </div>
@@ -656,7 +718,8 @@ const AddVehiclePage = () => {
                       <strong>Phone:</strong> {nextOfKinForm.getValues().phone}
                     </p>
                     <p>
-                      <strong>Relationship:</strong> {nextOfKinForm.getValues().relationship}
+                      <strong>Relationship:</strong>{" "}
+                      {nextOfKinForm.getValues().relationship}
                     </p>
                   </div>
                 </div>
@@ -664,10 +727,12 @@ const AddVehiclePage = () => {
                   <h3 className="text-lg font-semibold">Vehicle Information</h3>
                   <div className="grid gap-2">
                     <p>
-                      <strong>Category:</strong> {vehicleForm.getValues().category}
+                      <strong>Category:</strong>{" "}
+                      {vehicleForm.getValues().category}
                     </p>
                     <p>
-                      <strong>Plate Number:</strong> {vehicleForm.getValues().plateNumber}
+                      <strong>Plate Number:</strong>{" "}
+                      {vehicleForm.getValues().plateNumber}
                     </p>
                     <p>
                       <strong>Status:</strong> {vehicleForm.getValues().status}
@@ -684,7 +749,13 @@ const AddVehiclePage = () => {
               type="button"
               variant="outline"
               onClick={() =>
-                setActiveTab(activeTab === "nextofkin" ? "owner" : activeTab === "vehicle" ? "nextofkin" : "vehicle")
+                setActiveTab(
+                  activeTab === "nextofkin"
+                    ? "owner"
+                    : activeTab === "vehicle"
+                    ? "nextofkin"
+                    : "vehicle"
+                )
               }
             >
               Previous
@@ -693,7 +764,10 @@ const AddVehiclePage = () => {
 
           {activeTab !== "review" ? (
             activeTab === "owner" ? (
-              <Button type="button" onClick={() => handleTabChange("nextofkin")}>
+              <Button
+                type="button"
+                onClick={() => handleTabChange("nextofkin")}
+              >
                 Next: Next of Kin
               </Button>
             ) : activeTab === "nextofkin" ? (
@@ -716,12 +790,15 @@ const AddVehiclePage = () => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. Are you sure you want to submit?
+                    This action cannot be undone. Are you sure you want to
+                    submit?
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={onSubmit}>{isLoading ? "Submitting..." : "Submit"}</AlertDialogAction>
+                  <AlertDialogAction onClick={onSubmit}>
+                    {isLoading ? "Submitting..." : "Submit"}
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -729,7 +806,7 @@ const AddVehiclePage = () => {
         </CardFooter>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default AddVehiclePage
+export default AddVehiclePage;

@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Map, MapPin, Layers } from "lucide-react";
 import { LGAScan } from "@/actions/lga";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { COLORS } from "@/lib/const";
+import { Layers, Map, MapPin } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 interface PolygonMapViewerProps {
   polygonCoordinates: number[][];
   locations?: LGAScan[];
   title?: string;
   height?: string;
+  totalScan: number;
 }
 
 // Calculate polygon bounds
@@ -34,6 +35,7 @@ export default function PolygonMapViewer({
   locations = [],
   title = "Polygon Boundary Map",
   height = "300px",
+  totalScan,
 }: PolygonMapViewerProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
@@ -163,10 +165,10 @@ export default function PolygonMapViewer({
               <Layers className="w-3 h-3" />
               {polygonCoordinates.length} vertices
             </Badge>
-            {locations.length > 0 && (
+            {totalScan > 0 && (
               <Badge variant="outline" className="flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
-                {locations.length} location{locations.length !== 1 ? "s" : ""}
+                {totalScan} location{totalScan !== 1 ? "s" : ""}
               </Badge>
             )}
           </div>
@@ -202,13 +204,14 @@ export default function PolygonMapViewer({
                 </div>
               </div>
 
-              {locations.length > 0 && (
+              {totalScan > 0 && (
                 <div>
                   <h4 className="font-medium text-foreground mb-2">
                     Locations
                   </h4>
                   <div className="space-y-1 max-h-32 overflow-y-auto">
-                    {locations.map((location, index) => (
+                    {locations.length} Locations
+                    {/* {locations.map((location, index) => (
                       <div
                         key={location.id}
                         className="flex items-center gap-2"
@@ -221,7 +224,7 @@ export default function PolygonMapViewer({
                         )}
                         <span>{location.detectedLga.name}</span>
                       </div>
-                    ))}
+                    ))} */}
                   </div>
                 </div>
               )}

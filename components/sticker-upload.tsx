@@ -2,7 +2,10 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { uploadStickers } from "@/actions/stickers";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -10,20 +13,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { uploadStickers } from "@/actions/stickers";
 import {
-  Upload,
-  FileText,
-  CheckCircle,
-  XCircle,
   AlertCircle,
+  CheckCircle,
+  FileText,
+  Upload,
+  XCircle,
 } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export function StickerUpload() {
@@ -115,9 +115,7 @@ export function StickerUpload() {
               <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
                 <FileText className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm font-medium">{file.name}</span>
-                <Badge variant="secondary">
-                  {(file.size / 1024).toFixed(1)} KB
-                </Badge>
+                <Badge>{(file.size / 1024).toFixed(1)} KB</Badge>
               </div>
             )}
 

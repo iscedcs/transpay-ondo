@@ -1,4 +1,6 @@
-import { Suspense } from "react";
+import { auth } from "@/auth";
+import { StickerUpload } from "@/components/sticker-upload";
+import { StickersContent } from "@/components/stickers-content";
 import {
   Card,
   CardContent,
@@ -7,13 +9,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { StickersContent } from "@/components/stickers-content";
-import { StickerUpload } from "@/components/sticker-upload";
-import { Package, Upload, BarChart3, QrCode } from "lucide-react";
-import { auth } from "@/auth";
 import { isAuthorized } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { Role } from "@prisma/client";
+import { Package, QrCode, Upload } from "lucide-react";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
 interface SearchParams {
   tab?: string;
@@ -46,7 +46,7 @@ export default async function StickersPage({
     redirect("/unauthorized");
   }
   const params = await searchParams;
-  const activeTab = params.tab || "overview";
+  const activeTab = params.tab || "stickers";
 
   return (
     <div className="mx-auto p-5 space-y-6">
@@ -74,11 +74,7 @@ export default async function StickersPage({
 
       {/* Main Content */}
       <Tabs defaultValue={activeTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview" className="flex items-center gap-2">
-            <BarChart3 className="h-4 w-4" />
-            Overview
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="stickers" className="flex items-center gap-2">
             <Package className="h-4 w-4" />
             All Stickers
@@ -92,55 +88,6 @@ export default async function StickersPage({
             Assign
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Quick Upload
-                </CardTitle>
-                <Upload className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">CSV Upload</div>
-                <p className="text-xs text-muted-foreground">
-                  Upload barcode CSV files quickly
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Bulk Assignment
-                </CardTitle>
-                <QrCode className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">Assign to Vehicles</div>
-                <p className="text-xs text-muted-foreground">
-                  Attach stickers to vehicles in bulk
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  Management
-                </CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">Full Control</div>
-                <p className="text-xs text-muted-foreground">
-                  Delete, restore, and manage stickers
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
 
         <TabsContent value="stickers" className="space-y-6">
           <Suspense

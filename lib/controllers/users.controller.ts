@@ -1,6 +1,6 @@
+import { auth } from "@/auth";
 import { Role } from "@prisma/client";
 import { API, URLS } from "../const";
-import { auth } from "@/auth";
 
 export const getUsers = async (o: {
   offset?: number;
@@ -69,7 +69,6 @@ export const getUser = async (id: string) => {
 
     const res = await fetch(url, { headers, next: { revalidate: 0 } });
     const result = await res.json();
-    console.log({ result });
     if (!res.ok || !result.success) {
       console.log("API error:", result);
       return undefined;

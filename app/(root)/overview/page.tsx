@@ -1,25 +1,25 @@
-import { Suspense } from "react";
-import { checkUserAccess } from "@/lib/auth";
+import { getMe } from "@/actions/users";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { OverviewHeader } from "@/components/overview/overview-header";
-import { KPIStatsCards } from "@/components/overview/kpi-stats-cards";
-import { ComplianceSummaryChart } from "@/components/overview/compliance-summary-chart";
-import { RegistrationsByDay } from "@/components/overview/registrations-by-day";
 import { AgentPerformanceTable } from "@/components/overview/agent-performance-table";
-import { TopDefaultersList } from "@/components/overview/top-defaulters-list";
+import { ComplianceSummaryChart } from "@/components/overview/compliance-summary-chart";
+import { KPIStatsCards } from "@/components/overview/kpi-stats-cards";
+import { OverviewHeader } from "@/components/overview/overview-header";
 import { RecentActivityTimeline } from "@/components/overview/recent-activity-timeline";
-import {
-  getOverviewStats,
-  getComplianceData,
-  getRegistrationData,
-  getAgentPerformance,
-  getTopDefaulters,
-  getRecentActivity,
-} from "@/lib/overview-data";
+import { RegistrationsByDay } from "@/components/overview/registrations-by-day";
+import { TopDefaultersList } from "@/components/overview/top-defaulters-list";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getMe } from "@/actions/users";
+import { checkUserAccess } from "@/lib/auth";
+import {
+  getAgentPerformance,
+  getComplianceData,
+  getOverviewStats,
+  getRecentActivity,
+  getRegistrationData,
+  getTopDefaulters,
+} from "@/lib/overview-data";
 import { Role } from "@prisma/client";
+import { Suspense } from "react";
 
 // Loading components
 function StatsLoading() {
@@ -51,7 +51,7 @@ function ChartLoading() {
 }
 
 async function OverviewContent() {
-  const user = await getMe();
+  const user: any = (await getMe()).user;
 
   // Check access permissions
   const allowedRoles = [
@@ -107,7 +107,7 @@ async function OverviewContent() {
 }
 
 export default async function OverviewPage() {
-  const user = await getMe();
+  const user: any = (await getMe()).user;
 
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
