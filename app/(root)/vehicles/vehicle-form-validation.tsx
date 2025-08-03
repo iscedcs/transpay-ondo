@@ -47,8 +47,11 @@ export const ownerFormSchema = z.object({
   nextOfKinName: z.string().min(1, "Next of kin name is required"),
   nextOfKinPhone: z
     .string()
-    .min(1, "Next of kin phone is required")
-    .regex(/^\+234\d{10}$/, "Please enter a valid Nigerian phone number"),
+    .min(1, "Next of Kin phone number is required")
+    .regex(
+      /^(070|080|081|090|091|071|089)\d{8}$/,
+      "Please enter a valid Nigerian phone number"
+    ),
   nextOfKinRelationship: z.string().min(1, "Relationship is required"),
 });
 
@@ -65,7 +68,10 @@ export const driverFormSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .regex(/^\+234\d{10}$/, "Please enter a valid Nigerian phone number"),
+    .regex(
+      /^(070|080|081|090|091|071|089)\d{8}$/,
+      "Please enter a valid Nigerian phone number"
+    ),
   // Address Information
   residentialAddress: z.string().min(1, "Residential address is required"),
   city: z.string().min(1, "City is required"),

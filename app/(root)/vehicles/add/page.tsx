@@ -94,6 +94,7 @@ const AddVehiclePage = () => {
       nextOfKinPhone: "",
       nextOfKinRelationship: "",
     },
+    mode: "all",
   });
 
   const driverForm = useForm({
@@ -109,6 +110,7 @@ const AddVehiclePage = () => {
       residentialAddress: "",
       email: "",
     },
+    mode: "all",
   });
 
   const vehicleForm = useForm({
@@ -122,6 +124,7 @@ const AddVehiclePage = () => {
       vin: "",
       blacklisted: false,
     },
+    mode: "all",
   });
 
   const validateOwnerTab = async () => {
