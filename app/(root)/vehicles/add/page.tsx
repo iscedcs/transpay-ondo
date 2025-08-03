@@ -49,11 +49,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { maritalStatusOptions } from "../../users/user-edit-form-validation";
 import {
   CreateVehicleRequest,
+  driverFormSchema,
   genderOptions,
-  nextOfKinSchema,
+  maritalStatusOptions,
   ownerFormSchema,
   vehicleFormSchema,
 } from "../vehicle-form-validation";
@@ -61,7 +61,7 @@ import {
 const AddVehiclePage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("owner");
+  const [activeTab, setActiveTab] = useState("vehicle");
   const [lgas, setLgas] = useState<{ id: string; name: string }[]>([]);
 
   // Fetch LGAs on component mount
@@ -86,27 +86,28 @@ const AddVehiclePage = () => {
   const ownerForm = useForm({
     resolver: zodResolver(ownerFormSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      residentialAddress: "",
-      lgaId: "",
-      city: "",
-      postalCode: "",
       gender: "MALE",
       maritalStatus: "SINGLE",
       whatsappNumber: "",
-      email: "",
       maidenName: "",
+      nextOfKinName: "",
+      nextOfKinPhone: "",
+      nextOfKinRelationship: "",
     },
   });
 
-  const nextOfKinForm = useForm({
-    resolver: zodResolver(nextOfKinSchema),
+  const driverForm = useForm({
+    resolver: zodResolver(driverFormSchema),
     defaultValues: {
-      name: "",
       phone: "",
-      relationship: "",
+      city: "",
+      country: "",
+      firstName: "",
+      lastName: "",
+      lgaId: "",
+      postalCode: "",
+      residentialAddress: "",
+      email: "",
     },
   });
 
@@ -132,12 +133,10 @@ const AddVehiclePage = () => {
     return true;
   };
 
-  const validateNextOfKinTab = async () => {
-    const isValid = await nextOfKinForm.trigger();
+  const validatedDriverTab = async () => {
+    const isValid = await driverForm.trigger();
     if (!isValid) {
-      toast.error(
-        "Please complete all required next of kin information fields"
-      );
+      toast.error("Please complete all required driver fields");
       return false;
     }
     return true;
@@ -158,18 +157,18 @@ const AddVehiclePage = () => {
   };
 
   const handleTabChange = async (newTab: string) => {
-    if (newTab === "nextofkin" && activeTab === "owner") {
-      const isValid = await validateOwnerTab();
-      if (!isValid) return;
-    }
-
-    if (newTab === "vehicle" && activeTab === "nextofkin") {
-      const isValid = await validateNextOfKinTab();
-      if (!isValid) return;
-    }
-
-    if (newTab === "review" && activeTab === "vehicle") {
+    if (newTab === "driver" && activeTab === "vehicle") {
       const isValid = await validateVehicleTab();
+      if (!isValid) return;
+    }
+
+    if (newTab === "vehicle" && activeTab === "driver") {
+      const isValid = await validatedDriverTab();
+      if (!isValid) return;
+    }
+
+    if (newTab === "review" && activeTab === "owner") {
+      const isValid = await validateOwnerTab();
       if (!isValid) return;
     }
 
@@ -182,7 +181,7 @@ const AddVehiclePage = () => {
       // Validate all forms
       const [ownerValid, nextOfKinValid, vehicleValid] = await Promise.all([
         ownerForm.trigger(),
-        nextOfKinForm.trigger(),
+        driverForm.trigger(),
         vehicleForm.trigger(),
       ]);
 
@@ -194,36 +193,36 @@ const AddVehiclePage = () => {
 
       // Get form data
       const ownerData = ownerForm.getValues();
-      const nextOfKinData = nextOfKinForm.getValues();
+      const driverData = driverForm.getValues();
       const vehicleData = vehicleForm.getValues();
 
       // Get the selected LGA name for address
-      const selectedLga = lgas.find((lga) => lga.id === ownerData.lgaId);
+      const selectedLga = lgas.find((lga) => lga.id === driverData.lgaId);
 
       // Prepare vehicle creation request according to API structure
       const vehicleRequest: CreateVehicleRequest = {
         category: vehicleData.category,
         plateNumber: vehicleData.plateNumber,
         owner: {
-          firstName: ownerData.firstName,
-          lastName: ownerData.lastName,
-          phone: ownerData.phone,
+          firstName: driverData.firstName,
+          lastName: driverData.lastName,
+          phone: driverData.phone,
           address: {
-            text: ownerData.residentialAddress,
+            text: driverData.residentialAddress,
             lga: selectedLga?.name || "",
-            city: ownerData.city,
+            city: driverData.city,
             state: "Edo",
             unit: selectedLga?.name || "",
             country: "Nigeria",
-            postal_code: ownerData.postalCode,
+            postal_code: driverData.postalCode,
           },
           gender: ownerData.gender,
           marital_status: ownerData.maritalStatus,
           whatsapp: ownerData.whatsappNumber,
-          email: ownerData.email,
-          nok_name: nextOfKinData.name,
-          nok_phone: nextOfKinData.phone,
-          nok_relationship: nextOfKinData.relationship,
+          email: driverData.email,
+          nok_name: ownerData.nextOfKinName,
+          nok_phone: ownerData.nextOfKinPhone,
+          nok_relationship: ownerData.nextOfKinRelationship,
           maiden_name: ownerData.maidenName,
         },
         lgaId: vehicleData.registeredLgaId,
@@ -281,268 +280,11 @@ const AddVehiclePage = () => {
         <CardContent>
           <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList>
-              <TabsTrigger value="owner">Owner</TabsTrigger>
-              <TabsTrigger value="nextofkin">Next of Kin</TabsTrigger>
-              <TabsTrigger value="vehicle">Vehicle</TabsTrigger>
+              <TabsTrigger value="vehicle">Vehicle Details</TabsTrigger>
+              <TabsTrigger value="driver">Driver Details</TabsTrigger>
+              <TabsTrigger value="owner">Owner Details</TabsTrigger>
               <TabsTrigger value="review">Review</TabsTrigger>
             </TabsList>
-            <TabsContent value="owner">
-              <Form {...ownerForm}>
-                <form className="grid gap-4 md:grid-cols-2">
-                  <FormField
-                    control={ownerForm.control}
-                    name="firstName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="lastName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="08012345678" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="whatsappNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Whatsapp Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="08012345678" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email Address</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="johndoe@example.com"
-                            type="email"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="maidenName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mother's Maiden Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Jane" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gender</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a gender" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {genderOptions.map((Gender, i) => (
-                              <SelectItem key={i} value={Gender.value}>
-                                {Gender.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="maritalStatus"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Marital Status</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select marital status" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {maritalStatusOptions.map((MaritalStatus, i) => (
-                              <SelectItem key={i} value={MaritalStatus.value}>
-                                {MaritalStatus.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="residentialAddress"
-                    render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>Residential Address</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="123 Main Street, City"
-                            className="resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="lgaId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>LGA</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an LGA" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {lgas.map((lga) => (
-                              <SelectItem key={lga.id} value={lga.id}>
-                                {lga.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Benin" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="postalCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Postal Code</FormLabel>
-                        <FormControl>
-                          <Input placeholder="12345" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </TabsContent>
-            <TabsContent value="nextofkin">
-              <Form {...nextOfKinForm}>
-                <form className="grid gap-4">
-                  <FormField
-                    control={nextOfKinForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Jane Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={nextOfKinForm.control}
-                    name="phone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="08012345678" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={nextOfKinForm.control}
-                    name="relationship"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Relationship</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Sister" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </TabsContent>
             <TabsContent value="vehicle">
               <Form {...vehicleForm}>
                 <form className="grid gap-4">
@@ -686,40 +428,299 @@ const AddVehiclePage = () => {
                 </form>
               </Form>
             </TabsContent>
+            <TabsContent value="driver">
+              <Form {...driverForm}>
+                <form className="grid gap-4">
+                  <FormField
+                    control={driverForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="08012345678" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="johndoe@example.com"
+                            type="email"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="lgaId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>LGA</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an LGA" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lgas.map((lga) => (
+                              <SelectItem key={lga.id} value={lga.id}>
+                                {lga.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="residentialAddress"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Residential Address</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="123 Main Street, City"
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Benin" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Postal Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="12345" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+            </TabsContent>
+            <TabsContent value="owner">
+              <Form {...ownerForm}>
+                <form className="grid gap-4">
+                  <FormField
+                    control={ownerForm.control}
+                    name="gender"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Gender</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a gender" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {genderOptions.map((Gender, i) => (
+                              <SelectItem key={i} value={Gender.value}>
+                                {Gender.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ownerForm.control}
+                    name="maritalStatus"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Marital Status</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select marital status" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {maritalStatusOptions.map((MaritalStatus, i) => (
+                              <SelectItem key={i} value={MaritalStatus.value}>
+                                {MaritalStatus.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ownerForm.control}
+                    name="whatsappNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Whatsapp Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="08012345678" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ownerForm.control}
+                    name="maidenName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mother's Maiden Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Jane" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ownerForm.control}
+                    name="nextOfKinName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Next of Kin Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Jane Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ownerForm.control}
+                    name="nextOfKinPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Next of Kin Phone Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="08012345678" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={ownerForm.control}
+                    name="nextOfKinRelationship"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Relationship with Next of Kin</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Sister" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+            </TabsContent>
             <TabsContent value="review">
               <div className="grid gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Owner Information</h3>
+                  <h3 className="text-lg font-semibold">Driver Information</h3>
                   <div className="grid gap-2">
                     <p>
-                      <strong>Name:</strong> {ownerForm.getValues().firstName}{" "}
-                      {ownerForm.getValues().lastName}
+                      <strong>Name:</strong> {driverForm.getValues().firstName}{" "}
+                      {driverForm.getValues().lastName}
                     </p>
                     <p>
-                      <strong>Phone:</strong> {ownerForm.getValues().phone}
+                      <strong>Phone:</strong> {driverForm.getValues().phone}
                     </p>
                     <p>
-                      <strong>Email:</strong> {ownerForm.getValues().email}
+                      <strong>Email:</strong> {driverForm.getValues().email}
                     </p>
                     <p>
                       <strong>Address:</strong>{" "}
-                      {ownerForm.getValues().residentialAddress},{" "}
-                      {ownerForm.getValues().city}
+                      {driverForm.getValues().residentialAddress},{" "}
+                      {driverForm.getValues().city}
                     </p>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Next of Kin</h3>
+                  <h3 className="text-lg font-semibold">Owner Information</h3>
                   <div className="grid gap-2">
                     <p>
-                      <strong>Name:</strong> {nextOfKinForm.getValues().name}
+                      <strong>Next of Kin Name:</strong>{" "}
+                      {ownerForm.getValues().nextOfKinName}
                     </p>
                     <p>
-                      <strong>Phone:</strong> {nextOfKinForm.getValues().phone}
+                      <strong>Next of Kin Phone Number:</strong>{" "}
+                      {ownerForm.getValues().nextOfKinPhone}
                     </p>
                     <p>
-                      <strong>Relationship:</strong>{" "}
-                      {nextOfKinForm.getValues().relationship}
+                      <strong>Relationship with Next of Kin:</strong>{" "}
+                      {ownerForm.getValues().nextOfKinRelationship}
                     </p>
                   </div>
                 </div>
@@ -744,16 +745,16 @@ const AddVehiclePage = () => {
           </Tabs>
         </CardContent>
         <CardFooter className="flex justify-between">
-          {activeTab !== "owner" && (
+          {activeTab !== "vehicle" && (
             <Button
               type="button"
               variant="outline"
               onClick={() =>
                 setActiveTab(
-                  activeTab === "nextofkin"
-                    ? "owner"
-                    : activeTab === "vehicle"
-                    ? "nextofkin"
+                  activeTab === "driver"
+                    ? "vehicle"
+                    : activeTab === "owner"
+                    ? "driver"
                     : "vehicle"
                 )
               }
@@ -763,16 +764,13 @@ const AddVehiclePage = () => {
           )}
 
           {activeTab !== "review" ? (
-            activeTab === "owner" ? (
-              <Button
-                type="button"
-                onClick={() => handleTabChange("nextofkin")}
-              >
-                Next: Next of Kin
+            activeTab === "vehicle" ? (
+              <Button type="button" onClick={() => handleTabChange("driver")}>
+                Next: Driver Information
               </Button>
-            ) : activeTab === "nextofkin" ? (
-              <Button type="button" onClick={() => handleTabChange("vehicle")}>
-                Next: Vehicle Info
+            ) : activeTab === "driver" ? (
+              <Button type="button" onClick={() => handleTabChange("owner")}>
+                Next: Owner Information
               </Button>
             ) : (
               <Button type="button" onClick={() => handleTabChange("review")}>
