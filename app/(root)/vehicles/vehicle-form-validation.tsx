@@ -42,14 +42,7 @@ export const ownerFormSchema = z.object({
   maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], {
     required_error: "Please select marital status",
   }),
-  whatsappNumber: z
-    .string()
-    .min(1, "Next of Kin phone number is required")
-    .regex(
-      /^(070|080|081|090|091|071|089)\d{8}$/,
-      "Please enter a valid Nigerian phone number"
-    )
-    .optional(),
+  whatsappNumber: z.string().optional(),
   maidenName: z.string().optional(),
   nextOfKinName: z.string().min(1, "Next of kin name is required"),
   nextOfKinPhone: z
