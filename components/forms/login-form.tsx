@@ -130,7 +130,7 @@ export function LoginForm({ error }: { error?: string }) {
         </div>
         <div className="grid gap-2">
           <Button
-            className="bg-primary text-base text-secondary font-semibold"
+            className="bg-primary  font-semibold"
             disabled={isLoading}
             type="submit"
           >

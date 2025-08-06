@@ -1,13 +1,13 @@
 "use server";
 
-import { db } from "@/lib/db";
-import { TransactionCategories } from "@prisma/client";
-import { z } from "zod";
-import { API } from "@/lib/const";
-import { auth } from "@/auth";
 import { CreateVehicleRequest } from "@/app/(root)/vehicles/vehicle-form-validation";
-import { revalidatePath } from "next/cache";
+import { auth } from "@/auth";
+import { API } from "@/lib/const";
+import { db } from "@/lib/db";
 import { VehicleOwner } from "@/types/vehicles";
+import { TransactionCategories } from "@prisma/client";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
 
 interface FetchVehicleParams {
   page?: number;
@@ -313,9 +313,7 @@ export async function getVehicles(
 
 export async function createVehicleWithOwner(
   vehicleData: CreateVehicleRequest
-): Promise<
-  { success: true; data: Vehicle } | { success: false; error: string }
-> {
+): Promise<{ success: true; data: any } | { success: false; error: string }> {
   try {
     const session = await auth();
     if (!session || !session.user) {
@@ -836,22 +834,22 @@ export const getFullVehicleById = async (id: string) => {
 };
 
 export const getVehicleIdByPlate = async (plateNumber: string) => {
-     try {
-          const vehicle = await db.vehicle.findFirst({
-               where: {
-                    plateNumber,
-               },
-               select: {
-                    id: true,
-                    User: true
-               },
-          });
-          if (vehicle) {
-               return vehicle
-          } else {
-               return undefined;
-          }
-     } catch (error) {
-          return undefined;
-     }
-}
+  try {
+    const vehicle = await db.vehicle.findFirst({
+      where: {
+        plateNumber,
+      },
+      select: {
+        id: true,
+        User: true,
+      },
+    });
+    if (vehicle) {
+      return vehicle;
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    return undefined;
+  }
+};

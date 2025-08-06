@@ -49,11 +49,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { maritalStatusOptions } from "../../users/user-edit-form-validation";
 import {
   CreateVehicleRequest,
+  driverFormSchema,
   genderOptions,
-  nextOfKinSchema,
+  maritalStatusOptions,
   ownerFormSchema,
   vehicleFormSchema,
 } from "../vehicle-form-validation";
@@ -61,7 +61,8 @@ import {
 const AddVehiclePage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("owner");
+  const [activeTab, setActiveTab] = useState("vehicle");
+  const [displayDialog, setDisplayDialog] = useState(false);
   const [lgas, setLgas] = useState<{ id: string; name: string }[]>([]);
 
   // Fetch LGAs on component mount
@@ -86,28 +87,31 @@ const AddVehiclePage = () => {
   const ownerForm = useForm({
     resolver: zodResolver(ownerFormSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      phone: "",
-      residentialAddress: "",
-      lgaId: "",
-      city: "",
-      postalCode: "",
       gender: "MALE",
       maritalStatus: "SINGLE",
       whatsappNumber: "",
-      email: "",
       maidenName: "",
+      nextOfKinName: "",
+      nextOfKinPhone: "",
+      nextOfKinRelationship: "",
     },
+    mode: "all",
   });
 
-  const nextOfKinForm = useForm({
-    resolver: zodResolver(nextOfKinSchema),
+  const driverForm = useForm({
+    resolver: zodResolver(driverFormSchema),
     defaultValues: {
-      name: "",
       phone: "",
-      relationship: "",
+      city: "",
+      country: "",
+      firstName: "",
+      lastName: "",
+      lgaId: "",
+      postalCode: "",
+      residentialAddress: "",
+      email: "",
     },
+    mode: "all",
   });
 
   const vehicleForm = useForm({
@@ -121,6 +125,7 @@ const AddVehiclePage = () => {
       vin: "",
       blacklisted: false,
     },
+    mode: "all",
   });
 
   const validateOwnerTab = async () => {
@@ -132,12 +137,10 @@ const AddVehiclePage = () => {
     return true;
   };
 
-  const validateNextOfKinTab = async () => {
-    const isValid = await nextOfKinForm.trigger();
+  const validatedDriverTab = async () => {
+    const isValid = await driverForm.trigger();
     if (!isValid) {
-      toast.error(
-        "Please complete all required next of kin information fields"
-      );
+      toast.error("Please complete all required driver fields");
       return false;
     }
     return true;
@@ -158,18 +161,18 @@ const AddVehiclePage = () => {
   };
 
   const handleTabChange = async (newTab: string) => {
-    if (newTab === "nextofkin" && activeTab === "owner") {
-      const isValid = await validateOwnerTab();
-      if (!isValid) return;
-    }
-
-    if (newTab === "vehicle" && activeTab === "nextofkin") {
-      const isValid = await validateNextOfKinTab();
-      if (!isValid) return;
-    }
-
-    if (newTab === "review" && activeTab === "vehicle") {
+    if (newTab === "driver" && activeTab === "vehicle") {
       const isValid = await validateVehicleTab();
+      if (!isValid) return;
+    }
+
+    if (newTab === "vehicle" && activeTab === "driver") {
+      const isValid = await validatedDriverTab();
+      if (!isValid) return;
+    }
+
+    if (newTab === "review" && activeTab === "owner") {
+      const isValid = await validateOwnerTab();
       if (!isValid) return;
     }
 
@@ -182,7 +185,7 @@ const AddVehiclePage = () => {
       // Validate all forms
       const [ownerValid, nextOfKinValid, vehicleValid] = await Promise.all([
         ownerForm.trigger(),
-        nextOfKinForm.trigger(),
+        driverForm.trigger(),
         vehicleForm.trigger(),
       ]);
 
@@ -194,36 +197,36 @@ const AddVehiclePage = () => {
 
       // Get form data
       const ownerData = ownerForm.getValues();
-      const nextOfKinData = nextOfKinForm.getValues();
+      const driverData = driverForm.getValues();
       const vehicleData = vehicleForm.getValues();
 
       // Get the selected LGA name for address
-      const selectedLga = lgas.find((lga) => lga.id === ownerData.lgaId);
+      const selectedLga = lgas.find((lga) => lga.id === driverData.lgaId);
 
       // Prepare vehicle creation request according to API structure
       const vehicleRequest: CreateVehicleRequest = {
         category: vehicleData.category,
         plateNumber: vehicleData.plateNumber,
         owner: {
-          firstName: ownerData.firstName,
-          lastName: ownerData.lastName,
-          phone: ownerData.phone,
+          firstName: driverData.firstName,
+          lastName: driverData.lastName,
+          phone: driverData.phone,
           address: {
-            text: ownerData.residentialAddress,
+            text: driverData.residentialAddress,
             lga: selectedLga?.name || "",
-            city: ownerData.city,
+            city: driverData.city,
             state: "Edo",
             unit: selectedLga?.name || "",
             country: "Nigeria",
-            postal_code: ownerData.postalCode,
+            postal_code: driverData.postalCode,
           },
           gender: ownerData.gender,
           marital_status: ownerData.maritalStatus,
           whatsapp: ownerData.whatsappNumber,
-          email: ownerData.email,
-          nok_name: nextOfKinData.name,
-          nok_phone: nextOfKinData.phone,
-          nok_relationship: nextOfKinData.relationship,
+          email: driverData.email,
+          nok_name: ownerData.nextOfKinName,
+          nok_phone: ownerData.nextOfKinPhone,
+          nok_relationship: ownerData.nextOfKinRelationship,
           maiden_name: ownerData.maidenName,
         },
         lgaId: vehicleData.registeredLgaId,
@@ -235,6 +238,7 @@ const AddVehiclePage = () => {
 
       // Create vehicle with owner
       const vehicle = await createVehicleWithOwner(vehicleRequest);
+      // console.log({ vehicle });
 
       if (!vehicle.success) {
         toast.error("Registration Failed", {
@@ -248,10 +252,11 @@ const AddVehiclePage = () => {
       toast.success("Registration Successful", {
         description: "Vehicle and owner have been registered successfully!",
       });
+      // router.push(`/vehicles/${vehicle.data?.vehicle.id}`);
 
       // Redirect to vehicle details or list
-      if (vehicle.data?.id) {
-        router.push(`/vehicles/${vehicle.data.id}`);
+      if (vehicle.data?.vehicle.id) {
+        router.push(`/vehicles/${vehicle.data?.vehicle.id}`);
       } else {
         router.push("/vehicles");
       }
@@ -281,77 +286,121 @@ const AddVehiclePage = () => {
         <CardContent>
           <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList>
-              <TabsTrigger value="owner">Owner</TabsTrigger>
-              <TabsTrigger value="nextofkin">Next of Kin</TabsTrigger>
-              <TabsTrigger value="vehicle">Vehicle</TabsTrigger>
+              <TabsTrigger value="vehicle">Vehicle Details</TabsTrigger>
+              <TabsTrigger value="driver">Driver Details</TabsTrigger>
+              <TabsTrigger value="owner">Owner Details</TabsTrigger>
               <TabsTrigger value="review">Review</TabsTrigger>
             </TabsList>
-            <TabsContent value="owner">
-              <Form {...ownerForm}>
-                <form className="grid gap-4 md:grid-cols-2">
+            <TabsContent value="vehicle">
+              <Form {...vehicleForm}>
+                <form className="grid gap-4">
                   <FormField
-                    control={ownerForm.control}
-                    name="firstName"
+                    control={vehicleForm.control}
+                    name="category"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>Vehicle Category</FormLabel>
                         <FormControl>
-                          <Input placeholder="John" {...field} />
+                          <Select
+                            onValueChange={(value) =>
+                              vehicleForm.setValue("category", value)
+                            }
+                            defaultValue={vehicleForm.watch("category")}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {VEHICLE_CATEGORIES.map((option) => (
+                                <SelectItem key={option} value={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={ownerForm.control}
-                    name="lastName"
+                    control={vehicleForm.control}
+                    name="plateNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>Plate Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Doe" {...field} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={ownerForm.control}
-                    name="phone"
+                    control={vehicleForm.control}
+                    name="vin"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>Chassis Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="08012345678" {...field} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={ownerForm.control}
-                    name="whatsappNumber"
+                    control={vehicleForm.control}
+                    name="registeredLgaId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Whatsapp Number</FormLabel>
+                        <FormLabel>Registered LGA</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an LGA" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lgas.map((lga) => (
+                              <SelectItem key={lga.id} value={lga.id}>
+                                {lga.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={vehicleForm.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vehicle Status</FormLabel>
                         <FormControl>
-                          <Input placeholder="08012345678" {...field} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={ownerForm.control}
-                    name="email"
+                    control={vehicleForm.control}
+                    name="image"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel>Driver Image</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="johndoe@example.com"
-                            type="email"
-                            {...field}
+                          <AvatarUploader
+                            onAvatarUpload={handleVehicleImageUpload}
+                            currentAvatarUrl={vehicleForm.watch("image")}
+                            userInitials="VH"
+                            size="xl"
                           />
                         </FormControl>
                         <FormMessage />
@@ -359,18 +408,157 @@ const AddVehiclePage = () => {
                     )}
                   />
                   <FormField
-                    control={ownerForm.control}
-                    name="maidenName"
+                    control={vehicleForm.control}
+                    name="blacklisted"
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Mother's Maiden Name</FormLabel>
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-sm">Blacklisted</FormLabel>
+                          <FormDescription>
+                            Is this vehicle blacklisted?
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <Input placeholder="Jane" {...field} />
+                          <Input
+                            type="checkbox"
+                            checked={field.value}
+                            onChange={(e) => field.onChange(e.target.checked)}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                </form>
+              </Form>
+            </TabsContent>
+            <TabsContent value="driver">
+              <Form {...driverForm}>
+                <form className="grid gap-4">
+                  <FormField
+                    control={driverForm.control}
+                    name="firstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="lastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="lgaId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>LGA</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an LGA" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {lgas.map((lga) => (
+                              <SelectItem key={lga.id} value={lga.id}>
+                                {lga.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="residentialAddress"
+                    render={({ field }) => (
+                      <FormItem className="md:col-span-2">
+                        <FormLabel>Residential Address</FormLabel>
+                        <FormControl>
+                          <Textarea className="resize-none" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={driverForm.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Postal Code</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </form>
+              </Form>
+            </TabsContent>
+            <TabsContent value="owner">
+              <Form {...ownerForm}>
+                <form className="grid gap-4">
                   <FormField
                     control={ownerForm.control}
                     name="gender"
@@ -427,16 +615,12 @@ const AddVehiclePage = () => {
                   />
                   <FormField
                     control={ownerForm.control}
-                    name="residentialAddress"
+                    name="whatsappNumber"
                     render={({ field }) => (
-                      <FormItem className="md:col-span-2">
-                        <FormLabel>Residential Address</FormLabel>
+                      <FormItem>
+                        <FormLabel>Whatsapp Number</FormLabel>
                         <FormControl>
-                          <Textarea
-                            placeholder="123 Main Street, City"
-                            className="resize-none"
-                            {...field}
-                          />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -444,39 +628,12 @@ const AddVehiclePage = () => {
                   />
                   <FormField
                     control={ownerForm.control}
-                    name="lgaId"
+                    name="maidenName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>LGA</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an LGA" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {lgas.map((lga) => (
-                              <SelectItem key={lga.id} value={lga.id}>
-                                {lga.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={ownerForm.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
+                        <FormLabel>Mother's Maiden Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="Benin" {...field} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -484,200 +641,38 @@ const AddVehiclePage = () => {
                   />
                   <FormField
                     control={ownerForm.control}
-                    name="postalCode"
+                    name="nextOfKinName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Postal Code</FormLabel>
+                        <FormLabel>Next of Kin Name</FormLabel>
                         <FormControl>
-                          <Input placeholder="12345" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </TabsContent>
-            <TabsContent value="nextofkin">
-              <Form {...nextOfKinForm}>
-                <form className="grid gap-4">
-                  <FormField
-                    control={nextOfKinForm.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Jane Doe" {...field} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={nextOfKinForm.control}
-                    name="phone"
+                    control={ownerForm.control}
+                    name="nextOfKinPhone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>Next of Kin Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="08012345678" {...field} />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                   <FormField
-                    control={nextOfKinForm.control}
-                    name="relationship"
+                    control={ownerForm.control}
+                    name="nextOfKinRelationship"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Relationship</FormLabel>
+                        <FormLabel>Relationship with Next of Kin</FormLabel>
                         <FormControl>
-                          <Input placeholder="Sister" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </form>
-              </Form>
-            </TabsContent>
-            <TabsContent value="vehicle">
-              <Form {...vehicleForm}>
-                <form className="grid gap-4">
-                  <FormField
-                    control={vehicleForm.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vehicle Category</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={(value) =>
-                              vehicleForm.setValue("category", value)
-                            }
-                            defaultValue={vehicleForm.watch("category")}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {VEHICLE_CATEGORIES.map((option) => (
-                                <SelectItem key={option} value={option}>
-                                  {option}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vehicleForm.control}
-                    name="plateNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Plate Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ABC-123-XY" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vehicleForm.control}
-                    name="vin"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Vehicle Identification Number (VIN)
-                        </FormLabel>
-                        <FormControl>
-                          <Input placeholder="VIN" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vehicleForm.control}
-                    name="registeredLgaId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Registered LGA</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an LGA" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {lgas.map((lga) => (
-                              <SelectItem key={lga.id} value={lga.id}>
-                                {lga.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vehicleForm.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vehicle Status</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Functional" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vehicleForm.control}
-                    name="image"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vehicle Image</FormLabel>
-                        <FormControl>
-                          <AvatarUploader
-                            onAvatarUpload={handleVehicleImageUpload}
-                            currentAvatarUrl={vehicleForm.watch("image")}
-                            userInitials="VH"
-                            size="xl"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={vehicleForm.control}
-                    name="blacklisted"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-sm">Blacklisted</FormLabel>
-                          <FormDescription>
-                            Is this vehicle blacklisted?
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Input
-                            type="checkbox"
-                            checked={field.value}
-                            onChange={(e) => field.onChange(e.target.checked)}
-                          />
+                          <Input {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -689,37 +684,39 @@ const AddVehiclePage = () => {
             <TabsContent value="review">
               <div className="grid gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold">Owner Information</h3>
+                  <h3 className="text-lg font-semibold">Driver Information</h3>
                   <div className="grid gap-2">
                     <p>
-                      <strong>Name:</strong> {ownerForm.getValues().firstName}{" "}
-                      {ownerForm.getValues().lastName}
+                      <strong>Name:</strong> {driverForm.getValues().firstName}{" "}
+                      {driverForm.getValues().lastName}
                     </p>
                     <p>
-                      <strong>Phone:</strong> {ownerForm.getValues().phone}
+                      <strong>Phone:</strong> {driverForm.getValues().phone}
                     </p>
                     <p>
-                      <strong>Email:</strong> {ownerForm.getValues().email}
+                      <strong>Email:</strong> {driverForm.getValues().email}
                     </p>
                     <p>
                       <strong>Address:</strong>{" "}
-                      {ownerForm.getValues().residentialAddress},{" "}
-                      {ownerForm.getValues().city}
+                      {driverForm.getValues().residentialAddress},{" "}
+                      {driverForm.getValues().city}
                     </p>
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Next of Kin</h3>
+                  <h3 className="text-lg font-semibold">Owner Information</h3>
                   <div className="grid gap-2">
                     <p>
-                      <strong>Name:</strong> {nextOfKinForm.getValues().name}
+                      <strong>Next of Kin Name:</strong>{" "}
+                      {ownerForm.getValues().nextOfKinName}
                     </p>
                     <p>
-                      <strong>Phone:</strong> {nextOfKinForm.getValues().phone}
+                      <strong>Next of Kin Phone Number:</strong>{" "}
+                      {ownerForm.getValues().nextOfKinPhone}
                     </p>
                     <p>
-                      <strong>Relationship:</strong>{" "}
-                      {nextOfKinForm.getValues().relationship}
+                      <strong>Relationship with Next of Kin:</strong>{" "}
+                      {ownerForm.getValues().nextOfKinRelationship}
                     </p>
                   </div>
                 </div>
@@ -744,16 +741,16 @@ const AddVehiclePage = () => {
           </Tabs>
         </CardContent>
         <CardFooter className="flex justify-between">
-          {activeTab !== "owner" && (
+          {activeTab !== "vehicle" && (
             <Button
               type="button"
               variant="outline"
               onClick={() =>
                 setActiveTab(
-                  activeTab === "nextofkin"
-                    ? "owner"
-                    : activeTab === "vehicle"
-                    ? "nextofkin"
+                  activeTab === "driver"
+                    ? "vehicle"
+                    : activeTab === "owner"
+                    ? "driver"
                     : "vehicle"
                 )
               }
@@ -763,16 +760,13 @@ const AddVehiclePage = () => {
           )}
 
           {activeTab !== "review" ? (
-            activeTab === "owner" ? (
-              <Button
-                type="button"
-                onClick={() => handleTabChange("nextofkin")}
-              >
-                Next: Next of Kin
+            activeTab === "vehicle" ? (
+              <Button type="button" onClick={() => handleTabChange("driver")}>
+                Next: Driver Information
               </Button>
-            ) : activeTab === "nextofkin" ? (
-              <Button type="button" onClick={() => handleTabChange("vehicle")}>
-                Next: Vehicle Info
+            ) : activeTab === "driver" ? (
+              <Button type="button" onClick={() => handleTabChange("owner")}>
+                Next: Owner Information
               </Button>
             ) : (
               <Button type="button" onClick={() => handleTabChange("review")}>

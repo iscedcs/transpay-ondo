@@ -3,7 +3,66 @@
 import { z } from "zod";
 
 // Owner information validation schema
+// export const ownerFormSchema = z.object({
+//   // Basic Information
+//   firstName: z
+//     .string()
+//     .min(1, "First name is required")
+//     .max(50, "First name must not exceed 50 characters"),
+//   lastName: z
+//     .string()
+//     .min(1, "Last name is required")
+//     .max(50, "Last name must not exceed 50 characters"),
+//   phone: z
+//     .string()
+//     .min(1, "Phone number is required")
+//     .regex(/^\+234\d{10}$/, "Please enter a valid Nigerian phone number"),
+//   gender: z.enum(["MALE", "FEMALE", "OTHERS"], {
+//     required_error: "Please select a gender",
+//   }),
+//   maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], {
+//     required_error: "Please select marital status",
+//   }),
+//   email: z.string().email().optional(),
+//   whatsappNumber: z.string().optional(),
+//   maidenName: z.string().optional(),
+
+//   // Address Information
+//   residentialAddress: z.string().min(1, "Residential address is required"),
+//   city: z.string().min(1, "City is required"),
+//   lgaId: z.string().min(1, "LGA is required"),
+//   country: z.string().default("Nigeria"),
+//   postalCode: z.string().optional(),
+// });
+
 export const ownerFormSchema = z.object({
+  gender: z.enum(["MALE", "FEMALE", "OTHERS"], {
+    required_error: "Please select a gender",
+  }),
+  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], {
+    required_error: "Please select marital status",
+  }),
+  whatsappNumber: z
+    .string()
+    .min(1, "Next of Kin phone number is required")
+    .regex(
+      /^(070|080|081|090|091|071|089)\d{8}$/,
+      "Please enter a valid Nigerian phone number"
+    )
+    .optional(),
+  maidenName: z.string().optional(),
+  nextOfKinName: z.string().min(1, "Next of kin name is required"),
+  nextOfKinPhone: z
+    .string()
+    .min(1, "Next of Kin phone number is required")
+    .regex(
+      /^(070|080|081|090|091|071|089)\d{8}$/,
+      "Please enter a valid Nigerian phone number"
+    ),
+  nextOfKinRelationship: z.string().min(1, "Relationship is required"),
+});
+
+export const driverFormSchema = z.object({
   // Basic Information
   firstName: z
     .string()
@@ -16,34 +75,28 @@ export const ownerFormSchema = z.object({
   phone: z
     .string()
     .min(1, "Phone number is required")
-    .regex(/^\+234\d{10}$/, "Please enter a valid Nigerian phone number"),
-  gender: z.enum(["MALE", "FEMALE", "OTHERS"], {
-    required_error: "Please select a gender",
-  }),
-  maritalStatus: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], {
-    required_error: "Please select marital status",
-  }),
-  email: z.string().email().optional(),
-  whatsappNumber: z.string().optional(),
-  maidenName: z.string().optional(),
-
+    .regex(
+      /^(070|080|081|090|091|071|089)\d{8}$/,
+      "Please enter a valid Nigerian phone number"
+    ),
   // Address Information
   residentialAddress: z.string().min(1, "Residential address is required"),
   city: z.string().min(1, "City is required"),
   lgaId: z.string().min(1, "LGA is required"),
   country: z.string().default("Nigeria"),
   postalCode: z.string().optional(),
+  email: z.string().email().optional(),
 });
 
 // Next of kin validation schema
-export const nextOfKinSchema = z.object({
-  name: z.string().min(1, "Next of kin name is required"),
-  phone: z
-    .string()
-    .min(1, "Next of kin phone is required")
-    .regex(/^\+234\d{10}$/, "Please enter a valid Nigerian phone number"),
-  relationship: z.string().min(1, "Relationship is required"),
-});
+// export const nextOfKinSchema = z.object({
+//   name: z.string().min(1, "Next of kin name is required"),
+//   phone: z
+//     .string()
+//     .min(1, "Next of kin phone is required")
+//     .regex(/^\+234\d{10}$/, "Please enter a valid Nigerian phone number"),
+//   relationship: z.string().min(1, "Relationship is required"),
+// });
 
 // Vehicle form validation schema
 export const vehicleFormSchema = z.object({
@@ -61,13 +114,13 @@ export const vehicleFormSchema = z.object({
 // Complete registration schema
 export const completeRegistrationSchema = z.object({
   owner: ownerFormSchema,
-  nextOfKin: nextOfKinSchema,
+  nextOfKin: driverFormSchema,
   vehicle: vehicleFormSchema,
   createVirtualAccount: z.boolean().default(false),
 });
 
 export type OwnerFormValues = z.infer<typeof ownerFormSchema>;
-export type NextOfKinFormValues = z.infer<typeof nextOfKinSchema>;
+export type DriverFormValues = z.infer<typeof driverFormSchema>;
 export type VehicleFormValues = z.infer<typeof vehicleFormSchema>;
 export type CompleteRegistrationValues = z.infer<
   typeof completeRegistrationSchema

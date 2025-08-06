@@ -2,6 +2,7 @@ import { getVehicleById } from "@/actions/vehicles";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import NotificationAddStickers from "@/components/vehicles/temporary-add-sticker";
 import VehicleDetailTabs from "@/components/vehicles/vehicle-detail-tabs";
 import VehicleHeader from "@/components/vehicles/vehicle-header";
 import VehicleSidebar from "@/components/vehicles/vehicle-sidebar";
@@ -9,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type React from "react";
+import * as React from "react";
 import { Suspense } from "react";
 
 interface VehiclePageProps {
@@ -26,6 +27,7 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
 
   try {
     vehicle = await getVehicleById(id);
+    console.log({ vehicle });
   } catch (err) {
     error = err instanceof Error ? err.message : "Failed to fetch vehicle";
     console.log("Error fetching vehicle:", err);
@@ -65,6 +67,8 @@ export default async function VehiclePage({ params }: VehiclePageProps) {
       <Suspense fallback={<HeaderSkeleton />}>
         <VehicleHeader vehicle={vehicle.data} />
       </Suspense>
+
+      <NotificationAddStickers vehicle={vehicle.data} />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Vehicle Profile Card */}

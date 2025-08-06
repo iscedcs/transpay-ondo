@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { Camera, User, Loader2 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Camera, Loader2, User } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface AvatarUploaderProps {
@@ -24,6 +24,14 @@ const sizeClasses = {
   xl: "h-24 w-24",
 };
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Image as ImageIcon } from "lucide-react";
+
 export default function AvatarUploader({
   currentAvatarUrl,
   onAvatarUpload,
@@ -37,7 +45,6 @@ export default function AvatarUploader({
   const handleFileUpload = async (file: File) => {
     if (!file) return;
 
-    // Validate file type
     const validImageTypes = [
       "image/jpeg",
       "image/png",
@@ -52,7 +59,6 @@ export default function AvatarUploader({
       return;
     }
 
-    // Validate file size (5MB max for avatars)
     if (file.size > 5 * 1024 * 1024) {
       toast.error("File too large", {
         description: "Avatar image must be less than 5MB.",
@@ -61,7 +67,6 @@ export default function AvatarUploader({
     }
 
     setUploading(true);
-
     try {
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -72,16 +77,10 @@ export default function AvatarUploader({
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
 
-      const jsonData = await response.json();
-      const { url, fields } = jsonData;
-
-      if (!url || !fields) {
-        throw new Error("Invalid server response");
-      }
+      const { url, fields } = await response.json();
+      if (!url || !fields) throw new Error("Invalid server response");
 
       const formData = new FormData();
       Object.entries(fields).forEach(([key, value]) =>
@@ -99,10 +98,8 @@ export default function AvatarUploader({
         setAvatarUrl(fileUrl);
 
         const result = await onAvatarUpload(fileUrl);
-        if (result && result.error) {
-          toast.error("Upload error", {
-            description: result.error,
-          });
+        if (result?.error) {
+          toast.error("Upload error", { description: result.error });
         } else {
           toast.success("Success", {
             description: result?.success || "Avatar updated successfully!",
@@ -112,7 +109,7 @@ export default function AvatarUploader({
         throw new Error("Upload failed");
       }
     } catch (error) {
-      console.log("Upload error:", error);
+      console.error("Upload error:", error);
       toast.error("Upload failed", {
         description:
           error instanceof Error
@@ -122,6 +119,11 @@ export default function AvatarUploader({
     } finally {
       setUploading(false);
     }
+  };
+
+  const triggerFileInput = (id: string) => {
+    const input = document.getElementById(id) as HTMLInputElement;
+    if (input) input.click();
   };
 
   return (
@@ -137,21 +139,36 @@ export default function AvatarUploader({
         </AvatarFallback>
       </Avatar>
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full p-0"
-        disabled={disabled || uploading}
-        onClick={() => document.getElementById("avatar-upload")?.click()}
-      >
-        {uploading ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Camera className="h-3 w-3" />
-        )}
-      </Button>
+      {/* Single Dropdown Button */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full p-0"
+            disabled={disabled || uploading}
+          >
+            {uploading ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Camera className="h-3 w-3" />
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="top">
+          <DropdownMenuItem onSelect={() => triggerFileInput("avatar-upload")}>
+            <ImageIcon className="mr-2 h-4 w-4" />
+            Upload from device
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => triggerFileInput("avatar-camera")}>
+            <Camera className="mr-2 h-4 w-4" />
+            Take a photo
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
+      {/* Hidden Inputs */}
       <Input
         id="avatar-upload"
         type="file"
@@ -159,9 +176,20 @@ export default function AvatarUploader({
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
-          if (file) {
-            handleFileUpload(file);
-          }
+          if (file) handleFileUpload(file);
+        }}
+        disabled={disabled || uploading}
+      />
+
+      <Input
+        id="avatar-camera"
+        type="file"
+        accept="image/*"
+        capture="user"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFileUpload(file);
         }}
         disabled={disabled || uploading}
       />
