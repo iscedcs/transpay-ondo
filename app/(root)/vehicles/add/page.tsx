@@ -286,10 +286,10 @@ const AddVehiclePage = () => {
         <CardContent>
           <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList>
-              <TabsTrigger value="vehicle">Vehicle Details</TabsTrigger>
-              <TabsTrigger value="driver">Driver Details</TabsTrigger>
-              <TabsTrigger value="owner">Owner Details</TabsTrigger>
-              <TabsTrigger value="review">Review</TabsTrigger>
+              <TabsTrigger value="vehicle">Vehicle</TabsTrigger>
+              <TabsTrigger value="driver">Driver</TabsTrigger>
+              <TabsTrigger value="owner">Owner</TabsTrigger>
+              {/* <TabsTrigger value="review">Review</TabsTrigger> */}
             </TabsList>
             <TabsContent value="vehicle">
               <Form {...vehicleForm}>
@@ -681,7 +681,7 @@ const AddVehiclePage = () => {
                 </form>
               </Form>
             </TabsContent>
-            <TabsContent value="review">
+            {/* <TabsContent value="review">
               <div className="grid gap-4">
                 <div>
                   <h3 className="text-lg font-semibold">Driver Information</h3>
@@ -737,7 +737,7 @@ const AddVehiclePage = () => {
                   </div>
                 </div>
               </div>
-            </TabsContent>
+            </TabsContent> */}
           </Tabs>
         </CardContent>
         <CardFooter className="flex justify-between">
@@ -769,9 +769,30 @@ const AddVehiclePage = () => {
                 Next: Owner Information
               </Button>
             ) : (
-              <Button type="button" onClick={() => handleTabChange("review")}>
-                Next: Review
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button type="button" disabled={isLoading}>
+                    {isLoading ? "Submitting..." : "Submit"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. Are you sure you want to
+                      submit?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={onSubmit}>
+                      {isLoading ? "Submitting..." : "Submit"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             )
           ) : (
             <AlertDialog>
