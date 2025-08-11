@@ -250,6 +250,7 @@ model Vehicle {
   customerReference            String?                      @unique
   createdBy                    String?
   category                     VehicleCategories?
+  vehicleSettingId             String?
   AuditTrail                   AuditTrail[]
   BarCodes                     BarCodes?
   Driver                       Driver[]
@@ -263,6 +264,7 @@ model Vehicle {
   VehicleGroup                 VehicleGroup?                @relation(fields: [groupId], references: [id])
   User                         User?                        @relation(fields: [ownerId], references: [id])
   LGA                          LGA?                         @relation(fields: [registeredLgaId], references: [id])
+  VehicleSetting               VehicleSetting?              @relation(fields: [vehicleSettingId], references: [id])
   VehicleFine                  VehicleFine[]
   VehicleImage                 VehicleImage[]
   VehicleRoute                 VehicleRoute[]
@@ -602,6 +604,18 @@ model FlaggedRecord {
   @@index([approvedBy])
   @@index([resolvedBy])
   @@index([vehicleId])
+}
+
+model VehicleSetting {
+  id            String    @id
+  name          String    @unique
+  description   String?
+  totalVehicles Int?      @default(0)
+  isActive      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  deletedAt     DateTime?
+  Vehicle       Vehicle[]
 }
 
 enum DriverStatus {

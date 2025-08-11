@@ -23,12 +23,12 @@ export async function VehicleTypes() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {data.map((vehicle: any) => {
+          {data.map((vehicle: any, index: number) => {
             const maxCount = Math.max(...data.map((v: any) => v.count));
             const percentage = (vehicle.count / maxCount) * 100;
 
             return (
-              <div key={vehicle.type} className="space-y-2">
+              <div key={index} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{vehicle.type}</span>
                   <span className="text-sm text-muted-foreground">

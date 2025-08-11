@@ -178,7 +178,7 @@ export default function AllLGAsPage() {
             <MapPin className="h-4 w-4" />
             {showMap ? "Hide Map" : "Show Map"}
           </Button>
-          {["ADMIN", "SUPERADMIN"].includes(String(session.data?.user.role)) ? (
+          {["SUPERADMIN"].includes(String(session.data?.user.role)) ? (
             <Button
               onClick={() => setIsImportModalOpen(true)}
               className="flex items-center gap-2"
@@ -332,9 +332,7 @@ export default function AllLGAsPage() {
               </p>
               {!searchTerm && (
                 <div className="mt-6">
-                  <Button
-                    onClick={() => setIsImportModalOpen(true)}
-                  >
+                  <Button onClick={() => setIsImportModalOpen(true)}>
                     <Plus className="h-4 w-4 mr-2" />
                     Import LGAs
                   </Button>

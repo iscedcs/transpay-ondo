@@ -61,8 +61,10 @@ export function LGAImportModal({
   const [isLoading, setIsLoading] = useState(false);
   const [selectedLGAs, setSelectedLGAs] = useState<NigeriaLGAFeature[]>([]);
   const [defaultFees, setDefaultFees] = useState<VehicleFee[]>([
-    { vehicleCategory: "TRICYCLE", fee: 500 },
-    { vehicleCategory: "TRUCKS", fee: 2000 },
+    { vehicleCategory: "TRICYCLE", fee: 300 },
+    { vehicleCategory: "MOTORCYCLE", fee: 150 },
+    { vehicleCategory: "TAXI", fee: 400 },
+    { vehicleCategory: "BUS", fee: 800 },
   ]);
   const [stateFilter, setStateFilter] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState("");
