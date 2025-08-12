@@ -198,6 +198,20 @@ export async function getLGAs(
   params: GetLGAsParams = { limit: 50, page: 1 }
 ): Promise<LGAResponse> {
   try {
+    const session = await auth();
+    if (!session || !session.user) {
+      return {
+        success: false,
+        message: "No session or user found",
+        meta: {
+          total: 0,
+          page: params.page || 1,
+          limit: params.limit || 50,
+          pages: 0,
+        },
+        data: [],
+      };
+    }
     const { limit, page } = GetLGAsSchema.parse(params);
 
     const url = new URL(`${API}/api/lga/all`);
@@ -207,6 +221,7 @@ export async function getLGAs(
     const response = await fetch(url.toString(), {
       headers: {
         accept: "*/*",
+        Authorization: `Bearer ${session.user.access_token}`,
       },
       cache: "no-store", // Ensure we get fresh data
     });
