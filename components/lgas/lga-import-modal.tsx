@@ -27,6 +27,7 @@ import { Upload, FileText, MapPin, Filter, Plus, Trash2 } from "lucide-react";
 import { BOUNDARY_OBJECT } from "@/lib/nigerian-local-government-administrative-boundaries";
 import { VehicleFee, createLGAsBulk } from "@/actions/lga";
 import { NIGERIAN_STATES } from "@/lib/const";
+import { toast } from "sonner";
 
 // Nigerian states mapping
 
@@ -148,13 +149,20 @@ export function LGAImportModal({
       }));
 
       // @ts-expect-error: kdmmdksjdm
-      await createLGAsBulk(lgasToCreate);
+      const newLgas = await createLGAsBulk(lgasToCreate);
+
+      if (!newLgas.success) {
+        console.log({ newLgas });
+        toast.error("Failed to import LGAs. Please try again.");
+      }
 
       // Reset form
       setSelectedLGAs([]);
       setDefaultFees([
-        { vehicleCategory: "TRICYCLE", fee: 500 },
-        { vehicleCategory: "TRUCKS", fee: 2000 },
+        { vehicleCategory: "TRICYCLE", fee: 300 },
+        { vehicleCategory: "MOTORCYCLE", fee: 150 },
+        { vehicleCategory: "TAXI", fee: 400 },
+        { vehicleCategory: "BUS", fee: 800 },
       ]);
       setStateFilter("all");
       setSearchTerm("");

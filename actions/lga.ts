@@ -227,9 +227,17 @@ export async function getLGAs(
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to fetch LGAs: ${response.status} ${response.statusText}`
-      );
+      return {
+        success: false,
+        message: `Failed to fetch LGAs: ${response.status} ${response.statusText}`,
+        meta: {
+          total: 0,
+          page: params.page || 1,
+          limit: params.limit || 50,
+          pages: 0,
+        },
+        data: [],
+      };
     }
 
     const data: LGAResponse = await response.json();
@@ -369,7 +377,6 @@ export async function getLGAUsers(
     const data: LGAUsersResponse = await response.json();
 
     if (!data.success) {
-      
       return data;
     }
 
@@ -466,7 +473,6 @@ export async function getLGAVehicles(
     const data: LGAVehiclesResponse = await response.json();
 
     if (!data.success) {
-      
       return {
         success: false,
         message: data.message || "Failed to fetch LGA vehicles",
@@ -547,7 +553,7 @@ export async function getLGAScans(
 
     if (!response.ok) {
       const errorMessage = `Failed to fetch LGA scans: ${response.status} ${response.statusText}`;
-      
+
       return {
         success: false,
         message: errorMessage,
@@ -565,7 +571,7 @@ export async function getLGAScans(
 
     if (!data.success) {
       const errorMessage = data.message || "Failed to fetch LGA scans";
-      
+
       return {
         success: false,
         message: errorMessage,
@@ -649,7 +655,7 @@ export async function getLGARoutes(
 
     if (!response.ok) {
       const errorMessage = `Failed to fetch LGA routes: ${response.status} ${response.statusText}`;
-      
+
       return {
         success: false,
         message: errorMessage,
@@ -666,7 +672,7 @@ export async function getLGARoutes(
 
     if (!data.success) {
       const errorMessage = data.message || "Failed to fetch LGA routes";
-      
+
       return {
         success: false,
         message: errorMessage,
@@ -707,28 +713,34 @@ export async function createLGAsBulk(
     };
   }[]
 ): Promise<{ success: boolean; message: string; data?: any }> {
+  const session = await auth();
   try {
     const response = await fetch(`${API}/api/lga/create-bulk`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         accept: "*/*",
+        Authorization: `Bearer ${session?.user.access_token}`,
       },
       body: JSON.stringify(lgas),
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to create LGAs: ${response.status} ${response.statusText}`
-      );
+      return {
+        success: false,
+        message: `Failed to create LGAs: ${response.status} ${response.statusText}`,
+        data: null,
+      };
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to create LGAs"
-    );
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to create LGAs",
+      data: null,
+    };
   }
 }
 
@@ -736,10 +748,12 @@ export async function softDeleteLGA(
   id: string
 ): Promise<{ success: boolean; message: string }> {
   try {
+    const session = await auth();
     const response = await fetch(`${API}/api/lga/soft/${id}`, {
       method: "PATCH",
       headers: {
         accept: "*/*",
+        Authorization: `Bearer ${session?.user.access_token}`,
       },
       cache: "no-store",
     });
@@ -769,10 +783,12 @@ export async function hardDeleteLGA(
   id: string
 ): Promise<{ success: boolean; message: string }> {
   try {
+    const session = await auth();
     const response = await fetch(`${API}/api/lga/hard/${id}`, {
       method: "DELETE",
       headers: {
         accept: "*/*",
+        Authorization: `Bearer ${session?.user.access_token}`,
       },
       cache: "no-store",
     });

@@ -410,7 +410,7 @@ export async function createUser(
   }
 
   try {
-    const response = await fetch(`${API}/api/user/create`, {
+    const response = await fetch(`${API}/api/user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

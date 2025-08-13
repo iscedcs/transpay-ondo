@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { getLGAs } from "@/actions/lga";
 import { createUser } from "@/actions/users";
 import { Button } from "@/components/ui/button";
@@ -22,54 +24,56 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ADMIN_ROLES } from "@/lib/const";
 import { assignableRoles } from "@/lib/constants";
 import { formatRoleName } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Role } from "@prisma/client";
 import { ArrowLeft, Eye, EyeOff, Loader2, Save } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { useSession } from "next-auth/react";
 
-// Define the form schema with Zod
+// Define the form schema with Zod - updated with new required fields
 const userFormSchema = z
   .object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    email: z.string().email("Invalid email address"),
-    phone: z.string().min(10, "Phone number must be at least 10 characters"),
+    email: z.string().optional(), // Made optional as per requirements
+    phone: z
+      .string()
+      .min(10, "Phone number is required and must be at least 10 characters"),
     role: z.any(),
-    identification: z.string().min(1, "Identification type is required"),
+    identification: z.string().min(1, "Means of identification is required"),
     identificationNumber: z
       .string()
       .min(1, "Identification number is required"),
     address: z.object({
-      text: z.string().min(1, "Street is required"),
+      text: z.string().min(1, "Street address is required"),
       unit: z.string().optional(),
       city: z.string().min(1, "City is required"),
       state: z.string().min(1, "State is required"),
       postal_code: z.string().optional(),
       country: z.string().default("Nigeria"),
-      lga: z.string().optional(),
+      lga: z.string().min(1, "LGA is required"),
     }),
-    lgaId: z.string().optional(),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    confirmPassword: z
+    lgaId: z.string().min(1, "LGA selection is required"),
+    password: z
       .string()
-      .min(8, "Password must be at least 8 characters"),
-    gender: z.enum(["MALE", "FEMALE", "OTHER"]).optional(),
-    marital_status: z
-      .enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"])
-      .optional(),
+      .min(8, "Password is required and must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Password confirmation is required"),
+    gender: z.enum(["MALE", "FEMALE", "OTHER"], {
+      required_error: "Gender is required",
+    }),
+    marital_status: z.enum(["SINGLE", "MARRIED", "DIVORCED", "WIDOWED"], {
+      required_error: "Marital status is required",
+    }),
+    maiden_name: z.string().min(1, "Mother's maiden name is required"),
     whatsapp: z.string().optional(),
     nok_name: z.string().optional(),
     nok_phone: z.string().optional(),
     nok_relationship: z.string().optional(),
-    maiden_name: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -79,16 +83,8 @@ const userFormSchema = z
 type UserFormValues = z.infer<typeof userFormSchema>;
 
 export default function AddUserPage() {
-  const session = useSession();
   const router = useRouter();
-  if (!session?.data?.user) {
-    router.push("/sign-in");
-  }
-  const role = session.data?.user.role;
-  if (!ADMIN_ROLES.includes(String(role))) {
-    toast.error("You do not have edit permission");
-    router.push("/unauthorized");
-  }
+  const session = useSession();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
@@ -100,11 +96,12 @@ export default function AddUserPage() {
     null
   );
   const [activeTab, setActiveTab] = useState("basic");
+
+  // Updated tab fields with new required fields
   const tabFields = {
     basic: [
       "firstName",
       "lastName",
-      "email",
       "phone",
       "role",
       "identification",
@@ -114,6 +111,7 @@ export default function AddUserPage() {
       "gender",
     ],
     address: ["address.text", "address.city", "address.state", "lgaId"],
+    additional: ["marital_status", "maiden_name"],
   };
 
   const handleNext = async (
@@ -121,7 +119,7 @@ export default function AddUserPage() {
     currentTab: keyof typeof tabFields,
     nextTab: string
   ) => {
-    event.preventDefault(); // Prevent form submit or navigation
+    event.preventDefault();
 
     // @ts-expect-error: ignore this error, it always happens
     const valid = await form.trigger(tabFields[currentTab]);
@@ -159,19 +157,10 @@ export default function AddUserPage() {
       marital_status: "SINGLE",
       whatsapp: "",
       nok_name: "",
-      nok_phone: "",
       nok_relationship: "",
       maiden_name: "",
     },
   });
-  const rolesToOmit = [
-    Role.SUPERADMIN,
-    Role.ADMIN,
-    Role.EIRS_ADMIN,
-    Role.EIRS_AGENT,
-    Role.LGA_ADMIN,
-    Role.POS_AGENT,
-  ];
 
   // Fetch LGAs on component mount
   useEffect(() => {
@@ -194,23 +183,34 @@ export default function AddUserPage() {
     setIsLoading(true);
 
     try {
+      // Generate email from phone number if not provided
+      const email =
+        data.email && data.email.trim() !== ""
+          ? data.email
+          : `${data.phone}@transpayedo.com`;
+
       // Prepare the user data for submission
       const userData = {
         ...data,
+        email, // Use generated or provided email
         address: data.address,
-        identificationNumber: data.identificationNumber || nin,
+        identification: {
+          number: data.identificationNumber,
+          type: data.identification,
+        },
       };
 
       // Remove confirmPassword as it's not needed in the API
       const { confirmPassword, ...userDataToSubmit } = userData;
+      console.log({ userDataToSubmit });
 
       const result = await createUser(userDataToSubmit);
 
       if (!result.success) {
-        toast.error(result.error); // or show inline error
+        toast.error(result.error);
       } else {
-        toast.success("User created!");
-        router.push("/users");
+        toast.success("User created successfully!");
+        router.push("/");
       }
     } catch (error) {
       toast.error("Error", {
@@ -229,8 +229,10 @@ export default function AddUserPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Add New User</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Add New User
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Create a new user account in the system
           </p>
         </div>
@@ -239,6 +241,7 @@ export default function AddUserPage() {
             variant="outline"
             onClick={() => router.back()}
             className="flex items-center gap-2"
+            size="sm"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
@@ -246,165 +249,146 @@ export default function AddUserPage() {
         </div>
       </div>
 
-      {/* NIN Verification Card */}
-      {/* <Card>
-        <CardHeader>
-          <CardTitle>Identity Verification</CardTitle>
-          <CardDescription>
-            Enter the user's National Identification Number (NIN) to
-            automatically fetch their information
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <Label htmlFor="nin">National Identification Number (NIN)</Label>
-              <Input
-                id="nin"
-                placeholder="Enter NIN"
-                value={nin}
-                onChange={(e) => setNin(e.target.value)}
-                className="mt-1"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Enter the 11-digit NIN to fetch user information automatically
-              </p>
-            </div>
-            <div className="flex items-end">
-              <Button
-                // onClick={handleVerifyNIN}
-                disabled={isVerifying || !nin}
-                className="flex items-center gap-2"
-              >
-                {isVerifying ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="h-4 w-4" />
-                )}
-                {isVerifying ? "Verifying..." : "Verify NIN"}
-              </Button>
-            </div>
-          </div>
-
-          {verificationError && (
-            <Alert variant="destructive">
-              <AlertTitle>Verification Failed</AlertTitle>
-              <AlertDescription>{verificationError}</AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card> */}
-
       {/* User Form */}
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 w-full sm:w-auto">
-            <TabsTrigger value="basic">Basic Information</TabsTrigger>
-            <TabsTrigger value="address">Address & LGA</TabsTrigger>
-            <TabsTrigger value="additional">Additional Details</TabsTrigger>
+          <TabsList className="grid grid-cols-3 w-full">
+            <TabsTrigger value="basic" className="text-xs sm:text-sm">
+              Basic Info
+            </TabsTrigger>
+            <TabsTrigger value="address" className="text-xs sm:text-sm">
+              Address & LGA
+            </TabsTrigger>
+            <TabsTrigger value="additional" className="text-xs sm:text-sm">
+              Additional
+            </TabsTrigger>
           </TabsList>
 
           {/* Basic Information Tab */}
           <TabsContent value="basic" className="space-y-4 mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-                <CardDescription>
-                  Enter the user's basic personal and account information
+                <CardTitle className="text-lg sm:text-xl">
+                  Basic Information
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Enter the user's basic personal and account information.
+                  Fields marked with * are required.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Personal Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="firstName" className="text-sm font-medium">
+                      First Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="firstName"
                       placeholder="Enter first name"
+                      className="text-sm"
                       {...form.register("firstName")}
                     />
                     {form.formState.errors.firstName && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.firstName.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="lastName" className="text-sm font-medium">
+                      Last Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="lastName"
                       placeholder="Enter last name"
+                      className="text-sm"
                       {...form.register("lastName")}
                     />
                     {form.formState.errors.lastName && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.lastName.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email" className="text-sm font-medium">
+                      Email Address{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
                     <Input
                       id="email"
                       type="email"
                       placeholder="Enter email address"
+                      className="text-sm"
                       {...form.register("email")}
                     />
+                    <p className="text-xs text-muted-foreground">
+                      If not provided, we'll use your phone number with
+                      @transpayedo.com
+                    </p>
                     {form.formState.errors.email && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.email.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-sm font-medium">
+                      Phone Number <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="phone"
                       placeholder="Enter phone number"
+                      className="text-sm"
                       {...form.register("phone")}
                     />
                     {form.formState.errors.phone && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.phone.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="role">Admin Role</Label>
+                    <Label htmlFor="role" className="text-sm font-medium">
+                      Admin Role <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       onValueChange={(value) =>
                         form.setValue("role", value as any)
                       }
                       defaultValue={form.watch("role")}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        {assignableRoles[String(session.data?.user.role)].map(
-                          (role) => (
-                            <SelectItem value={role} key={role}>
-                              {formatRoleName(role)}
-                            </SelectItem>
-                          )
-                        )}
+                        {assignableRoles[
+                          session?.data?.user?.role ?? "VEHICLE_OWNER"
+                        ].map((role) => (
+                          <SelectItem value={role} key={role}>
+                            {formatRoleName(role)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="gender">Gender</Label>
+                    <Label htmlFor="gender" className="text-sm font-medium">
+                      Gender <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       onValueChange={(value) =>
                         form.setValue("gender", value as any)
                       }
                       defaultValue={form.watch("gender") || "MALE"}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
                       <SelectContent>
@@ -413,16 +397,25 @@ export default function AddUserPage() {
                         <SelectItem value="OTHER">Other</SelectItem>
                       </SelectContent>
                     </Select>
+                    {form.formState.errors.gender && (
+                      <p className="text-xs text-destructive">
+                        {form.formState.errors.gender.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 <Separator />
 
                 {/* Identification */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="identification">
-                      Means of Identification
+                    <Label
+                      htmlFor="identification"
+                      className="text-sm font-medium"
+                    >
+                      Means of Identification{" "}
+                      <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       onValueChange={(value) =>
@@ -430,36 +423,37 @@ export default function AddUserPage() {
                       }
                       defaultValue={form.watch("identification")}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select identification type" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="NIN">NIN</SelectItem>
-                        {/* <SelectItem value="DRIVERS_LICENSE">
-                          Driver's License
-                        </SelectItem>
-                        <SelectItem value="PASSPORT">
-                          International Passport
-                        </SelectItem>
-                        <SelectItem value="VOTERS_CARD">
-                          Voter's Card
-                        </SelectItem> */}
                       </SelectContent>
                     </Select>
+                    {form.formState.errors.identification && (
+                      <p className="text-xs text-destructive">
+                        {form.formState.errors.identification.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="identificationNumber">
-                      Identification Number
+                    <Label
+                      htmlFor="identificationNumber"
+                      className="text-sm font-medium"
+                    >
+                      Identification Number{" "}
+                      <span className="text-red-500">*</span>
                     </Label>
                     <Input
                       id="identificationNumber"
                       placeholder="Enter identification number"
+                      className="text-sm"
                       {...form.register("identificationNumber")}
                       defaultValue={nin}
                     />
                     {form.formState.errors.identificationNumber && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.identificationNumber.message}
                       </p>
                     )}
@@ -469,14 +463,17 @@ export default function AddUserPage() {
                 <Separator />
 
                 {/* Password */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password" className="text-sm font-medium">
+                      Password <span className="text-red-500">*</span>
+                    </Label>
                     <div className="relative">
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
                         placeholder="Enter password"
+                        className="text-sm pr-10"
                         {...form.register("password")}
                       />
                       <Button
@@ -494,19 +491,25 @@ export default function AddUserPage() {
                       </Button>
                     </div>
                     {form.formState.errors.password && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.password.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Label
+                      htmlFor="confirmPassword"
+                      className="text-sm font-medium"
+                    >
+                      Confirm Password <span className="text-red-500">*</span>
+                    </Label>
                     <div className="relative">
                       <Input
                         id="confirmPassword"
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Confirm password"
+                        className="text-sm pr-10"
                         {...form.register("confirmPassword")}
                       />
                       <Button
@@ -526,20 +529,25 @@ export default function AddUserPage() {
                       </Button>
                     </div>
                     {form.formState.errors.confirmPassword && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.confirmPassword.message}
                       </p>
                     )}
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => router.back()}>
+              <CardFooter className="flex flex-col sm:flex-row justify-between gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => router.back()}
+                  size="sm"
+                >
                   Cancel
                 </Button>
                 <Button
                   type="button"
                   onClick={(e) => handleNext(e, "basic", "address")}
+                  size="sm"
                 >
                   Next: Address & LGA
                 </Button>
@@ -551,79 +559,102 @@ export default function AddUserPage() {
           <TabsContent value="address" className="space-y-4 mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>Address & LGA</CardTitle>
-                <CardDescription>
-                  Enter the user's address information and assign an LGA
+                <CardTitle className="text-lg sm:text-xl">
+                  Address & LGA
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Enter the user's address information and assign an LGA. Fields
+                  marked with * are required.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Address */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="street">Street</Label>
+                    <Label htmlFor="street" className="text-sm font-medium">
+                      Street Address <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="street"
                       placeholder="Enter street address"
+                      className="text-sm"
                       {...form.register("address.text")}
                     />
                     {form.formState.errors.address?.text && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.address.text.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="unit">Unit (Optional)</Label>
+                    <Label htmlFor="unit" className="text-sm font-medium">
+                      Unit{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
                     <Input
                       id="unit"
                       placeholder="Apartment, suite, unit, etc."
+                      className="text-sm"
                       {...form.register("address.unit")}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city" className="text-sm font-medium">
+                      City <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="city"
                       placeholder="Enter city"
+                      className="text-sm"
                       {...form.register("address.city")}
                     />
                     {form.formState.errors.address?.city && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.address.city.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
+                    <Label htmlFor="state" className="text-sm font-medium">
+                      State <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="state"
                       placeholder="Enter state"
+                      className="text-sm"
                       {...form.register("address.state")}
                     />
                     {form.formState.errors.address?.state && (
-                      <p className="text-sm text-destructive-foreground">
+                      <p className="text-xs text-destructive">
                         {form.formState.errors.address.state.message}
                       </p>
                     )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="postalCode">Postal Code (Optional)</Label>
+                    <Label htmlFor="postalCode" className="text-sm font-medium">
+                      Postal Code{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
                     <Input
                       id="postalCode"
                       placeholder="Enter postal code"
+                      className="text-sm"
                       {...form.register("address.postal_code")}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="country">Country</Label>
+                    <Label htmlFor="country" className="text-sm font-medium">
+                      Country
+                    </Label>
                     <Input
                       id="country"
                       placeholder="Enter country"
+                      className="text-sm"
                       {...form.register("address.country")}
                       defaultValue="Nigeria"
                     />
@@ -635,7 +666,10 @@ export default function AddUserPage() {
                 {/* LGA Assignment */}
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="lga">Local Government Area (LGA)</Label>
+                    <Label htmlFor="lga" className="text-sm font-medium">
+                      Local Government Area (LGA){" "}
+                      <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       onValueChange={(value) => {
                         form.setValue("lgaId", value);
@@ -649,7 +683,7 @@ export default function AddUserPage() {
                       }}
                       defaultValue={form.watch("lgaId")}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select LGA" />
                       </SelectTrigger>
                       <SelectContent>
@@ -669,16 +703,26 @@ export default function AddUserPage() {
                     <p className="text-xs text-muted-foreground mt-1">
                       Assign the user to a specific Local Government Area
                     </p>
+                    {form.formState.errors.lgaId && (
+                      <p className="text-xs text-destructive">
+                        {form.formState.errors.lgaId.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => setActiveTab("basic")}>
+              <CardFooter className="flex flex-col sm:flex-row justify-between gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setActiveTab("basic")}
+                  size="sm"
+                >
                   Back
                 </Button>
                 <Button
                   type="button"
                   onClick={(e) => handleNext(e, "address", "additional")}
+                  size="sm"
                 >
                   Next: Additional Details
                 </Button>
@@ -690,23 +734,31 @@ export default function AddUserPage() {
           <TabsContent value="additional" className="space-y-4 mt-4">
             <Card>
               <CardHeader>
-                <CardTitle>Additional Details</CardTitle>
-                <CardDescription>
-                  Optional additional information about the user
+                <CardTitle className="text-lg sm:text-xl">
+                  Additional Details
+                </CardTitle>
+                <CardDescription className="text-sm">
+                  Additional information about the user. Fields marked with *
+                  are required.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Personal Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="marital_status">Marital Status</Label>
+                    <Label
+                      htmlFor="marital_status"
+                      className="text-sm font-medium"
+                    >
+                      Marital Status <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       onValueChange={(value) =>
                         form.setValue("marital_status", value as any)
                       }
                       defaultValue={form.watch("marital_status") || "SINGLE"}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select marital status" />
                       </SelectTrigger>
                       <SelectContent>
@@ -716,23 +768,44 @@ export default function AddUserPage() {
                         <SelectItem value="WIDOWED">Widowed</SelectItem>
                       </SelectContent>
                     </Select>
+                    {form.formState.errors.marital_status && (
+                      <p className="text-xs text-destructive">
+                        {form.formState.errors.marital_status.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="whatsapp">WhatsApp Number (Optional)</Label>
+                    <Label
+                      htmlFor="maiden_name"
+                      className="text-sm font-medium"
+                    >
+                      Mother's Maiden Name{" "}
+                      <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="maiden_name"
+                      placeholder="Enter mother's maiden name"
+                      className="text-sm"
+                      {...form.register("maiden_name")}
+                    />
+                    {form.formState.errors.maiden_name && (
+                      <p className="text-xs text-destructive">
+                        {form.formState.errors.maiden_name.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp" className="text-sm font-medium">
+                      WhatsApp Number{" "}
+                      <span className="text-muted-foreground">(Optional)</span>
+                    </Label>
                     <Input
                       id="whatsapp"
                       placeholder="Enter WhatsApp number"
+                      className="text-sm"
                       {...form.register("whatsapp")}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="maiden_name">Maiden Name (Optional)</Label>
-                    <Input
-                      id="maiden_name"
-                      placeholder="Enter maiden name if applicable"
-                      {...form.register("maiden_name")}
                     />
                   </div>
                 </div>
@@ -741,43 +814,62 @@ export default function AddUserPage() {
 
                 {/* Next of Kin */}
                 <div>
-                  <h3 className="text-lg font-medium mb-4">
-                    Next of Kin Information (Optional)
+                  <h3 className="text-base sm:text-lg font-medium mb-4">
+                    Next of Kin Information{" "}
+                    <span className="text-muted-foreground text-sm">
+                      (Optional)
+                    </span>
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="nok_name">Next of Kin Name</Label>
+                      <Label htmlFor="nok_name" className="text-sm font-medium">
+                        Next of Kin Name
+                      </Label>
                       <Input
                         id="nok_name"
                         placeholder="Enter next of kin name"
+                        className="text-sm"
                         {...form.register("nok_name")}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="nok_phone">Next of Kin Phone</Label>
+                      <Label
+                        htmlFor="nok_phone"
+                        className="text-sm font-medium"
+                      >
+                        Next of Kin Phone
+                      </Label>
                       <Input
                         id="nok_phone"
                         placeholder="Enter next of kin phone number"
+                        className="text-sm"
                         {...form.register("nok_phone")}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="nok_relationship">Relationship</Label>
+                      <Label
+                        htmlFor="nok_relationship"
+                        className="text-sm font-medium"
+                      >
+                        Relationship
+                      </Label>
                       <Input
                         id="nok_relationship"
                         placeholder="E.g., Spouse, Parent, Sibling"
+                        className="text-sm"
                         {...form.register("nok_relationship")}
                       />
                     </div>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex justify-between">
+              <CardFooter className="flex flex-col sm:flex-row justify-between gap-3">
                 <Button
                   variant="outline"
                   onClick={() => setActiveTab("address")}
+                  size="sm"
                 >
                   Back
                 </Button>
@@ -785,6 +877,7 @@ export default function AddUserPage() {
                   type="submit"
                   disabled={isLoading}
                   className="flex items-center gap-2"
+                  size="sm"
                 >
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
