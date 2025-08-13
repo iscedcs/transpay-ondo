@@ -260,9 +260,11 @@ export async function getLGAs(
 
 export async function getLGAById(id: string): Promise<LGA> {
   try {
+    const session = await auth();
     const response = await fetch(`${API}/api/lga/one/${id}`, {
       headers: {
         accept: "*/*",
+        Authorization: `Bearer ${session?.user.access_token}`,
       },
       cache: "no-store",
     });

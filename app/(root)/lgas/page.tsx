@@ -394,23 +394,27 @@ export default function AllLGAsPage() {
                           >
                             <Eye className="h-4 w-4" />
                           </Link>
-                          <Link
-                            href={`/lgas/${lga.id}/edit`}
-                            className={buttonVariants({
-                              variant: "ghost",
-                              size: "sm",
-                            })}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => handleDeleteLGA(lga)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          {session.data?.user.role === "SUPERADMIN" && (
+                            <>
+                              <Link
+                                href={`/lgas/${lga.id}/edit`}
+                                className={buttonVariants({
+                                  variant: "ghost",
+                                  size: "sm",
+                                })}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Link>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive hover:text-destructive"
+                                onClick={() => handleDeleteLGA(lga)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
