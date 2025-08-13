@@ -25,7 +25,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ADMIN_ROLES } from "@/lib/const";
 import { parseAddressExtended } from "@/lib/utils";
-import { Role } from "@prisma/client";
 import { ArrowLeft, Edit3, Loader2, Save, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
@@ -45,9 +44,7 @@ interface IdentificationData {
 type EditingField =
   | "firstName"
   | "lastName"
-  | "email"
   | "phone"
-  | "role"
   | "gender"
   | "identification"
   | "blacklisted"
@@ -499,30 +496,12 @@ export default function EditUserPage() {
                   "Enter last name"
                 )}
                 {renderEditableField(
-                  "email",
-                  "Email Address",
-                  fieldValues.email,
-                  "input",
-                  undefined,
-                  "Enter email address"
-                )}
-                {renderEditableField(
                   "phone",
                   "Phone Number",
                   fieldValues.phone,
                   "input",
                   undefined,
                   "Enter phone number"
-                )}
-                {renderEditableField(
-                  "role",
-                  "User Role",
-                  fieldValues.role,
-                  "select",
-                  Object.keys(Role).map((role) => ({
-                    value: role,
-                    label: role,
-                  }))
                 )}
                 {renderEditableField(
                   "gender",
