@@ -59,8 +59,6 @@ import {
 import { devLog } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import { User, getMe } from "@/actions/users";
-import { AlertTriangle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const AddVehiclePage = () => {
   const router = useRouter();
@@ -73,7 +71,7 @@ const AddVehiclePage = () => {
   const [filteredLgas, setFilteredLgas] = useState<
     { id: string; name: string }[]
   >([]);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const checkUserAccess = (user: User) => {
     const allowedRoles = [
       "ADMIN",
@@ -247,69 +245,69 @@ const AddVehiclePage = () => {
     );
   }
 
-  if (!hasAccess) {
-    return (
-      <div className="px-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive-foreground" />
-              Access Denied
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                {user?.status !== "ACTIVE"
-                  ? "Your account is not active. Please contact your administrator."
-                  : user?.blacklisted
-                  ? "Your account has been restricted. Please contact your administrator."
-                  : "You don't have permission to create vehicles. Only ADMIN, LGA_AGENT, SUPERADMIN, EIRS_ADMIN, EIRS_AGENT, and LGA_ADMIN roles can create vehicles."}
-              </AlertDescription>
-            </Alert>
-            <div className="mt-4">
-              <Button onClick={() => router.back()} variant="outline">
-                Go Back
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // if (status === "authenticated" && !hasAccess) {
+  //   return (
+  //     <div className="px-4">
+  //       <Card>
+  //         <CardHeader>
+  //           <CardTitle className="flex items-center gap-2">
+  //             <AlertTriangle className="h-5 w-5 text-destructive-foreground" />
+  //             Access Denied
+  //           </CardTitle>
+  //         </CardHeader>
+  //         <CardContent>
+  //           <Alert variant="destructive">
+  //             <AlertTriangle className="h-4 w-4" />
+  //             <AlertDescription>
+  //               {user?.status !== "ACTIVE"
+  //                 ? "Your account is not active. Please contact your administrator."
+  //                 : user?.blacklisted
+  //                 ? "Your account has been restricted. Please contact your administrator."
+  //                 : "You don't have permission to create vehicles. Only ADMIN, LGA_AGENT, SUPERADMIN, EIRS_ADMIN, EIRS_AGENT, and LGA_ADMIN roles can create vehicles."}
+  //             </AlertDescription>
+  //           </Alert>
+  //           <div className="mt-4">
+  //             <Button onClick={() => router.back()} variant="outline">
+  //               Go Back
+  //             </Button>
+  //           </div>
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   );
+  // }
 
-  if (
-    (user?.role === "LGA_ADMIN" || user?.role === "LGA_AGENT") &&
-    filteredLgas.length === 0
-  ) {
-    return (
-      <div className="px-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-destructive-foreground" />
-              No LGA Assigned
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                You don't have an LGA assigned to your account. Please contact
-                your administrator to assign an LGA before creating vehicles.
-              </AlertDescription>
-            </Alert>
-            <div className="mt-4">
-              <Button onClick={() => router.back()} variant="outline">
-                Go Back
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  // if (
+  //   (user?.role === "LGA_ADMIN" || user?.role === "LGA_AGENT") &&
+  //   filteredLgas.length === 0
+  // ) {
+  //   return (
+  //     <div className="px-4">
+  //       <Card>
+  //         <CardHeader>
+  //           <CardTitle className="flex items-center gap-2">
+  //             <AlertTriangle className="h-5 w-5 text-destructive-foreground" />
+  //             No LGA Assigned
+  //           </CardTitle>
+  //         </CardHeader>
+  //         <CardContent>
+  //           <Alert variant="destructive">
+  //             <AlertTriangle className="h-4 w-4" />
+  //             <AlertDescription>
+  //               You don't have an LGA assigned to your account. Please contact
+  //               your administrator to assign an LGA before creating vehicles.
+  //             </AlertDescription>
+  //           </Alert>
+  //           <div className="mt-4">
+  //             <Button onClick={() => router.back()} variant="outline">
+  //               Go Back
+  //             </Button>
+  //           </div>
+  //         </CardContent>
+  //       </Card>
+  //     </div>
+  //   );
+  // }
 
   const validateOwnerTab = async () => {
     const isValid = await ownerForm.trigger();
