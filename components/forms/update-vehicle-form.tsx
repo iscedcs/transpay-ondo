@@ -180,7 +180,9 @@ export function UpdateVehicleForm({ vehicle }: { vehicle: IVehicle }) {
           }
      }
 
-     const isValidCategory = vehicle.category !== TransactionCategories.OTHERS;
+     const isValidCategory = !Object.keys(TransactionCategories).includes(
+       vehicle.category
+     );
      const hasChasis = !!vehicle.vin
 
      return (

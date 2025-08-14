@@ -39,7 +39,9 @@ export default async function StatusPage({ params }: { params: Promise<{ bcid: s
      const CVOFBalance = Number(wallet.cvof_balance);
      const CVOFOwing = Number(wallet.cvof_owing);
 
-     const isValidCategory = vehicle.category !== TransactionCategories.OTHERS;
+     const isValidCategory = !Object.keys(TransactionCategories).includes(
+       vehicle.category
+     );
      const isOwing = false;
      const hasFareFlex = !!vehicle.fairFlexImei && vehicle.fairFlexImei.trim() !== "";
      const hasSticker = !!vehicle.barcode && vehicle.barcode.trim() !== "";
