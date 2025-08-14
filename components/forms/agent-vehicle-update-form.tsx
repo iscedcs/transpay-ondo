@@ -158,7 +158,9 @@ export function AgentVehicleUpdateForm({ vehicle }: { vehicle: IVehicle }) {
           }
      }
 
-     const isValidCategory = vehicle.category !== TransactionCategories.OTHERS;
+     const isValidCategory = !Object.keys(TransactionCategories).includes(
+       vehicle.category
+     );
 
      return (
           <div className="mb-20">

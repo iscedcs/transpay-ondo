@@ -48,7 +48,9 @@ export default async function SearchVehicle({ id }: { id: string }) {
     vehicle.status === "ACTIVE" && Number(wallet.cvof_owing) === 0;
   const CVOFOwing = Number(wallet.cvof_owing);
 
-  const isValidCategory = vehicle.category !== TransactionCategories.OTHERS;
+  const isValidCategory = !Object.keys(TransactionCategories).includes(
+    vehicle.category
+  );
   const hasFareFlex =
     !!vehicle.fairFlexImei && vehicle.fairFlexImei.trim() !== "";
   const hasSticker = !!vehicle.barcode && vehicle.barcode.trim() !== "";
