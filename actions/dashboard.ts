@@ -6,6 +6,7 @@ import { API, URLS } from "@/lib/const";
 import { db } from "@/lib/db";
 import { Role } from "@prisma/client";
 import { getMe } from "./users";
+import { devLog } from "@/lib/utils";
 
 export const getComplianceRate = async () => {
   const session = await auth();
@@ -164,7 +165,6 @@ export const getMonthlyRevenueChange = async () => {
   };
   const res = await fetch(URL, { headers, cache: "no-store" });
   if (!res.ok) {
-    
     return {
       currentMonthRevenue: 0,
       lastMonthRevenue: 0,
@@ -175,7 +175,6 @@ export const getMonthlyRevenueChange = async () => {
 
   const monthly_revenue_change = data;
   if (!monthly_revenue_change) {
-    
     return {
       currentMonthRevenue: 0,
       lastMonthRevenue: 0,
@@ -222,7 +221,6 @@ export const getUsersByRole = async () => {
   };
   const res = await fetch(URL, { headers, cache: "no-store" });
   if (!res.ok) {
-    
     return [
       { role: "ADMIN", count: 0 },
       { role: "EIRS_ADMIN", count: 0 },
@@ -237,7 +235,6 @@ export const getUsersByRole = async () => {
 
   const user_count = data.data;
   if (!user_count) {
-    
     return [
       { role: "ADMIN", count: 0 },
       { role: "EIRS_ADMIN", count: 0 },
@@ -256,14 +253,14 @@ export async function fetchVehicleTypes() {
   if (!session || !session.user) {
     return [
       { type: "TRICYCLE", count: 0 },
-      { type: "BUS_INTRASTATE", count: 0 },
+      { type: "BUS", count: 0 },
     ];
   }
   const token = session?.user.access_token;
   if (!token) {
     return [
       { type: "TRICYCLE", count: 0 },
-      { type: "BUS_INTRASTATE", count: 0 },
+      { type: "BUS", count: 0 },
     ];
   }
   const URL = `${API}${URLS.dashboard.superadmin.vehicle_category_count}`;
@@ -273,22 +270,21 @@ export async function fetchVehicleTypes() {
   };
   const res = await fetch(URL, { headers, cache: "no-store" });
   if (!res.ok) {
-    
     return [
       { type: "TRICYCLE", count: 0 },
-      { type: "BUS_INTRASTATE", count: 0 },
+      { type: "BUS", count: 0 },
     ];
   }
   const data = await res.json();
 
   const vehicle_category_count = data.data;
   if (!vehicle_category_count) {
-    
     return [
       { type: "TRICYCLE", count: 0 },
-      { type: "BUS_INTRASTATE", count: 0 },
+      { type: "BUS", count: 0 },
     ];
   }
+  devLog({ vehicle_category_count });
   return vehicle_category_count;
 }
 

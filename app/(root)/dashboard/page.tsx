@@ -21,21 +21,31 @@ export default async function DashboardPage() {
   if (userRequest.user.status === "BLOCKED") {
     redirect("/blocked");
   }
-  if (!userRequest.user) {
-    redirect("/sign-in");
-  }
 
-  if (userRequest.user.role === Role.LGA_ADMIN) {
-    return <LGAAdminDashboard />;
-  }
+  // BEGIN: ed8c6549bwf9
+  const renderDashboard = () => {
+    switch (userRequest.user.role) {
+      case Role.LGA_ADMIN:
+        return <LGAAdminDashboard />;
+      case Role.LGA_C_AGENT:
+        return <LGACAgentDashboard />;
+      case Role.LGA_AGENT:
+        return <LGAAgentDashboard />;
+      default:
+        return <SuperadminDashboard />;
+    }
+  };
 
-  if (userRequest.user.role === Role.LGA_C_AGENT) {
-    return <LGACAgentDashboard />;
-  }
-
-  if (userRequest.user.role === Role.LGA_AGENT) {
-    return <LGAAgentDashboard />;
-  }
-
-  return <SuperadminDashboard />;
+  return (
+    <div>
+      {userRequest.user.lga && (
+        <div className="mx-auto container grid gap-6 px-4 md:px-6 lg:px-8">
+          <div className="flex justify-between gap-5 font-bold uppercase">
+            <div className="">{userRequest.user.lga.name}</div>
+          </div>
+        </div>
+      )}
+      {renderDashboard()}
+    </div>
+  );
 }
