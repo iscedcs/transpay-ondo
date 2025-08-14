@@ -66,6 +66,34 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
+        {/* IP Whitelist - Active */}
+        <Card className="hover:shadow-lg transition-shadow border-primary/20">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Shield className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">IP Whitelist</CardTitle>
+                <CardDescription className="text-sm">
+                  Access control & security
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Control which IP addresses can access your system for enhanced
+              security
+            </p>
+            <Link href="/settings/ip-whitelist">
+              <Button className="w-full" size="sm">
+                Manage IPs
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+
         {/* User Management - Coming Soon */}
         <Card className="hover:shadow-lg transition-shadow opacity-60">
           <CardHeader>
@@ -166,14 +194,15 @@ export default function SettingsPage() {
               <div>
                 <CardTitle className="text-lg">Security Settings</CardTitle>
                 <CardDescription className="text-sm">
-                  Authentication & security
+                  Advanced security policies
                 </CardDescription>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Manage authentication methods, security policies, and audit logs
+              Configure advanced security policies, encryption settings, and
+              audit logs
             </p>
             <Button
               variant="outline"
