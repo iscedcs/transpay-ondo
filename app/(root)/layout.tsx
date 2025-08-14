@@ -16,6 +16,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await getMe();
+  if (!user.user) {
+    redirect("/login");
+  }
 
   if (user.user?.status === "BLOCKED") {
     redirect("/blocked");
