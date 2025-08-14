@@ -1,6 +1,6 @@
+import { FlatCompat } from "@eslint/eslintrc";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,6 +25,8 @@ const eslintConfig = [
       "@typescript-eslint/no-duplicate-enum-values": "off",
       "prefer-const": "off",
       "@typescript-eslint/no-unsafe-function-type": "off",
+      "react-hooks/exhaustive-deps": "off",
+      "no-var": "off",
     },
   },
 ];

@@ -25,7 +25,7 @@ export default function PaymentNotifications() {
          const data = await res.json();
          setcvofPaymentData(data);
        } catch (error) {
-         console.log("Error fetching payments:", error);
+         // TODO: IMPLEMENT ERROR HANDLING
        }
      }, []);
 
@@ -37,7 +37,7 @@ export default function PaymentNotifications() {
          const data = await res.json();
          setdmPaymentData(data);
        } catch (error) {
-         console.log("Error fetching payments:", error);
+         // TODO: IMPLEMENT ERROR HANDLING
        }
      }, []);
 
@@ -47,7 +47,7 @@ export default function PaymentNotifications() {
          const data = await res.json();
          setffPaymentData(data);
        } catch (error) {
-         console.log("Error fetching payments:", error);
+         // TODO: IMPLEMENT ERROR HANDLING
        }
      }, []);
 

@@ -30,7 +30,7 @@ export default function QrIdPage() {
   const id = String(params.qrid);
   const user = session.data?.user;
   const router = useRouter();
-  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [vehicle, setVehicle] = useState<Vehicle | null | undefined>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -61,7 +61,6 @@ export default function QrIdPage() {
         setVehicle(vehicleData);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Vehicle not found");
-        console.log("Error fetching vehicle:", err);
       } finally {
         setLoading(false);
       }

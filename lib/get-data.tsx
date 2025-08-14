@@ -53,10 +53,8 @@ export const getDashboard = async (duration?: "1D" | "1M" | "1Y") => {
     if (!res.ok) {
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
-        // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
+        // TODO: Handle 429 (Too Many Requests) error
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -66,7 +64,7 @@ export const getDashboard = async (duration?: "1D" | "1M" | "1Y") => {
     return data;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -90,9 +88,7 @@ export const getDashboardTotalYearlyRevenue = async (
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -103,7 +99,7 @@ export const getDashboardTotalYearlyRevenue = async (
     return revenueYearlyTotal;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -124,7 +120,6 @@ export const getDashboardTotalRevenue = async (
     const result = await res.json();
 
     if (!result.status || !result.data) {
-      console.log(`HTTP error! Status: ${res.status}`);
       return undefined;
     }
 
@@ -132,49 +127,10 @@ export const getDashboardTotalRevenue = async (
     return revenueYearlyTotal;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
-
-// export const getDashboardTotalYearlyRevenue = async (
-// 	type?: ITotalDashboard
-// ) => {
-// 	const session = await getSSession();
-// 	const headers = {
-// 		'Content-Type': 'application/json',
-// 		'api-secret': process.env.API_SECRET || '',
-// 		Authorization: `Bearer ${session.access_token}`,
-// 	};
-// 	const url = `${API}${URLS.dashboard.total_revenue_yearly}${
-// 		type ? '?type=' + type : ''
-// 	}`;
-
-// 	const res = await fetch(url, { headers, cache: 'no-store' });
-
-// 	try {
-// 		if (!res.ok) {
-// 			if (res.status === 429) {
-// 				// Handle 429 (Too Many Requests) error
-// 				console.log(
-// 					'Too Many Requests. Please retry after a while.'
-// 				);
-// 			} else {
-// 				console.log(`HTTP error! Status: ${res.status}`);
-// 			}
-
-// 			return undefined;
-// 		}
-
-// 		const { data } = await res.json();
-// 		const revenueYearlyTotal: number = data.total;
-// 		return revenueYearlyTotal;
-// 	} catch (error: any) {
-// 		// Handle other errors (e.g., network issues, JSON parsing errors)
-// 		console.log('An error occurred:', error.message);
-// 		return undefined;
-// 	}
-// };
 
 export const getDashboardTotalMonthlyRevenue = async (
   type?: ITotalDashboard
@@ -195,9 +151,7 @@ export const getDashboardTotalMonthlyRevenue = async (
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -208,7 +162,7 @@ export const getDashboardTotalMonthlyRevenue = async (
     return revenueMonthlyTotal;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -232,9 +186,7 @@ export const getDashboardTotalWeeklyRevenue = async (
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -245,7 +197,7 @@ export const getDashboardTotalWeeklyRevenue = async (
     return revenueMonthlyTotal;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -267,9 +219,7 @@ export const getDashboardTotalDailyRevenue = async (type?: ITotalDashboard) => {
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -280,7 +230,7 @@ export const getDashboardTotalDailyRevenue = async (type?: ITotalDashboard) => {
     return revenueDailyTotal;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -300,9 +250,7 @@ export const getDashboardTotalTrackerFees = async () => {
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -313,7 +261,7 @@ export const getDashboardTotalTrackerFees = async () => {
     return trackerTotal;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -333,9 +281,7 @@ export const getDashboardBlacklistedAdmin = async () => {
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -346,7 +292,7 @@ export const getDashboardBlacklistedAdmin = async () => {
     return blacklistedAdmins;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -366,9 +312,7 @@ export const getDashboardActivities = async (amount: string) => {
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -379,7 +323,7 @@ export const getDashboardActivities = async (amount: string) => {
     return all_activities;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };
@@ -399,9 +343,7 @@ export const getDashboardEarningRevenueChart = async () => {
       // Handle non-2xx HTTP errors
       if (res.status === 429) {
         // Handle 429 (Too Many Requests) error
-        console.log("Too Many Requests. Please retry after a while.");
       } else {
-        console.log(`HTTP error! Status: ${res.status}`);
       }
 
       return undefined;
@@ -412,7 +354,7 @@ export const getDashboardEarningRevenueChart = async () => {
     return all_activities;
   } catch (error: any) {
     // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
+
     return undefined;
   }
 };

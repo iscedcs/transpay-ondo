@@ -16,13 +16,16 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = await getMe();
+  if (!user.user) {
+    redirect("/sign-in");
+  }
 
   if (user.user?.status === "BLOCKED") {
     redirect("/blocked");
   }
   return (
     <ProtectedRoute>
-      <div className="">
+      <div className="bg-gray-50">
         <Navbar />
         <div className="">
           <Sidebar />

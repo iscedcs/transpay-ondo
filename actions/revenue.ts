@@ -184,7 +184,6 @@ export async function getRevenueData(params: RevenueDataParams) {
       availableLGAs,
     };
   } catch (error) {
-    console.log("Error fetching revenue data:", error);
     throw new Error("Failed to fetch revenue data");
   }
 }
@@ -204,7 +203,6 @@ export async function exportRevenueData(
 
     return { success: true };
   } catch (error) {
-    console.log("Error exporting revenue data:", error);
     throw new Error("Failed to export revenue data");
   }
 }

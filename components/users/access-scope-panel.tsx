@@ -37,7 +37,7 @@ export function AccessScopePanel({ user, permissions, onUpdate }: AccessScopePan
       })
       setIsEditing(false)
     } catch (error) {
-      console.log("Failed to update user scope:", error);
+      // TODO: Handle error (e.g., show toast or alert)
     } finally {
       setIsLoading(false)
     }

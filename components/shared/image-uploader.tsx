@@ -124,7 +124,6 @@ export default function ImageUploader({
         });
       }
     } catch (error) {
-      console.log("Upload error:", error);
       toast.error("Upload failed", {
         description:
           error instanceof Error

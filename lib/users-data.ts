@@ -147,6 +147,5 @@ export async function createUser(userData: any): Promise<SystemUser> {
 
 export async function updateUserStatus(userId: string, status: SystemUser["status"]): Promise<void> {
   // Simulate API call
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  console.log(`Updated user ${userId} status to ${status}`)
+  await new Promise((resolve) => setTimeout(resolve, 300));
 }

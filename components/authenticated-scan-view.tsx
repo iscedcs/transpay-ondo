@@ -44,7 +44,6 @@ export default function AuthenticatedScanView({
   const handleLocationReceived = (loc: Location) => {
     setLocation(loc);
     setScanState((prev) => ({ ...prev, hasLocation: true, error: null }));
-    // console.log({ loc });
     // Automatically perform scan once location is acquired
     performScanWithLocation(loc);
   };
@@ -85,7 +84,6 @@ export default function AuthenticatedScanView({
         description: "Vehicle scanned successfully",
       });
     } catch (error) {
-      console.log({ error });
       const errorMessage =
         error instanceof Error ? error.message : "Failed to scan vehicle";
       setScanState((prev) => ({

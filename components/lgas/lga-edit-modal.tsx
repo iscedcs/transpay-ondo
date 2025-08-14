@@ -65,7 +65,6 @@ export function LGAEditModal({
       await onSubmit({ ...data, boundary });
       onClose();
     } catch (error) {
-      console.log("Failed to update LGA:", error);
       form.setError("root", {
         message: "Failed to update LGA. Please try again.",
       });

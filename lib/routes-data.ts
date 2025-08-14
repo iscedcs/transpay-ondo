@@ -232,13 +232,11 @@ export async function createVehicleRoute(data: CreateRouteData): Promise<Vehicle
 }
 
 export async function updateVehicleRoute(routeId: string, steps: RouteStep[]): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  console.log(`Updated route ${routeId} with steps:`, steps)
+  await new Promise((resolve) => setTimeout(resolve, 300));
 }
 
 export async function deleteVehicleRoute(routeId: string, hard = false): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  console.log(`${hard ? "Hard" : "Soft"} deleted route ${routeId}`)
+  await new Promise((resolve) => setTimeout(resolve, 300));
 }
 
 export async function getRoutesForLGA(lgaId: string): Promise<VehicleRoute[]> {

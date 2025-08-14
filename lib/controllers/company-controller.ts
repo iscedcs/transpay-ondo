@@ -81,7 +81,6 @@ export const getCompanyById = async (id: string) => {
 //     if (!result.status) return undefined;
 
 //     const data = result.data.data.directors.length;
-//     console.log(data)
 //     return data;
 //   } catch (e) {
 //     return undefined;
@@ -147,7 +146,7 @@ export const basicUserGetAllCompanies = async (
     if (!result.status) return undefined;
 
     const rows: companies[] = result.data.data;
-    // console.log(rows);
+    
     const totalCompanies: number = result.data.totalCompanies;
     const currentPage: number = result.data.currentPage;
     const totalPages: number = result.data.totalPages;
@@ -189,7 +188,7 @@ export const getVehiclesFromCompanies = async (
     const currentPage: number = result.data.data.currentPage;
     const perPage: number = result.data.data.perPage;
     const totalPages: number = result.data.data.totalPages;
-    // console.log(result);
+    
     return {
       success,
       rows,
@@ -232,7 +231,7 @@ export const getDirectorLengthFromCompanies = async (
     const currentPage: number = result.data.data.currentPage;
     const perPage: number = result.data.data.perPage;
     const totalPages: number = result.data.data.totalPages;
-    // console.log(result);
+    
     return {
       success,
       rows,
@@ -268,11 +267,11 @@ export const getCompaniesByUserID = async (
     const res = await fetch(url, { headers, next: { revalidate: 0 } });
     const result = await res.json();
     if (!result.status) return undefined;
-    // console.log(result);
+    
 
     const totalCompanies: number = result.data.totalCompanies;
     const companies: companies[] = result.data.companies;
-    // console.log(companies);
+    
 
     return {
       totalCompanies,

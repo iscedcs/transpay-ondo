@@ -282,12 +282,10 @@ export async function updateLGA(
   data: Partial<CreateLGAData>
 ): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, 300));
-  console.log(`Updated LGA ${id}:`, data);
 }
 
 export async function deleteLGA(id: string, hard = false): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, 300));
-  console.log(`${hard ? "Hard" : "Soft"} deleted LGA ${id}`);
 }
 
 // New function to import LGAs from Nigerian official data

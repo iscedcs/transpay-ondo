@@ -60,7 +60,6 @@ export async function uploadStickers(formData: FormData) {
     revalidatePath("/stickers");
     return { success: true, data: result };
   } catch (error) {
-    console.log("Error uploading stickers:", error);
     return {
       success: false,
       error:
@@ -90,7 +89,6 @@ export async function attachStickerToVehicle(code: string, vehicleId: string) {
     revalidatePath("/stickers");
     return { success: true, data: result };
   } catch (error) {
-    console.log("Error attaching sticker:", error);
     return {
       success: false,
       error:
@@ -116,7 +114,6 @@ export async function getStickerByCode(code: string) {
     const result = await response.json();
     return { success: true, data: result.data };
   } catch (error) {
-    console.log("Error fetching sticker:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to fetch sticker",
@@ -142,7 +139,6 @@ export async function deleteSticker(id: string) {
     revalidatePath("/stickers");
     return { success: true };
   } catch (error) {
-    console.log("Error deleting sticker:", error);
     return {
       success: false,
       error:
@@ -169,7 +165,6 @@ export async function restoreSticker(id: string) {
     revalidatePath("/stickers");
     return { success: true };
   } catch (error) {
-    console.log("Error restoring sticker:", error);
     return {
       success: false,
       error:
@@ -258,7 +253,6 @@ export async function getAllStickers(
       },
     };
   } catch (error) {
-    console.log("Error fetching stickers:", error);
     return {
       success: false,
       error:

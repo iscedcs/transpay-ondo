@@ -1,20 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { Vehicle } from "@/actions/vehicles";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Share2,
-  MessageCircle,
-  Star,
-  MapPin,
-  Clock,
-  Users,
-} from "lucide-react";
-import { toast } from "sonner";
 import type { ScanLocation } from "@/types/scan";
-import { Vehicle } from "@prisma/client";
+import { Clock, MapPin, MessageCircle, Share2, Star } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface ShareRideComponentProps {
   vehicle: Vehicle;
@@ -99,13 +92,13 @@ export function ShareRideComponent({
                 {new Date().toLocaleTimeString()}
               </p>
             </div>
-            <div className="p-3 bg-purple-50 rounded-lg text-center">
+            {/* <div className="p-3 bg-purple-50 rounded-lg text-center">
               <Users className="w-5 h-5 text-purple-600 mx-auto mb-1" />
               <p className="font-medium text-sm">Capacity</p>
               <p className="text-xs text-muted-foreground">
-                {vehicle.category === "Bus" ? "14+ seats" : "4 seats"}
+                {vehicle.category === "BUS_INTERSTATE" ? "14+ seats" : "4 seats"}
               </p>
-            </div>
+            </div> */}
           </div>
         </div>
 

@@ -67,7 +67,6 @@ export default function RoutesPage() {
 
         await loadRoutes();
       } catch (error) {
-        console.log("Failed to initialize routes page:", error);
         toast.error("Error", {
           description: "Failed to load routes page",
         });
@@ -95,7 +94,6 @@ export default function RoutesPage() {
         setLGARoutes(lgaRoutesData);
       }
     } catch (error) {
-      console.log("Failed to load routes:", error);
       toast.error("Error", {
         description: "Failed to load routes",
       });
@@ -116,7 +114,6 @@ export default function RoutesPage() {
         description: "Vehicle route created successfully",
       });
     } catch (error) {
-      console.log("Failed to create route:", error);
       toast.error("Error", {
         description: "Failed to create route",
       });
@@ -152,7 +149,6 @@ export default function RoutesPage() {
         } successfully`,
       });
     } catch (error) {
-      console.log("Failed to delete route:", error);
       toast.error("Error", {
         description: "Failed to delete route",
       });

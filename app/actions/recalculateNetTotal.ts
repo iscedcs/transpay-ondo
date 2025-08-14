@@ -12,17 +12,19 @@ export async function recalculateNetTotal(tCode: string) {
   try {
     const response = await fetch(`${API}/api/v1/vehicles/${tCode}/net-total`, {
       method: "PUT",
-      headers
-    })
+      headers,
+    });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const result = await response.json()
-    return { success: true, message: result.data.message }
+    const result = await response.json();
+    return { success: true, message: result.data.message };
   } catch (error) {
-    console.log("Failed to recalculate net total:", error);
-    return { success: false, message: "Failed to recalculate net total. Please try again." }
+    return {
+      success: false,
+      message: "Failed to recalculate net total. Please try again.",
+    };
   }
 }

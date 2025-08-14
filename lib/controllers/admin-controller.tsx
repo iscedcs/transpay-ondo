@@ -64,12 +64,11 @@ export const getAgentRegisteredByAdminId = async ({
      };
 
      const url = `${API}${URLS["audit-trails"].user}?userId=${userId}&page=${page}&lmit=${pageSize}`;
-     console.log("Fetching agents from URL:", url);
+     
 
      const res = await fetch(url, { headers, cache: "no-store" });
-   
+
      if (!res.ok) {
-       console.log(`Failed to fetch agents: ${res.status} ${res.statusText}`);
        return undefined;
      }
    

@@ -58,7 +58,6 @@ export function AddVehicleToGroup({ vehicleId }: AddVehicleToGroupProps) {
         throw new Error("Failed to fetch groups");
       }
     } catch (error) {
-      console.log("Error fetching groups:", error);
       toast.error("Failed to load groups");
     }
   };
@@ -109,7 +108,6 @@ export function AddVehicleToGroup({ vehicleId }: AddVehicleToGroupProps) {
       setOpen(false);
       router.refresh();
     } catch (error) {
-      console.log("Error adding vehicle to group:", error);
       toast.error("Failed to add vehicle to group");
     } finally {
       setIsLoading(false);

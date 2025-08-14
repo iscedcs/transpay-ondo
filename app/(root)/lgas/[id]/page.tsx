@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CONFIG from "@/config";
-import { ADMIN_ROLES } from "@/lib/const";
+import { ADMIN_ROLES, SUPER_ADMIN_ROLES } from "@/lib/const";
 import { cn, formatFees } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -74,8 +74,8 @@ export default async function LGAPage({
   const scans = scans_res;
   const routes = routes_res.data;
 
-  const canEdit = ADMIN_ROLES.includes(currentUser.role);
-  const canDelete = ADMIN_ROLES.includes(currentUser.role);
+  const canEdit = SUPER_ADMIN_ROLES.includes(currentUser.role);
+  const canDelete = SUPER_ADMIN_ROLES.includes(currentUser.role);
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -112,7 +112,7 @@ export default async function LGAPage({
               <h1 className="text-2xl font-bold">{lga.name}</h1>
               <div className="flex items-center gap-2 mt-1">
                 <Badge variant="outline">Edo State</Badge>
-                <Badge className="text-foreground">
+                <Badge className="text-white">
                   {formatFees(JSON.parse(lga.fee) as VehicleFee[])} levy
                 </Badge>
               </div>

@@ -2,8 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -12,7 +10,7 @@
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
-    --primary: 51 100% 50%;
+    --primary: #4d4100;
     --primary-foreground: 54 40% 94%;
     --secondary: 206 34% 14%;
     --secondary-foreground: 24 9.8% 10%;
@@ -76,7 +74,6 @@
 }
 
 @layer utilities {
-
   /* Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -95,7 +92,6 @@
 }
 
 /* styles/globals.css */
-
 
 .slide.active {
   display: block;

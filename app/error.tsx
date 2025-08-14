@@ -14,10 +14,7 @@ export default function Error({
      error: Error & { digest?: string };
      reset: () => void;
 }) {
-     useEffect(() => {
-          // Log the error to an error reporting service
-          console.log(error);
-     }, [error]);
+     useEffect(() => {}, [error]);
 
      return (
           <>

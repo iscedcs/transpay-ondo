@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { API, URLS } from "@/lib/const";
 import { db } from "@/lib/db";
+import { devLog } from "@/lib/utils";
 import { $Enums, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
@@ -62,10 +63,12 @@ export interface UsersResponse {
   data: {
     users: User[];
     count: number;
+    roleSummary: Record<string, number>; // Summary of users by role
     pagination: {
       limit: number;
       offset: number;
     };
+    showDeleted: boolean; // Flag to show deleted users
   };
 }
 
@@ -74,57 +77,55 @@ const GetUsersSchema = z.object({
   limit: z.number().optional().default(10),
   offset: z.number().optional().default(0),
   role: z.nativeEnum(Role).optional(),
+  blacklisted: z.boolean().optional(),
 });
 
 type GetUsersParams = z.infer<typeof GetUsersSchema>;
 
 /**
  * Server action to fetch paginated list of users
- * @param params - Query parameters (limit, offset, role)
- * @returns Promise with users response data
  */
 export async function getUsers(
   params: GetUsersParams = { limit: 10, offset: 0 }
 ): Promise<UsersResponse> {
   try {
-    // Validate input parameters
-    const { limit, offset, role } = GetUsersSchema.parse(params);
+    // Validate input
+    const { limit, offset, role, blacklisted } = GetUsersSchema.parse(params);
 
-    // Build the URL with query parameters
+    // Build URL with query params
     const url = new URL(`${API}/api/user`);
     url.searchParams.append("limit", limit.toString());
     url.searchParams.append("offset", offset.toString());
-    if (role) {
-      url.searchParams.append("role", role);
-    }
-    const session = await auth();
-    if (!session || !session.user) {
-      throw new Error("Unauthorized access: No session found");
-    }
-    const token = session?.user.access_token;
-    if (!token) {
-      throw new Error("Unauthorized access: No token found");
+    if (role) url.searchParams.append("role", role);
+    if (typeof blacklisted !== "undefined") {
+      url.searchParams.append("blacklisted", blacklisted.toString());
     }
 
-    // Fetch data from the API
+    // Get auth token
+    const session = await auth();
+    if (!session?.user?.access_token) {
+      throw new Error("Unauthorized: No token found");
+    }
+
+    const token = session.user.access_token;
+
+    // Fetch from API
     const response = await fetch(url.toString(), {
       headers: {
-        accept: "*/*",
+        accept: "application/json",
         Authorization: `Bearer ${token}`,
       },
-      cache: "no-store", // Ensure we get fresh data
+      cache: "no-store", // fresh data every time
     });
 
     if (!response.ok) {
-      throw new Error(
-        `Failed to fetch users: ${response.status} ${response.statusText}`
-      );
+      devLog({ response, token });
     }
 
     const data: UsersResponse = await response.json();
 
-    // Parse address strings into objects if they exist
-    const processedData = {
+    // Just return directly — backend already filters visibility
+    return {
       ...data,
       data: {
         ...data.data,
@@ -134,15 +135,25 @@ export async function getUsers(
         })),
       },
     };
-
-    return processedData;
   } catch (error) {
-    console.log("Error fetching users:", error);
-    throw new Error(
-      error instanceof Error ? error.message : "Failed to fetch users"
-    );
+    devLog({ error });
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to fetch users",
+      data: {
+        users: [],
+        count: 0,
+        roleSummary: {},
+        pagination: {
+          limit: params.limit || 10,
+          offset: params.offset || 0,
+        },
+        showDeleted: false,
+      },
+    };
   }
 }
+
 
 export async function getUserById(id: string): Promise<User> {
   const session = await auth();
@@ -179,7 +190,6 @@ export async function getUserById(id: string): Promise<User> {
 
     return data.data;
   } catch (error) {
-    console.log("Error fetching user by ID:", error);
     throw new Error(
       error instanceof Error ? error.message : "Failed to fetch user"
     );
@@ -230,7 +240,6 @@ export async function updateUser(
 
     return data.data;
   } catch (error) {
-    console.log("Error updating user:", error);
     throw new Error(
       error instanceof Error ? error.message : "Failed to update user"
     );
@@ -308,7 +317,6 @@ export const allUsers = async ({
         },
       };
     } catch (error) {
-      console.log("Error fetching users:", error);
       return { error: "Something went wrong!!!" };
     }
 };
@@ -362,7 +370,6 @@ export const allAgentsCreatedByAdminId = async ({
       },
     };
   } catch (error) {
-    console.log("Error fetching users:", error);
     return { error: "Something went wrong!!!" };
   }
 };
@@ -395,7 +402,6 @@ export const getMe = async () => {
     }
     return { user };
   } catch (error) {
-    console.log("Error fetching user data:", error);
     return { error: "Something went wrong while fetching user data" };
   }
 };
@@ -414,7 +420,7 @@ export async function createUser(
   }
 
   try {
-    const response = await fetch(`${API}/api/user/create`, {
+    const response = await fetch(`${API}/api/user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -440,7 +446,6 @@ export async function createUser(
 
     return { success: true, data: result.data };
   } catch (error) {
-    console.log("Error creating user:", error);
     return {
       success: false,
       error:

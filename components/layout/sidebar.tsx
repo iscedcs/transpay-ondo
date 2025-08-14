@@ -33,7 +33,7 @@ export default function Sidebar() {
   // }
 
   return (
-    <div className="no-scrollbar fixed z-10 hidden h-full w-52 justify-between overflow-y-scroll text-secondary bg-white/50 backdrop-blur px-5 md:flex shadow-xl">
+    <div className="no-scrollbar fixed z-10 hidden h-full w-52 justify-between overflow-y-scroll text-secondary bg-white/50 backdrop-blur px-5 md:flex border-r">
       <div className="flex h-full w-full flex-col gap-3 pt-20">
         {(ROLE?.toLowerCase() === "agent"
           ? SIDEBAR_LINKS_LGA_AGENT

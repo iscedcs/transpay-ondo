@@ -81,7 +81,6 @@ export default async function VehicleEditPage({
       </div>
     );
   } catch (error) {
-    console.log("Error loading vehicle edit page:", error);
     notFound();
   }
 }
@@ -98,9 +97,7 @@ export async function generateMetadata({ params }: VehicleEditPageProps) {
         description: `Edit vehicle information for ${vehicle.plateNumber}`,
       };
     }
-  } catch (error) {
-    console.log("Error generating metadata:", error);
-  }
+  } catch (error) {}
 
   return {
     title: "Edit Vehicle - Vehicle Management",

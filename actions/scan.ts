@@ -194,7 +194,6 @@ export async function getVehicleByBarcode(
     const { data } = await response.json();
     return { success: true, data };
   } catch (error) {
-    console.log("Error fetching vehicle by barcode:", error);
     return {
       success: false,
       error: "Failed to fetch vehicle",

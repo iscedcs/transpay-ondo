@@ -695,7 +695,6 @@ export function getNextPaymentDate(
       nextPaymentDate = addDays(nextPaymentDate, 1);
     }
   }
-  // console.log(nextPaymentDate, "PAYMENT DATE");
   return nextPaymentDate;
 }
 
@@ -809,7 +808,6 @@ export function parseAddressExtended(addressString: string | null): {
       postal_code: parsed.POSTAL_CODE,
     };
   } catch (error) {
-    console.log("Error parsing address:", error);
     return {};
   }
 }
@@ -886,3 +884,21 @@ export function isValidMillisecondTimestamp(
 
   return timestamp >= minTime && timestamp <= maxTime;
 }
+
+// Logger utility for development environment
+type LogLevel = 'log' | 'warn' | 'error' | 'info';
+
+const isDev = process.env.NODE_ENV === 'development';
+
+export function logger(level: LogLevel, ...args: unknown[]) {
+  if (isDev) {
+    const prefix = `[${level.toUpperCase()}]`;
+    console[level](prefix, ...args);
+  }
+}
+
+// Convenience helpers
+export const devLog = (...args: unknown[]) => logger('log', ...args);
+export const devWarn = (...args: unknown[]) => logger('warn', ...args);
+export const devError = (...args: unknown[]) => logger('error', ...args);
+export const devInfo = (...args: unknown[]) => logger('info', ...args);

@@ -125,7 +125,6 @@ export function DailyTransactionChart({ day }: { day: string }) {
     const fetchAllTotal = async () => {
       const totals = await Promise.all(
         dayHistory.map(async (time) => {
-          // console.log(startOfHour(time).toLocaleTimeString(), endOfHour(time).toLocaleTimeString());
           const total = await getPaymentTotalsOld(
             startOfHour(time),
             endOfHour(time)

@@ -170,8 +170,6 @@ export default function CreateVehicleForm() {
   });
 
   const onSubmit = async (data: vehicleFormValues) => {
-    console.log("Form submitted with data:", data);
-
     setIsLoading(true);
     try {
       // Structure the data according to the API schema
@@ -235,7 +233,6 @@ export default function CreateVehicleForm() {
         });
       }
     } catch (error) {
-      console.log("Error creating vehicle:", error);
       toast.error("An error occurred while creating the vehicle");
     } finally {
       setIsLoading(false);

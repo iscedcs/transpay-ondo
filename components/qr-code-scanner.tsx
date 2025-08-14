@@ -47,7 +47,7 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
         const history = JSON.parse(savedHistory);
         setScannedHistory(history);
       } catch (error) {
-        console.log("Error loading scan history:", error);
+        // FIXME: handle JSON parsing error
       }
     }
   }, []);
@@ -68,7 +68,7 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
       }
       return undefined;
     } catch (error) {
-      console.log("Error extracting vehicle ID:", error);
+      // FIXME: handle JSON parsing error
       return undefined;
     }
   };
@@ -135,8 +135,7 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
       // Create QR scanner instance with proper constructor
       scannerRef.current = new QrScanner(videoElement, handleScanResult, {
         onDecodeError: (error) => {
-          // Silently handle decode errors (normal when no QR code is visible)
-          console.debug("QR decode error:", error);
+          // TODO: handle decode errors
         },
         highlightScanRegion: true,
         highlightCodeOutline: true,
@@ -145,9 +144,9 @@ export function QRCodeScanner({ onSuccess, onError }: QRCodeScannerProps) {
 
       // Start scanning
       await scannerRef.current.start();
-      console.log("QR Scanner started successfully");
+      // FIXME: handle JSON parsing error
     } catch (error) {
-      console.log("Error starting QR scanner:", error);
+      // FIXME: handle JSON parsing error
       setError(
         `Unable to start camera: ${
           error instanceof Error ? error.message : "Unknown error"

@@ -22,26 +22,27 @@ export default function RequestStickerForm({ asin, name, plateNumber }: { asin: 
           };
           setIsLoading(true);
           try {
-               const createStickerResponse = await fetch("/api/request-sticker", {
-                    method: "POST",
-                    body: JSON.stringify(createRequest),
-               });
-               const result = await createStickerResponse.json();
-               if (createStickerResponse.status > 199 && createStickerResponse.status < 299) {
-                    toast.success("Sticker Requested Successfully");
-                    setIsLoading(false);
-                    router.refresh()
-                    return NextResponse.json(result);
-               } else {
-
-                    setIsLoading(false);
-                    toast.error("Sticker Not Requested");
-                    return null;
-               }
+            const createStickerResponse = await fetch("/api/request-sticker", {
+              method: "POST",
+              body: JSON.stringify(createRequest),
+            });
+            const result = await createStickerResponse.json();
+            if (
+              createStickerResponse.status > 199 &&
+              createStickerResponse.status < 299
+            ) {
+              toast.success("Sticker Requested Successfully");
+              setIsLoading(false);
+              router.refresh();
+              return NextResponse.json(result);
+            } else {
+              setIsLoading(false);
+              toast.error("Sticker Not Requested");
+              return null;
+            }
           } catch (error) {
-               console.log({error})
-               setIsLoading(false);
-                    toast.error("Something Went Wrong",);
+            setIsLoading(false);
+            toast.error("Something Went Wrong");
           }
      };
      const requestStickerSchema = z.object({

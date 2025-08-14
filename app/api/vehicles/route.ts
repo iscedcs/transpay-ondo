@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { Prisma, TransactionCategories } from "@prisma/client";
+import { Prisma, VehicleCategories } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const where: Prisma.VehicleWhereInput = {};
 
   if (status) where.status = status as any; // Cast to VehicleStatus enum
-  if (category) where.category = category as TransactionCategories;
+  if (category) where.category = category as VehicleCategories;
   if (type) where.type = type;
   if (search) {
     where.OR = [

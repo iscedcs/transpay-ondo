@@ -46,8 +46,7 @@ export function InsuranceCompanyFilters() {
   }
 
   const exportClaims = () => {
-    // Implement export functionality
-    console.log("Exporting claims data...")
+    // TODO: Implement export functionality
   }
 
   const hasActiveFilters = search || status !== "ALL_STATUS" || claimType !== "ALL_TYPES"

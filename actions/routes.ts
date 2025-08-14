@@ -75,7 +75,6 @@ export async function createVehicleRoute(data: {
     const session = await auth();
     const token = session?.user.access_token;
     if (!token) {
-      console.log("User is not authenticated");
       return {
         success: false,
         message: "User is not authenticated",
@@ -95,7 +94,6 @@ export async function createVehicleRoute(data: {
     });
 
     if (!response.ok) {
-      console.log("Failed to create vehicle route:", response.statusText);
       return {
         success: false,
         message: `Failed to create route: ${response.statusText}`,
@@ -106,7 +104,6 @@ export async function createVehicleRoute(data: {
     const result = await response.json();
 
     if (!result.success) {
-      console.log("API returned error:", result.message);
       return {
         success: false,
         message: result.message || "Failed to create route",
@@ -119,7 +116,6 @@ export async function createVehicleRoute(data: {
 
     return result;
   } catch (error) {
-    console.log("Error creating vehicle route:", error);
     return {
       success: false,
       message:
@@ -136,7 +132,6 @@ export async function getVehicleRoutes(
     const session = await auth();
     const token = session?.user.access_token;
     if (!token) {
-      console.log("User is not authenticated");
       return {
         success: false,
         message: "User is not authenticated",
@@ -146,7 +141,6 @@ export async function getVehicleRoutes(
     }
 
     if (!vehicleId) {
-      console.log("Vehicle ID is required");
       return {
         success: false,
         message: "Vehicle ID is required",
@@ -165,7 +159,6 @@ export async function getVehicleRoutes(
     });
 
     if (!response.ok) {
-      console.log("Failed to fetch vehicle routes:", response.statusText);
       return {
         success: false,
         message: `Failed to fetch routes: ${response.statusText}`,
@@ -177,7 +170,6 @@ export async function getVehicleRoutes(
     const result = await response.json();
 
     if (!result.success) {
-      console.log("API returned error:", result.message);
       return {
         success: false,
         message: result.message || "Failed to fetch routes",
@@ -193,7 +185,6 @@ export async function getVehicleRoutes(
       count: result.count || 0,
     };
   } catch (error) {
-    console.log("Error fetching vehicle routes:", error);
     return {
       success: false,
       message:
@@ -214,7 +205,6 @@ export async function reorderVehicleRoutes(
     const session = await auth();
     const token = session?.user.access_token;
     if (!token) {
-      console.log("User is not authenticated");
       return {
         success: false,
         message: "User is not authenticated",
@@ -233,7 +223,6 @@ export async function reorderVehicleRoutes(
     });
 
     if (!response.ok) {
-      console.log("Failed to reorder vehicle routes:", response.statusText);
       return {
         success: false,
         message: `Failed to reorder routes: ${response.statusText}`,
@@ -243,7 +232,6 @@ export async function reorderVehicleRoutes(
     const result = await response.json();
 
     if (!result.success) {
-      console.log("API returned error:", result.message);
       return {
         success: false,
         message: result.message || "Failed to reorder routes",
@@ -255,7 +243,6 @@ export async function reorderVehicleRoutes(
 
     return result;
   } catch (error) {
-    console.log("Error reordering vehicle routes:", error);
     return {
       success: false,
       message:
@@ -277,7 +264,6 @@ export async function deleteVehicleRoute(
     const session = await auth();
     const token = session?.user.access_token;
     if (!token) {
-      console.log("User is not authenticated");
       return {
         success: false,
         message: "User is not authenticated",
@@ -295,7 +281,6 @@ export async function deleteVehicleRoute(
     });
 
     if (!response.ok) {
-      console.log("Failed to delete vehicle route:", response.statusText);
       return {
         success: false,
         message: `Failed to delete route: ${response.statusText}`,
@@ -305,7 +290,6 @@ export async function deleteVehicleRoute(
     const result = await response.json();
 
     if (!result.success) {
-      console.log("API returned error:", result.message);
       return {
         success: false,
         message: result.message || "Failed to delete route",
@@ -317,7 +301,6 @@ export async function deleteVehicleRoute(
 
     return result;
   } catch (error) {
-    console.log("Error deleting vehicle route:", error);
     return {
       success: false,
       message:

@@ -20,10 +20,6 @@ export const getVehicles = async (page?: string, limit?: string) => {
   const res = await fetch(url, { headers, cache: "no-store" });
   if (!res.ok) {
     const errorText = await res.text();
-    console.log(
-      `Failed to fetch vehicles: ${res.status} ${res.statusText}`,
-      errorText
-    );
     return undefined;
   }
 
@@ -81,17 +77,15 @@ export const getVehicleById = async (id: string) => {
 
   try {
     const res = await fetch(url, { headers, cache: "no-store" });
-    // console.log("Response Status:", res.status, res.statusText);
     if (!res.ok) {
-      console.log(`Failed to fetch vehicle: ${res.status} ${res.statusText}`);
       return undefined;
     }
 
     const result = await res.json();
-    // console.log("API Result:", result);
+
     if (!result.success) {
       // Check result.success instead of result.status
-      console.log("API returned success false:", result.message);
+
       return undefined;
     }
 
@@ -108,7 +102,6 @@ export const getVehicleById = async (id: string) => {
 
     return vehicle;
   } catch (error: any) {
-    console.log("Error fetching vehicle:", error.message);
     return undefined;
   }
 };
@@ -170,7 +163,6 @@ export const getVehicleByTCodeOrPlateNumber = async (id: string) => {
     }
     return existingVehicle;
   } catch (error) {
-    console.log("Error fetching or updating vehicle:", error);
     return undefined;
   }
 };
@@ -256,11 +248,9 @@ export const getVehiclePaymentHistoryById = async (
     if (response.status) {
       return response.data;
     } else {
-      console.log({ response });
       return [];
     }
   } catch (error) {
-    console.log({ error });
     return [];
   }
 };

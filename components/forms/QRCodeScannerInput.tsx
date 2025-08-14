@@ -65,7 +65,8 @@ export default function QRCodeScannerInput<
            setSelectedCamera(videoDevices[0].deviceId);
          }
        } catch (error) {
-         console.log("Error getting cameras:", error);
+         setCameras([]);
+         setSelectedCamera("");
        }
      }, []);
 
@@ -92,7 +93,8 @@ export default function QRCodeScannerInput<
      );
 
      const handleError = (error: Error) => {
-       console.log(error);
+       // TODO: Optionally, you can show an error message to the user
+       // NOTE: toast.error("Failed to scan QR code. Please try again.");
      };
 
      const handleCameraChange = (deviceId: string) => {

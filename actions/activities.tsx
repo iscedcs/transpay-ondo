@@ -73,7 +73,6 @@ export async function getActivities(
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching activities:", error);
     throw new Error("Failed to fetch activities");
   }
 }
@@ -124,7 +123,6 @@ export async function getActivityStats(): Promise<{
       topActivityTypes,
     };
   } catch (error) {
-    console.log("Error fetching activity stats:", error);
     return {
       totalActivities: 0,
       todayActivities: 0,

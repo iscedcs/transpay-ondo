@@ -31,7 +31,7 @@ import {
 import { useDebounce } from "@/hooks/use-debounce";
 import { USER_ROLES } from "@/lib/constants";
 import { cn, formatRoleName, parseAddress } from "@/lib/utils";
-import { Edit, Eye, Search, Trash2, Users } from "lucide-react";
+import { Edit, Eye, Search, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState, useTransition } from "react";
@@ -407,13 +407,13 @@ export function UsersContent({
                             >
                               <Edit className="h-4 w-4" />
                             </Link>
-                            <Button
+                            {/* <Button
                               variant="ghost"
                               size="sm"
                               className="text-destructive-foreground hover:text-destructive-foreground"
                             >
                               <Trash2 className="h-4 w-4" />
-                            </Button>
+                            </Button> */}
                           </div>
                         </TableCell>
                       </TableRow>

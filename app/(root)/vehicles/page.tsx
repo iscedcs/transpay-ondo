@@ -2,6 +2,11 @@ import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VehiclesContent } from "@/components/vehicles/vehicle-content";
 
+export const metadata = {
+  title: "Vehicle Management",
+  description: "Manage and view all vehicles in the system",
+};
+
 export default function VehiclesPage() {
   return (
     <Suspense

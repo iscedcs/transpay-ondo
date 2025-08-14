@@ -33,30 +33,25 @@ const [agentCount, setAgentCount] = useState<number | null>(null);
         const allAgents = await allUsers({});
         const allAdmins = await allUsers({ role: "ADMIN" });
 
-        console.log("Vehicles:", allVehicle);
-        console.log("Admins:", allAdmins);
-        console.log("Agents:", allAgents);
-
         if (!data || typeof data !== "object") {
           throw new Error("Invalid payment totals data");
-      }
-      if (!allVehicle || typeof allVehicle !== "object") {
+        }
+        if (!allVehicle || typeof allVehicle !== "object") {
           throw new Error("Invalid vehicle data");
-      }
-      if (!allAgents || typeof allAgents !== "object") {
+        }
+        if (!allAgents || typeof allAgents !== "object") {
           throw new Error("Invalid agents data");
-      }
-      if (!allAdmins || typeof allAdmins !== "object") {
+        }
+        if (!allAdmins || typeof allAdmins !== "object") {
           throw new Error("Invalid admins data");
-      }
-      
+        }
+
         setVehicleCount(allVehicle?.pagination?.totalCount ?? 0);
         setAdminCount(allAdmins?.success?.totalUsers ?? 0);
         setAgentCount(allAgents?.success?.totalUsers ?? 0);
         setPaymentTotals(data as any);
         setIsLoading(false);
       } catch (err) {
-        console.log("Error loading data:", err);
         setError("Failed to load payment totals");
         setIsLoading(false);
       }

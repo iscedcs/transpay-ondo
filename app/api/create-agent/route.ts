@@ -12,14 +12,13 @@ export async function POST(req: NextRequest) {
   };
   try {
     const url = API + URLS.user.create;
-    console.log(url);
     const response = await fetch(url, {
       method: "POST",
       headers,
       body: JSON.stringify(body),
     });
     const result = await response.json();
-    console.log("Agent Result", result);
+
     if (!response.ok) {
       return NextResponse.json({ result }, { status: response.status });
     } else {
@@ -81,7 +80,6 @@ export async function PATCH(req: NextRequest) {
       }
       return NextResponse.json(result);
     } catch (error: any) {
-      console.log("Error updating agent:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }

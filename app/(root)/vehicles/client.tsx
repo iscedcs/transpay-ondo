@@ -46,24 +46,23 @@ export default function VehiclesClient({ initialVehicles, initialPagination, use
      const [search, setSearch] = useState("");
      const [filter, setFilter] = useState<VehicleFilter>({});
      const [isLoading, setIsLoading] = useState(false);
-     console.log({vehicles})
+     
 
      const fetchVehicles = useCallback(
-          async (page: number, searchTerm: string) => {
-               setIsLoading(true);
-               const newFilter = { ...filter, search: searchTerm };
-               try {
-                    const { vehicles, pagination } = await getVehicles();
-                    setVehicles(vehicles);
-                    setPagination(pagination);
-                    setFilter(newFilter);
-               } catch (error) {
-                    console.log("Error fetching vehicles:", error);
-               } finally {
-                    setIsLoading(false);
-               }
-          },
-          [filter, initialPagination.pageSize],
+       async (page: number, searchTerm: string) => {
+         setIsLoading(true);
+         const newFilter = { ...filter, search: searchTerm };
+         try {
+           const { vehicles, pagination } = await getVehicles();
+           setVehicles(vehicles);
+           setPagination(pagination);
+           setFilter(newFilter);
+         } catch (error) {
+         } finally {
+           setIsLoading(false);
+         }
+       },
+       [filter, initialPagination.pageSize]
      );
 
      const debouncedFetch = useDebouncedCallback((searchTerm: string) => fetchVehicles(1, searchTerm), 300);

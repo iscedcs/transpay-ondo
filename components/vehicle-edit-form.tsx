@@ -126,7 +126,6 @@ export function VehicleEditForm({ vehicle, lgas }: VehicleEditFormProps) {
         router.push(`/vehicles/${vehicle.id}`);
         router.refresh();
       } catch (error) {
-        console.log("Error updating vehicle:", error);
         toast.error(
           error instanceof Error ? error.message : "Failed to update vehicle"
         );

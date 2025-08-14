@@ -77,7 +77,6 @@ export function LGACreateModal({
       setBoundary(undefined);
       onClose();
     } catch (error) {
-      console.log("Failed to create LGA:", error);
       form.setError("root", {
         message: "Failed to create LGA. Please try again.",
       });

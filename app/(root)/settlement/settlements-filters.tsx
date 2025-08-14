@@ -61,8 +61,7 @@ export function SettlementsFilters() {
   }
 
   const exportData = () => {
-    // Implement export functionality
-    console.log("Exporting settlement data...")
+    // TODO: Implement export functionality
   }
 
   const hasActiveFilters = dateFrom || dateTo || lgaId !== "ALL_LGAS" || status !== "ALL_STATUSES"

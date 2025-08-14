@@ -48,13 +48,10 @@ export const getDashboardTotalRevenue = async (
     const res = await fetch(url, { headers, cache: "no-store" });
     const result = await res.json();
     if (!result.status) {
-      console.log(`HTTP error! Status: ${res.status}`);
       return undefined;
     }
     return result.data;
   } catch (error: any) {
-    // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
     return undefined;
   }
 };
@@ -75,14 +72,11 @@ export const getDashboardTotalTracker = async (
     const result = await res.json();
 
     if (!result.status) {
-      console.log(`HTTP error! Status: ${res.status}`);
       return undefined;
     }
 
     return result.data;
   } catch (error: any) {
-    // Handle other errors (e.g., network issues, JSON parsing errors)
-    console.log("An error occurred:", error.message);
     return undefined;
   }
 };

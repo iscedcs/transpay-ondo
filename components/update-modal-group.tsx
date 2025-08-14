@@ -190,7 +190,7 @@ export function UpdateAddModal({ company }: { company: ICompany }) {
   };
 
   const onInvalid = (errors: any) => {
-    console.log("Validation errors:", errors);
+    // TODO: Handle form validation errors
   };
 
   return (

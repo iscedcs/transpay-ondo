@@ -1,9 +1,7 @@
-"use client"
-import React from "react";
+"use client";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
-import { string } from "zod";
 import { useRouter } from "next/navigation";
 
 export default function DeleteCompanyButton({ id }: { id: string }) {
@@ -21,7 +19,6 @@ export default function DeleteCompanyButton({ id }: { id: string }) {
         }),
         headers: { "Content-Type": "application/json" },
       });
-      console.log(response);
       if (!response.ok) {
         toast.error("Company has not been deleted", {
           description: "There was a problem with deleting this company.",

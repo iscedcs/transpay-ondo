@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
      const { access_token } = await getSSession();
     const body = await req.json();
-    console.log({body})
      const headers = {
           "Content-Type": "application/json",
           "api-secret": process.env.API_SECRET || "",

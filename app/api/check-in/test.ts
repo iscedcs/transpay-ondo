@@ -9,16 +9,15 @@ export async function getVehicleByPlate(
 	plate: string
 ): Promise<IInterStateVehicle | undefined> {
 	try {
-		const v = await fetch(
-			checkEnvironment().concat(`/api/check-in?plate=${plate}`),
-			{ cache: 'no-store' }
-		);
-		const vehicle = await v.json();
-		return vehicle.v;
-	} catch (error) {
-		console.log("Failed to fetch Vehicle:", error);
-		throw new Error('Failed to fetch Vehicle.');
-	}
+    const v = await fetch(
+      checkEnvironment().concat(`/api/check-in?plate=${plate}`),
+      { cache: "no-store" }
+    );
+    const vehicle = await v.json();
+    return vehicle.v;
+  } catch (error) {
+    throw new Error("Failed to fetch Vehicle.");
+  }
 }
 
 export async function checkInOut(plate: string) {

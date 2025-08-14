@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, Info, CheckCircle } from "lucide-react";
 import { AlertItem } from "./alert-item";
 import { STATE_CONFIG } from "@/lib/constants";
+import { toast } from "sonner";
 
 interface DashboardAlert {
   id: string;
@@ -194,8 +195,14 @@ export function DashboardAlerts({ role }: DashboardAlertsProps) {
             <AlertItem
               actionLabel={alert.actionLabel}
               dismissible={alert.dismissible}
-              onAction={() => console.log(`Action: ${alert.actionLabel}`)}
-              onDismiss={() => console.log(`Dismiss: ${alert.id}`)}
+              onAction={() =>
+                // TODO: handle action based on alert type
+                toast.success(`Action for ${alert.title} executed`)
+              }
+              onDismiss={() =>
+                // TODO: handle action based on alert type
+                toast.success(`Action for ${alert.title} executed`)
+              }
             />
           </div>
         </Alert>

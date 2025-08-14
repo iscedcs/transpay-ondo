@@ -92,19 +92,22 @@ export async function createVehicle(data: CreateVehicleData): Promise<Vehicle> {
   return newVehicle
 }
 
-export async function updateVehicle(id: string, data: UpdateVehicleData): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  console.log(`Updated vehicle ${id}:`, data)
+export async function updateVehicle(
+  id: string,
+  data: UpdateVehicleData
+): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 300));
 }
 
-export async function updateVehicleSticker(id: string, data: VehicleStickerData): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 200))
-  console.log(`Updated vehicle sticker ${id}:`, data)
+export async function updateVehicleSticker(
+  id: string,
+  data: VehicleStickerData
+): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, 200));
 }
 
 export async function deleteVehicle(id: string): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 300))
-  console.log(`Deleted vehicle ${id}`)
+  await new Promise((resolve) => setTimeout(resolve, 300));
 }
 
 export async function generateQRCode(vehicleId: string): Promise<string> {

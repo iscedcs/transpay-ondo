@@ -4,41 +4,40 @@ import { db } from "@/lib/db";
 
 export const getAgentRegisteredByAdminId = async ({ userId, page = 1, pageSize = 10 }: { userId: string; page?: number; pageSize?: number }) => {
      try {
-          const skip = (page - 1) * pageSize;
+       const skip = (page - 1) * pageSize;
 
-          const allAgentsByAdminId = await db.auditTrail.findMany({
-               skip,
-               take: pageSize,
-               where: {
-                    userId,
-                    name: "USER_CREATED",
-                    description: {
-                         contains: "AGENT",
-                    },
-               },
-          });
+       const allAgentsByAdminId = await db.auditTrail.findMany({
+         skip,
+         take: pageSize,
+         where: {
+           userId,
+           name: "USER_CREATED",
+           description: {
+             contains: "AGENT",
+           },
+         },
+       });
 
-          const totalAgents = await db.auditTrail.count({
-               where: {
-                    userId,
-                    name: "USER_CREATED",
-                    description: {
-                         contains: "AGENT",
-                    },
-               },
-          });
-          return {
-               success: {
-                    message: "OKAY",
-                    data: allAgentsByAdminId,
-                    totalAgents, // Total count of users with the current filter
-                    currentPage: page,
-                    totalPages: Math.ceil(totalAgents / pageSize), // Calculate total pages for front-end
-               },
-          };
+       const totalAgents = await db.auditTrail.count({
+         where: {
+           userId,
+           name: "USER_CREATED",
+           description: {
+             contains: "AGENT",
+           },
+         },
+       });
+       return {
+         success: {
+           message: "OKAY",
+           data: allAgentsByAdminId,
+           totalAgents, // Total count of users with the current filter
+           currentPage: page,
+           totalPages: Math.ceil(totalAgents / pageSize), // Calculate total pages for front-end
+         },
+       };
      } catch (error) {
-          console.log("Error fetching users:", error);
-          return { error: "Something went wrong!!!" };
+       return { error: "Something went wrong!!!" };
      }
 };
 

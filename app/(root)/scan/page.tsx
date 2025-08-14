@@ -27,7 +27,7 @@ export default function ScanPage() {
         const history = JSON.parse(savedHistory);
         setScanHistory(history);
       } catch (error) {
-        console.log("Error loading scan history:", error);
+        setScanHistory([]);
       }
     }
   }, []);

@@ -10,24 +10,23 @@ export async function createNewPassword(userId: string, newPassword: string) {
     }
   try {
     const response = await fetch(`${API}/api/v1/users/set-new-password`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session.user.access_token}` // Make sure to set this environment variable
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.user.access_token}`, // Make sure to set this environment variable
       },
       body: JSON.stringify({ userId, newPassword }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error('Failed to set new password')
+      throw new Error("Failed to set new password");
     }
 
-    const data = await response.json()
-    revalidatePath(`/agents/${userId}`)
-    return { success: true, data }
+    const data = await response.json();
+    revalidatePath(`/agents/${userId}`);
+    return { success: true, data };
   } catch (error) {
-    console.log("Error setting new password:", error);
-    return { success: false, error: 'Failed to set new password' }
+    return { success: false, error: "Failed to set new password" };
   }
 }
 

@@ -30,7 +30,6 @@ export async function getAllStickerPayments({
     });
     return stickerPayments;
   } catch (error) {
-    console.log("Error fetching all sticker payments:", error);
     throw new Error("Failed to fetch all sticker payments");
   } finally {
     await prisma.$disconnect();
@@ -49,10 +48,6 @@ export async function getDeletedStickerRequestsByPlateNumber(
     });
     return deletedRequests;
   } catch (error) {
-    console.log(
-      "Error fetching deleted sticker requests by plate number:",
-      error
-    );
     throw new Error("Failed to fetch deleted sticker requests by plate number");
   } finally {
     await prisma.$disconnect();
@@ -72,10 +67,6 @@ export async function getCountNotDeletedByPlateNumber(plateNumber: string) {
     });
     return count;
   } catch (error) {
-    console.log(
-      "Error counting not deleted sticker requests by plate number:",
-      error
-    );
     return 0;
   } finally {
     await prisma.$disconnect();
@@ -95,7 +86,6 @@ export async function getCountByStatus(
     });
     return count;
   } catch (error) {
-    console.log("Error counting sticker requests by status:", error);
     throw new Error("Failed to count sticker requests by status");
   } finally {
     await prisma.$disconnect();
@@ -122,7 +112,6 @@ export async function getTotalStickerCost({
     });
     return totalCost._sum.stickerCost || 0;
   } catch (error) {
-    console.log("Error calculating total sticker cost:", error);
     throw new Error("Failed to calculate total sticker cost");
   } finally {
     await prisma.$disconnect();
@@ -149,7 +138,6 @@ export async function getLatestStickerRequest({
     });
     return latestRequest;
   } catch (error) {
-    console.log("Error fetching latest sticker request:", error);
     throw new Error("Failed to fetch latest sticker request");
   } finally {
     await prisma.$disconnect();

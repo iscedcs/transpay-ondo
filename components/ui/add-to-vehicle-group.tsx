@@ -62,68 +62,66 @@ export function AddVehicleToGroupModal({ group }: { group: any }) {
   const existingVehiclesIds = group.vehicles.map((a: IVehicle)=> a.id)
 
   const getVehicleIdByPlateNumber = async (pn: string) => {
-      try {
-        setIsLoading(true);
-        const result = await getVehicleIdByPlate(pn.trim());
-        if (result) {
-          if (existingVehiclesIds.includes(result.id)) {
-            setIsLoading(false)
-            toast.error(`Vehicle already belong to this group`);
-            return
-          }
-          //  @ts-ignore
-            toast.success(`Vehicle ID found for plate ${pn}: ${JSON.stringify(result.owner.name)}`)
-            setVehicleId(result.id)
-            form.setValue('vehicleId', result.id)
-            setIsLoading(false);
-          } else {
-            toast.error(`Vehicle ID NOT found for plate ${pn}`);
-            setIsLoading(false);
-          }
-        } catch (error) {
-        console.log({ error })
+    try {
+      setIsLoading(true);
+      const result = await getVehicleIdByPlate(pn.trim());
+      if (result) {
+        if (existingVehiclesIds.includes(result.id)) {
+          setIsLoading(false);
+          toast.error(`Vehicle already belong to this group`);
+          return;
+        }
+        toast.success(`Vehicle ID found for plate ${pn}:`);
+        setVehicleId(result.id);
+        form.setValue("vehicleId", result.id);
+        setIsLoading(false);
+      } else {
         toast.error(`Vehicle ID NOT found for plate ${pn}`);
         setIsLoading(false);
-        }
-    };
+      }
+    } catch (error) {
+      toast.error(`Vehicle ID NOT found for plate ${pn}`);
+      setIsLoading(false);
+    }
+  };
 
   const onSubmit = async (data: addVehicleToGroupSchemaValues) => {
     setIsLoading(true);
-    const url = `${API}${URLS.group.all}/${group.id}`
+    const url = `${API}${URLS.group.all}/${group.id}`;
     const newVehicleIds = [
-        ...group.vehicles.map((a: IVehicle)=> a.id),
-        data.vehicleId
-      ]
+      ...group.vehicles.map((a: IVehicle) => a.id),
+      data.vehicleId,
+    ];
     const payload = {
-      vehicleIds: newVehicleIds.filter(id => id.trim() !== "")
-    }
+      vehicleIds: newVehicleIds.filter((id) => id.trim() !== ""),
+    };
     try {
-         const addVehicleToGroupResponse = await fetch(url, {
-              method: "PUT",
-              headers: {
-                   "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payload),
-         });
-         const result = await addVehicleToGroupResponse.json();
-         console.log(result)
-         if (result.status) {
-              toast.success("Vehicle Added To Group successfully", {
-                   description: new Date().toLocaleDateString(),
-              });
-              router.push(`/groups/${group.id}?page=1&limit=15`);
-         } else {
-              toast.error("Group Not Created", {
-                   description: Array.isArray(result.errors?.message) ? result.errors.message[0] : result.errors?.message || "An unknown error occurred",
-              });
-         }
+      const addVehicleToGroupResponse = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const result = await addVehicleToGroupResponse.json();
+      if (result.status) {
+        toast.success("Vehicle Added To Group successfully", {
+          description: new Date().toLocaleDateString(),
+        });
+        router.push(`/groups/${group.id}?page=1&limit=15`);
+      } else {
+        toast.error("Group Not Created", {
+          description: Array.isArray(result.errors?.message)
+            ? result.errors.message[0]
+            : result.errors?.message || "An unknown error occurred",
+        });
+      }
     } catch (error) {
-         console.log("Error creating group:", error);
-         toast.error("An error occurred while creating the group");
+      toast.error("An error occurred while creating the group");
     } finally {
-         setIsLoading(false);
+      setIsLoading(false);
     }
-};
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

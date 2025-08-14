@@ -1,9 +1,9 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-import { PrismaClient, StickerRequestStatus} from '@prisma/client'
+import { revalidatePath } from "next/cache";
+import { PrismaClient, StickerRequestStatus } from "@prisma/client";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 // Fetch a single sticker request by ID
 export async function getStickerRequest(id: string) {
@@ -13,7 +13,6 @@ export async function getStickerRequest(id: string) {
     });
     return { success: true, data: request };
   } catch (error) {
-    console.log("Failed to fetch sticker request:", error);
     return { success: false, error: "Failed to fetch sticker request" };
   }
 }
@@ -38,7 +37,6 @@ export async function getAllStickerRequests(filters?: {
     });
     return { success: true, data: requests };
   } catch (error) {
-    console.log("Failed to fetch sticker requests:", error);
     return { success: false, error: "Failed to fetch sticker requests" };
   }
 }
@@ -55,7 +53,6 @@ export async function deleteStickerRequest(id: string) {
     revalidatePath("/sticker-requests");
     return { success: true, data: deletedRequest };
   } catch (error) {
-    console.log("Failed to delete sticker request:", error);
     return { success: false, error: "Failed to delete sticker request" };
   }
 }
@@ -74,7 +71,6 @@ export async function approveStickerRequest(id: string) {
     revalidatePath("/sticker-requests");
     return { success: true, data: approvedRequest };
   } catch (error) {
-    console.log("Failed to approve sticker request:", error);
     return { success: false, error: "Failed to approve sticker request" };
   }
 }

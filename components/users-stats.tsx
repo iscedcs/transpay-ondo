@@ -1,76 +1,176 @@
 "use client";
 
-import { Users, Shield, UserCheck } from "lucide-react";
+import type { FC } from "react";
+import { motion } from "framer-motion";
+import { Users, Shield, UserCheck, Car, UserCog } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMemo } from "react";
-import { User } from "@/actions/users";
+import type { User } from "@/actions/users";
+import { RoleBreakdownModal } from "./role-breakdown-modal";
 
-interface UsersStatsProps {
+export interface UsersStatsProps {
   users: User[];
   totalCount: number;
+  roleSummary: Record<string, number>;
 }
 
-export function UsersStats({ users, totalCount }: UsersStatsProps) {
-  // Role statistics
-  const roleStats = useMemo(() => {
-    const stats = users.reduce((acc, user) => {
-      acc[user.role] = (acc[user.role] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    return stats;
-  }, [users]);
+const fadeInUp = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+};
 
-  const activeUsersCount = users.filter(
-    (user) => !user.deletedAt && !user.blacklisted
-  ).length;
-  const adminsCount = (roleStats.SUPERADMIN || 0) + (roleStats.ADMIN || 0);
-  const vehicleOwnersCount = roleStats.VEHICLE_OWNER || 0;
+export const UsersStats: FC<UsersStatsProps> = ({
+  users = [],
+  totalCount = 0,
+  roleSummary = {},
+}) => {
+  const get = (key: string) => roleSummary?.[key] ?? 0;
+
+  // Derived metrics
+  const activeUsersCount =
+    users.filter((u) => !u?.deletedAt && !u?.blacklisted).length ?? 0;
+
+  const adminsCount =
+    get("SUPERADMIN") + get("ADMIN") + get("LGA_ADMIN") + get("EIRS_ADMIN");
+
+  const agentsCount =
+    get("LGA_AGENT") +
+    get("POS_AGENT") +
+    get("EIRS_AGENT") +
+    get("LGA_C_AGENT");
+
+  const vehicleOwnersCount = get("VEHICLE_OWNER");
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{totalCount}</div>
-          <p className="text-xs text-muted-foreground">All registered users</p>
-        </CardContent>
-      </Card>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium text-muted-foreground">Overview</h3>
+        <RoleBreakdownModal roleSummary={roleSummary} totalCount={totalCount} />
+      </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-          <UserCheck className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{activeUsersCount}</div>
-          <p className="text-xs text-muted-foreground">Currently active</p>
-        </CardContent>
-      </Card>
+      <motion.div
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5"
+        initial="initial"
+        animate="animate"
+        transition={{ staggerChildren: 0.05 }}
+        aria-label="Users statistics overview"
+      >
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users
+                className="h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </CardHeader>
+            <CardContent>
+              <div
+                className="text-2xl font-bold"
+                aria-label="Total users count"
+              >
+                {totalCount}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                All registered users
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Admins</CardTitle>
-          <Shield className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{adminsCount}</div>
-          <p className="text-xs text-muted-foreground">Super admins & admins</p>
-        </CardContent>
-      </Card>
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Active Users
+              </CardTitle>
+              <UserCheck
+                className="h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </CardHeader>
+            <CardContent>
+              <div
+                className="text-2xl font-bold"
+                aria-label="Active users count"
+              >
+                {activeUsersCount}
+              </div>
+              <p className="text-xs text-muted-foreground">Currently active</p>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Vehicle Owners</CardTitle>
-          <Users className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{vehicleOwnersCount}</div>
-          <p className="text-xs text-muted-foreground">Vehicle owners</p>
-        </CardContent>
-      </Card>
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Admins</CardTitle>
+              <Shield
+                className="h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" aria-label="Admins count">
+                {adminsCount}
+              </div>
+              <p
+                className="text-xs text-muted-foreground line-clamp-1"
+                title="Includes SUPERADMIN, ADMIN, LGA_ADMIN, EIRS_ADMIN"
+              >
+                Includes SUPERADMIN, ADMIN, LGA_ADMIN, EIRS_ADMIN
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Agents</CardTitle>
+              <UserCog
+                className="h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold" aria-label="Agents count">
+                {agentsCount}
+              </div>
+              <p
+                className="text-xs text-muted-foreground line-clamp-1"
+                title="Includes LGA_AGENT, POS_AGENT, EIRS_AGENT, LGA_C_AGENT"
+              >
+                Includes LGA_AGENT, POS_AGENT, EIRS_AGENT, LGA_C_AGENT
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={fadeInUp}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Vehicle Owners
+              </CardTitle>
+              <Car
+                className="h-4 w-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </CardHeader>
+            <CardContent>
+              <div
+                className="text-2xl font-bold"
+                aria-label="Vehicle owners count"
+              >
+                {vehicleOwnersCount}
+              </div>
+              <p className="text-xs text-muted-foreground">Vehicle owners</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
     </div>
   );
-}
+};
+
+export default UsersStats;

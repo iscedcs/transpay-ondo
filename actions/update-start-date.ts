@@ -13,26 +13,25 @@ export async function updateStartDate(tCode: string, startDate: string) {
   
   try {
     const response = await fetch(`${API}/api/v1/vehicles/calculate-new-owing`, {
-      method: 'POST',
+      method: "POST",
       headers,
       body: JSON.stringify({
         tCode: tCode,
         creation_date: startDate,
       }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error('Failed to update start date')
+      throw new Error("Failed to update start date");
     }
 
-    const data = await response.json()
+    const data = await response.json();
 
     // Revalidate the page where this data is used
-    revalidatePath(`/search/${tCode}`)
+    revalidatePath(`/search/${tCode}`);
 
-    return { success: true, data }
+    return { success: true, data };
   } catch (error) {
-    console.log("Error updating start date:", error);
-    return { success: false, error: 'Failed to update start date' }
+    return { success: false, error: "Failed to update start date" };
   }
 }

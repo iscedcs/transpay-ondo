@@ -48,7 +48,6 @@ export function LGAEditForm({ lga }: LGAEditFormProps) {
       try {
         return JSON.parse(feeData);
       } catch (error) {
-        console.log("Error parsing fee data:", error);
         return [];
       }
     }
@@ -93,7 +92,6 @@ export function LGAEditForm({ lga }: LGAEditFormProps) {
           throw new Error(result.message);
         }
       } catch (error) {
-        console.log("Error updating fee:", error);
         toast.error("Update Failed", {
           description:
             error instanceof Error ? error.message : "Failed to update fee",
@@ -126,7 +124,6 @@ export function LGAEditForm({ lga }: LGAEditFormProps) {
           throw new Error(result.message);
         }
       } catch (error) {
-        console.log("Error adding fee:", error);
         toast.error("Add Failed", {
           description:
             error instanceof Error ? error.message : "Failed to add fee",

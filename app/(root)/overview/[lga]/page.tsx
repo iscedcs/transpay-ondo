@@ -71,7 +71,6 @@ async function LGAOverviewContent({ lgaId }: { lgaId: string }) {
       </div>
     );
   } catch (error) {
-    console.log("Error loading LGA data:", error);
     notFound();
   }
 }

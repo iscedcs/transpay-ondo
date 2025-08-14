@@ -21,7 +21,7 @@ export default function BarcodeAdder({ id }: { id: string }) {
             className="flex items-center gap-2"
           >
             <Scan className="h-4 w-4" />
-            Add Barcode
+            Scan Barcode
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">

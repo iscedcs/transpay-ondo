@@ -98,8 +98,6 @@ export async function generateFundingVirtualAccount(
     // 2. Store the session in the database
     // 3. Set up expiry handling
 
-    console.log("Generated virtual account:", { virtualAccount, session });
-
     return {
       success: true,
       message: "Virtual account generated successfully",
@@ -108,7 +106,6 @@ export async function generateFundingVirtualAccount(
       expiryInSeconds,
     };
   } catch (error) {
-    console.log("Error generating virtual account:", error);
     throw new Error("Failed to generate virtual account");
   }
 }
@@ -148,7 +145,6 @@ export async function confirmFundingPayment(
       .substr(2, 9)}`;
 
     // Simulate updating vehicle wallet balance
-    console.log("Payment confirmed for session:", request.sessionId);
 
     // Revalidate relevant pages
     revalidatePath("/vehicles");
@@ -162,7 +158,6 @@ export async function confirmFundingPayment(
       newBalance: 5000 + Math.random() * 10000, // Dummy new balance
     };
   } catch (error) {
-    console.log("Error confirming payment:", error);
     throw new Error("Failed to confirm payment");
   }
 }
@@ -199,7 +194,6 @@ export async function getFundingSessionStatus(sessionId: string): Promise<{
       paymentReceived: Math.random() > 0.7, // 30% chance payment is received
     };
   } catch (error) {
-    console.log("Error fetching session status:", error);
     return {
       success: false,
       session: null,
@@ -226,14 +220,11 @@ export async function cancelFundingSession(sessionId: string): Promise<{
     // 2. Deactivate the virtual account
     // 3. Clean up any pending processes
 
-    console.log("Cancelled funding session:", sessionId);
-
     return {
       success: true,
       message: "Funding session cancelled successfully",
     };
   } catch (error) {
-    console.log("Error cancelling session:", error);
     throw new Error("Failed to cancel funding session");
   }
 }
@@ -275,7 +266,6 @@ export async function getVehicleFundingHistory(vehicleId: string): Promise<{
       transactions,
     };
   } catch (error) {
-    console.log("Error fetching funding history:", error);
     throw new Error("Failed to fetch funding history");
   }
 }

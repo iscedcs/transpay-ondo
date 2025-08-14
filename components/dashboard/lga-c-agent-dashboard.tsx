@@ -65,7 +65,7 @@ export function LGACAgentDashboard() {
         ]);
 
         setStats(dashboardStats);
-        setRecentScans(scansData as RecentScan[]);
+        // setRecentScans(scansData as RecentScan[]);
       } catch (err) {
         const errorMessage =
           err instanceof Error ? err.message : "Failed to load dashboard data";
@@ -208,7 +208,7 @@ export function LGACAgentDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Recent Scans */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <QrCode className="h-5 w-5" />
@@ -269,7 +269,7 @@ export function LGACAgentDashboard() {
               </Button>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Recent Activities */}
         <Card>

@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  getLGAAgentDashboardStats,
+  getLGAAgentRecentScans,
+  type DashboardStats,
+} from "@/actions/dashboard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,29 +15,22 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
-  Car,
-  Users,
   Activity,
   AlertTriangle,
-  QrCode,
-  Plus,
-  TrendingUp,
-  CheckCircle,
   Calendar,
+  Car,
+  CheckCircle,
   MapPin,
+  Plus,
+  QrCode,
+  TrendingUp,
+  Users,
 } from "lucide-react";
-import {
-  getLGAAgentDashboardStats,
-  getLGAAgentRecentScans,
-  type DashboardStats,
-} from "@/actions/dashboard";
-import { toast } from "sonner";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface RecentScan {
   id: string;
@@ -51,7 +51,7 @@ interface RecentScan {
 
 export function LGAAgentDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentScans, setRecentScans] = useState<RecentScan[]>([]);
+  // const [recentScans, setRecentScans] = useState<RecentScan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,7 +67,7 @@ export function LGAAgentDashboard() {
         ]);
 
         setStats(dashboardStats);
-        setRecentScans(scansData as RecentScan[]);
+        // setRecentScans(scansData as RecentScan[]);
 
         toast.success("Dashboard loaded successfully");
       } catch (err) {
@@ -285,7 +285,7 @@ export function LGAAgentDashboard() {
       {/* Mobile-first Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Scans */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <QrCode className="h-5 w-5" />
@@ -344,7 +344,7 @@ export function LGAAgentDashboard() {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Recent Activities */}
         <Card>

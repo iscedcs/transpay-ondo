@@ -5,8 +5,8 @@ export const dynamic = "force-dynamic"
 
 export async function GET() {
   try {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     const [payments, dailyTotal] = await Promise.all([
       db.paymentNotification.findMany({
@@ -32,15 +32,17 @@ export async function GET() {
           },
         },
       }),
-    ])
+    ]);
 
     return NextResponse.json({
       payments,
       dailyTotal: dailyTotal._sum.amount || 0,
-    })
+    });
   } catch (error) {
-    console.log("Database Error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
 

@@ -71,7 +71,6 @@ export async function getCurrentUserProfile(): Promise<UserProfile> {
 
     return data.data;
   } catch (error) {
-    console.log("Error fetching user profile:", error);
     throw new Error(
       error instanceof Error ? error.message : "Failed to fetch profile"
     );
@@ -116,7 +115,6 @@ export async function updateUserProfile(
 
     return updatedProfile;
   } catch (error) {
-    console.log("Error updating user profile:", error);
     throw new Error(
       error instanceof Error ? error.message : "Failed to update profile"
     );

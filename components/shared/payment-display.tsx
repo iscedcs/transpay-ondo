@@ -19,7 +19,6 @@ export default function PaymentDisplay({ check }: PaymentDisplayProps) {
          const CVOF = await getPaymentTotals({ revenueType: "CVOF" });
          setCvofDaily(Number(CVOF.dayToDateTotal));
        } catch (e) {
-         console.log("Error fetching payments:", e);
          setError("Failed to fetch CVOG payments");
        }
      }, []);
@@ -29,7 +28,6 @@ export default function PaymentDisplay({ check }: PaymentDisplayProps) {
          const ISCE = await getPaymentTotals({ revenueType: "ISCE" });
          setDmfDaily(Number(ISCE.dayToDateTotal));
        } catch (e) {
-         console.log("Error fetching payments:", e);
          setError("Failed to fetch DFM payments");
        }
      }, []);
@@ -40,7 +38,6 @@ export default function PaymentDisplay({ check }: PaymentDisplayProps) {
 
          setFfDaily(Number(FAREFLEX.dayToDateTotal));
        } catch (e) {
-         console.log("Error fetching payments:", e);
          setError("Failed to fetch FF payments");
        }
      }, []);

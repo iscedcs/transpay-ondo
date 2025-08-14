@@ -44,7 +44,9 @@ export async function GET() {
                dailyTotal: dailyTotal._sum.amount || 0,
           });
      } catch (error) {
-          console.log("Database Error:", error);
-          return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+       return NextResponse.json(
+         { error: "Internal Server Error" },
+         { status: 500 }
+       );
      }
 }

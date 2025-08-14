@@ -28,7 +28,7 @@ export function RoleAssignmentPanel({ user, permissions, onUpdate }: RoleAssignm
       await onUpdate({ role: editData.role })
       setIsEditing(false)
     } catch (error) {
-      console.log("Failed to update user role:", error);
+      // TODO: Handle error (e.g., show toast or alert)
     } finally {
       setIsLoading(false)
     }

@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
     headers,
     body: JSON.stringify(payload),
   });
-  // console.log({response,body, payload})
   const result = await response.json();
 
   try {
@@ -75,7 +74,7 @@ export async function PUT(req: NextRequest) {
     body: JSON.stringify(payload),
   });
   const result = await response.json();
-  console.log("PUT API Response:", { url, result, body, payload });
+
   try {
     if (!response.ok) {
       return NextResponse.json(

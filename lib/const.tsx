@@ -1938,7 +1938,7 @@ export const SLIDES = [
     desc="Accountability in a civilized society is the stepping stone to development and progressive environment"
     images="/avater.png"
     author="ISCE Digital Concept"
-    title="Plateau State"
+    title="Edo State"
   />,
 ];
 
@@ -2393,40 +2393,24 @@ export const COLORS = [
 
 export const vehicleTypeData = [
   { name: "TRICYCLE", value: 2000 },
-  { name: "SHUTTLE_BUS", value: 2400 },
-  { name: "TAXIS", value: 2400 },
-  { name: "BUS_INTRASTATE", value: 3000 },
-  { name: "OKADA", value: 1000 },
-  { name: "TRUCKS", value: 3000 },
-  { name: "BUS_INTERSTATE", value: 4000 },
+  { name: "BUS", value: 2400 },
+  { name: "TAXI", value: 2400 },
+  { name: "MOTORCYCLE", value: 1000 },
 ];
 
-export const VEHICLE_CATEGORIES = [
-  "BUS_INTERSTATE",
-  "BUS_INTRASTATE",
-  "SHUTTLE_BUS",
-  "TAXIS",
-  "TRICYCLE",
-  "TRUCKS",
-];
+export const VEHICLE_CATEGORIES = ["TRICYCLE", "BUS", "TAXI", "MOTORCYCLE"];
 export const VEHICLE_CATEGORIES_PRICE = [
-  { name: "TRICYCLE", price: 2000 },
-  { name: "OKADA", price: 1000 },
-  { name: "SHUTTLE_BUS", price: 2400 },
-  { name: "TAXIS", price: 2400 },
-  { name: "BUS_INTRASTATE", price: 3000 },
-  { name: "TRUCKS", price: 3000 },
-  { name: "BUS_INTERSTATE", price: 4000 },
+  { name: "TRICYCLE", price: 1000 },
+  { name: "BUS", price: 2400 },
+  { name: "TAXI", price: 2400 },
+  { name: "MOTORCYCLE", price: 3000 },
 ];
 
 export enum VehicleValues {
   TRICYCLE = 333,
-  SHUTTLE_BUS = 400,
-  TAXIS = 400,
-  BUS_INTRASTATE = 500,
-  TRUCKS = 500,
-  BUS_INTERSTATE = 666,
-  OTHERS = 500,
+  BUS = 400,
+  TAXI = 400,
+  MOTORCYCLE = 500,
 }
 
 export const STICKER_FEE = 500;

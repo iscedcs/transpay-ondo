@@ -22,14 +22,11 @@ export function UpdateStartDate({ tCode }: { tCode: string }) {
       if (result.success) {
         toast.success("Start date updated successfully")
         setOpen(false)
-        // You might want to do something with the returned data here
-        console.log("New owing amount:", result.data)
       } else {
         throw new Error(result.error)
       }
     } catch (error) {
       toast.error("Failed to update start date")
-      console.log("Error:", error);
     } finally {
       setIsLoading(false)
     }

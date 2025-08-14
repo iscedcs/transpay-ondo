@@ -26,7 +26,6 @@ export function LGARevenue() {
     }
     loadData();
   }, []);
-
   return (
     <Card>
       <CardHeader>
@@ -60,7 +59,7 @@ export function LGARevenue() {
                 content={<ChartTooltipContent />}
                 formatter={(value) => [
                   formatCurrency(value as number),
-                  "Revenue",
+                  " Revenue",
                 ]}
               />
               <Bar

@@ -27,8 +27,7 @@ export async function createNewPassword(userId: string, newPassword: string) {
     revalidatePath(`/agents/${userId}`)
     return { success: true, data }
   } catch (error) {
-    console.log("Error setting new password:", error);
-    return { success: false, error: 'Failed to set new password' }
+    return { success: false, error: "Failed to set new password" };
   }
 }
 

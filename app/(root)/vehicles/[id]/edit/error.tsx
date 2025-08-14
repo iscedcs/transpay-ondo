@@ -14,8 +14,12 @@ export default function VehicleEditError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.log("Vehicle edit error:", error);
-  }, [error])
+    if (error) {
+      // TODO: Log the error to an error tracking service
+      // FIXME: Optionally, you can send this error to an external service
+      // NOTE: e.g., Sentry, LogRocket, etc.
+    }
+  }, [error]);
 
   return (
     <div className="container mx-auto py-6">

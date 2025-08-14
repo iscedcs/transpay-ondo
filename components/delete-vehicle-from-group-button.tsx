@@ -61,7 +61,6 @@ export function DeleteVehicleButton({ vehicle }: DeleteVehicleButtonProps) {
           reject(new Error(result.errors?.message || "An unknown error occurred"))
         }
       } catch (error) {
-        console.log("Error removing vehicle from company:", error);
         reject(error)
       } finally {
         setIsLoading(false)

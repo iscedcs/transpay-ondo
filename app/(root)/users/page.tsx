@@ -95,6 +95,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
         <UsersStats
           users={usersResult.success ? usersResult.data.users : []}
           totalCount={usersResult.success ? usersResult.data.count : 0}
+          roleSummary={usersResult.success ? usersResult.data.roleSummary : {}}
         />
       </Suspense>
 

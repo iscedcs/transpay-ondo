@@ -33,13 +33,13 @@ model AuditTrail {
   id          String   @id
   name        String
   description String
-  userId      String
-  vehicleId   String
+  userId      String?
+  vehicleId   String?
   meta        Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime
-  User        User     @relation(fields: [userId], references: [id])
-  Vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  User        User?    @relation(fields: [userId], references: [id])
+  Vehicle     Vehicle? @relation(fields: [vehicleId], references: [id])
 }
 
 model Driver {
@@ -181,85 +181,98 @@ model StickerRequest {
 }
 
 model User {
-  id                                                 String               @id
-  firstName                                          String
-  lastName                                           String
-  phone                                              String               @unique
-  password                                           String
-  email                                              String               @unique
-  role                                               Role                 @default(VEHICLE_OWNER)
-  gender                                             String?
-  marital_status                                     String?
-  whatsapp                                           String?
-  nok_name                                           String?
-  nok_phone                                          String?
-  nok_relationship                                   String?
-  maiden_name                                        String?
-  blacklisted                                        Boolean              @default(false)
-  address                                            Json?
-  identification                                     Json?
-  createdAt                                          DateTime             @default(now())
-  updatedAt                                          DateTime
-  deletedAt                                          DateTime?
-  lastLogin                                          DateTime?
-  createdBy                                          String?
-  lgaId                                              String?
-  status                                             UserStatus           @default(ACTIVE)
-  image                                              String?
-  ApiKey                                             ApiKey[]
-  AuditTrail                                         AuditTrail[]
-  PasswordReset                                      PasswordReset?
-  PaymentOrder                                       PaymentOrder[]
-  Scan                                               Scan[]
-  LGA                                                LGA?                 @relation(fields: [lgaId], references: [id])
-  UserUnblockRequest                                 UserUnblockRequest[]
-  Vehicle                                            Vehicle[]
-  VehicleWaiver                                      VehicleWaiver[]
-  WaiverRequest_WaiverRequest_decisionMadeByIdToUser WaiverRequest[]      @relation("WaiverRequest_decisionMadeByIdToUser")
-  WaiverRequest_WaiverRequest_requestedByIdToUser    WaiverRequest[]      @relation("WaiverRequest_requestedByIdToUser")
+  id                                                     String               @id
+  firstName                                              String
+  lastName                                               String
+  phone                                                  String               @unique
+  password                                               String
+  email                                                  String               @unique
+  role                                                   Role                 @default(VEHICLE_OWNER)
+  gender                                                 String?
+  marital_status                                         String?
+  whatsapp                                               String?
+  nok_name                                               String?
+  nok_phone                                              String?
+  nok_relationship                                       String?
+  maiden_name                                            String?
+  blacklisted                                            Boolean              @default(false)
+  address                                                Json?
+  identification                                         Json?
+  createdAt                                              DateTime             @default(now())
+  updatedAt                                              DateTime
+  deletedAt                                              DateTime?
+  lastLogin                                              DateTime?
+  createdBy                                              String?
+  lgaId                                                  String?
+  status                                                 UserStatus           @default(ACTIVE)
+  image                                                  String?
+  refreshToken                                           String?
+  ApiKey                                                 ApiKey[]
+  AuditTrail                                             AuditTrail[]
+  FlaggedRecord_FlaggedRecord_approvedByToUser           FlaggedRecord[]      @relation("FlaggedRecord_approvedByToUser")
+  FlaggedRecord_FlaggedRecord_resolvedByToUser           FlaggedRecord[]      @relation("FlaggedRecord_resolvedByToUser")
+  PasswordReset                                          PasswordReset?
+  PaymentOrder                                           PaymentOrder[]
+  Scan                                                   Scan[]
+  LGA                                                    LGA?                 @relation(fields: [lgaId], references: [id])
+  UserUnblockRequest_UserUnblockRequest_resolvedByToUser UserUnblockRequest[] @relation("UserUnblockRequest_resolvedByToUser")
+  UserUnblockRequest                                     UserUnblockRequest[]
+  Vehicle_Vehicle_createdByToUser                        Vehicle[]            @relation("Vehicle_createdByToUser")
+  Vehicle                                                Vehicle[]
+  VehicleWaiver                                          VehicleWaiver[]
+  WaiverRequest_WaiverRequest_decisionMadeByIdToUser     WaiverRequest[]      @relation("WaiverRequest_decisionMadeByIdToUser")
+  WaiverRequest_WaiverRequest_requestedByIdToUser        WaiverRequest[]      @relation("WaiverRequest_requestedByIdToUser")
 }
 
 model Vehicle {
-  id                         String                       @id
-  color                      String?
-  category                   String?
-  plateNumber                String                       @unique
-  image                      String?
-  blacklisted                Boolean                      @default(false)
-  status                     VehicleStatus                @default(ACTIVE)
-  type                       String?
-  vin                        String?
-  fairFlexImei               String?
-  ownerId                    String?
-  stateCode                  String?                      @unique
-  vCode                      String?                      @unique
-  securityCode               String?                      @unique @db.VarChar(5)
-  startDate                  DateTime                     @default(now())
-  groupId                    String?
-  createdAt                  DateTime                     @default(now())
-  updatedAt                  DateTime
-  deletedAt                  DateTime?
-  registeredLgaId            String?
-  last_payment_date          DateTime?
-  AuditTrail                 AuditTrail[]
-  BarCodes                   BarCodes?
-  Driver                     Driver[]
-  LivePaymentNotification    LivePaymentNotification[]
-  PaymentNotification        PaymentNotification[]
-  Scan                       Scan[]
-  StickerPaymentNotification StickerPaymentNotification[]
-  StickerRequest             StickerRequest[]
-  VehicleGroup               VehicleGroup?                @relation(fields: [groupId], references: [id])
-  User                       User?                        @relation(fields: [ownerId], references: [id])
-  LGA                        LGA?                         @relation(fields: [registeredLgaId], references: [id])
-  VehicleFine                VehicleFine[]
-  VehicleImage               VehicleImage[]
-  VehicleRoute               VehicleRoute[]
-  VehicleTracker             VehicleTracker?
-  VehicleTransaction         VehicleTransaction[]
-  VehicleWaiver              VehicleWaiver[]
-  VehicleWallet              VehicleWallet?
-  WaiverRequest              WaiverRequest[]
+  id                           String                       @id
+  color                        String?
+  plateNumber                  String                       @unique
+  image                        String?
+  blacklisted                  Boolean                      @default(false)
+  status                       VehicleStatus                @default(ACTIVE)
+  type                         String?
+  vin                          String?
+  fairFlexImei                 String?
+  ownerId                      String?
+  stateCode                    String?                      @unique
+  vCode                        String?                      @unique
+  securityCode                 String?                      @unique @db.VarChar(5)
+  startDate                    DateTime                     @default(now())
+  groupId                      String?
+  createdAt                    DateTime                     @default(now())
+  updatedAt                    DateTime
+  deletedAt                    DateTime?
+  registeredLgaId              String?
+  last_payment_date            DateTime?
+  flaggedAt                    DateTime?
+  isFlagged                    Boolean                      @default(false)
+  customerReference            String?                      @unique
+  createdBy                    String?
+  category                     VehicleCategories?
+  vehicleSettingId             String?
+  AuditTrail                   AuditTrail[]
+  BarCodes                     BarCodes?
+  Driver                       Driver[]
+  FlaggedRecord                FlaggedRecord[]
+  LivePaymentNotification      LivePaymentNotification[]
+  PaymentNotification          PaymentNotification[]
+  Scan                         Scan[]
+  StickerPaymentNotification   StickerPaymentNotification[]
+  StickerRequest               StickerRequest[]
+  User_Vehicle_createdByToUser User?                        @relation("Vehicle_createdByToUser", fields: [createdBy], references: [id])
+  VehicleGroup                 VehicleGroup?                @relation(fields: [groupId], references: [id])
+  User                         User?                        @relation(fields: [ownerId], references: [id])
+  LGA                          LGA?                         @relation(fields: [registeredLgaId], references: [id])
+  VehicleSetting               VehicleSetting?              @relation(fields: [vehicleSettingId], references: [id])
+  VehicleFine                  VehicleFine[]
+  VehicleImage                 VehicleImage[]
+  VehicleRoute                 VehicleRoute[]
+  VehicleTracker               VehicleTracker?
+  VehicleTransaction           VehicleTransaction[]
+  VehicleWaiver                VehicleWaiver[]
+  VehicleWallet                VehicleWallet?
+  WaiverRequest                WaiverRequest[]
 }
 
 model VehicleFine {
@@ -330,7 +343,7 @@ model VehicleTracker {
 
 model VehicleTransaction {
   id                   String                  @id
-  vehicleId            String
+  vehicleId            String?
   lgaId                String?
   transactionReference String                  @unique
   inReference          String?
@@ -345,7 +358,7 @@ model VehicleTransaction {
   sender               Json?
   recipient            Json?
   amount               Decimal                 @default(0)
-  currency             String
+  currency             String?
   revenueAmount        Decimal                 @default(0)
   trackerAmount        Decimal                 @default(0)
   walletCharges        Decimal                 @default(0)
@@ -358,8 +371,10 @@ model VehicleTransaction {
   createdAt            DateTime                @default(now())
   updatedAt            DateTime
   deletedAt            DateTime?
+  customerReference    String?
+  failureReason        String?
   LGA                  LGA?                    @relation(fields: [lgaId], references: [id])
-  Vehicle              Vehicle                 @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  Vehicle              Vehicle?                @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   Webhook              Webhook[]
 }
 
@@ -446,28 +461,32 @@ model LGA {
 }
 
 model Scan {
-  id               String   @id
+  id               String    @id
   vehicleId        String
   userId           String
   latitude         Float
   longitude        Float
   detectedLgaId    String?
   declaredRouteHit Boolean
-  extraCharge      Int
-  createdAt        DateTime @default(now())
-  LGA              LGA?     @relation(fields: [detectedLgaId], references: [id])
-  User             User     @relation(fields: [userId], references: [id])
-  Vehicle          Vehicle  @relation(fields: [vehicleId], references: [id])
+  createdAt        DateTime  @default(now())
+  amount           Decimal?  @default(0)
+  charged          Boolean   @default(false)
+  levyType         LevyType? @default(BOTH_FEE)
+  LGA              LGA?      @relation(fields: [detectedLgaId], references: [id])
+  User             User      @relation(fields: [userId], references: [id])
+  Vehicle          Vehicle   @relation(fields: [vehicleId], references: [id])
 }
 
 model UserUnblockRequest {
-  id         String    @id
-  userId     String
-  reason     String?
-  resolved   Boolean   @default(false)
-  createdAt  DateTime  @default(now())
-  resolvedAt DateTime?
-  User       User      @relation(fields: [userId], references: [id])
+  id                                       String    @id
+  userId                                   String
+  reason                                   String?
+  resolved                                 Boolean   @default(false)
+  createdAt                                DateTime  @default(now())
+  resolvedAt                               DateTime?
+  resolvedBy                               String?
+  User_UserUnblockRequest_resolvedByToUser User?     @relation("UserUnblockRequest_resolvedByToUser", fields: [resolvedBy], references: [id])
+  User                                     User      @relation(fields: [userId], references: [id])
 }
 
 model VehicleRoute {
@@ -565,6 +584,40 @@ model PaymentOrder {
   @@index([transactionReference])
 }
 
+model FlaggedRecord {
+  id                                  String    @id
+  vehicleId                           String
+  reason                              String
+  approvedBy                          String?
+  resolvedReason                      String?
+  resolvedBy                          String?
+  flaggedAt                           DateTime  @default(now())
+  approvedAt                          DateTime?
+  resolvedAt                          DateTime?
+  deletedAt                           DateTime?
+  createdAt                           DateTime  @default(now())
+  updatedAt                           DateTime
+  User_FlaggedRecord_approvedByToUser User?     @relation("FlaggedRecord_approvedByToUser", fields: [approvedBy], references: [id])
+  User_FlaggedRecord_resolvedByToUser User?     @relation("FlaggedRecord_resolvedByToUser", fields: [resolvedBy], references: [id])
+  Vehicle                             Vehicle   @relation(fields: [vehicleId], references: [id])
+
+  @@index([approvedBy])
+  @@index([resolvedBy])
+  @@index([vehicleId])
+}
+
+model VehicleSetting {
+  id            String    @id
+  name          String    @unique
+  description   String?
+  totalVehicles Int?      @default(0)
+  isActive      Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime
+  deletedAt     DateTime?
+  Vehicle       Vehicle[]
+}
+
 enum DriverStatus {
   ACTIVE
   INACTIVE
@@ -587,6 +640,9 @@ enum Role {
   POS_AGENT
   LGA_C_AGENT
   VEHICLE_OWNER
+  TASK_FORCE_ADMIN
+  TASK_FORCE_HEAD
+  TASK_FORCE_AGENT
 }
 
 enum StickerRequestStatus {
@@ -648,4 +704,20 @@ enum UserStatus {
 enum VehicleTransactionTypes {
   CREDIT
   DEBIT
+}
+
+enum LevyType {
+  BASE_FEE
+  LGA_FEE
+  BOTH_FEE
+  NO_FEE
+}
+
+enum VehicleCategories {
+  TRICYCLE
+  SHUTTLE_BUS
+  BUS_INTRASTATE
+  TRUCKS
+  BUS_INTERSTATE
+  OTHERS
 }

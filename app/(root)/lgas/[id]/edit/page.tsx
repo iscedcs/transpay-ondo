@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SUPER_ADMIN_ROLES } from "@/lib/const";
 import { notFound, redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -45,7 +46,6 @@ async function LGAEditContent({ id }: { id: string }) {
       </div>
     );
   } catch (error) {
-    console.log("Error loading LGA:", error);
     notFound();
   }
 }
@@ -101,9 +101,9 @@ export default async function LGAEditPage({ params }: LGAEditPageProps) {
   if (!session?.user) {
     redirect("/sign-in");
   }
-  // if (!ADMIN_ROLES.includes(session?.user.role)) {
-  //   redirect("/unauthorized");
-  // }
+  if (!SUPER_ADMIN_ROLES.includes(session?.user.role)) {
+    redirect("/unauthorized");
+  }
   const id = (await params).id;
   return (
     <Suspense fallback={<LGAEditSkeleton />}>

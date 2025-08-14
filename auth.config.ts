@@ -48,7 +48,6 @@ export default {
             expires_in: String(decoded.exp),
           };
         } catch (error) {
-          console.log("Authorize error:", { error });
           return null;
         }
       },

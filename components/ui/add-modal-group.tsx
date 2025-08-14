@@ -1,6 +1,5 @@
 'use client'
 
-import { checkExistingVehicle } from "@/actions/vehicle-actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { loadingSpinner } from "@/lib/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Minus, Plus, PlusCircle, PlusIcon } from "lucide-react";
+import { Minus, Plus, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -128,82 +127,9 @@ export function AddGroupModal() {
   const removeDirector = () => {
     remove(fields.length - 1);
   };
-  // const handleCheckExistingPlateNumber = async (
-  //   field: string,
-  //   value: string
-  // ) => {
-  //   if (value.length < 4) {
-  //     setExistingFields((prev) => {
-  //       const newSet = new Set(prev);
-  //       newSet.delete(field);
-  //       return newSet;
-  //     });
-  //     return;
-  //   }
-
-  //   try {
-  //     const result = await checkExistingVehicle(field, value);
-  //     if (result.exists) {
-  //       setExistingFields((prev) => new Set(prev).add(field));
-  //       //   toast.success(`${field.replace("_", " ")} already exists`, {
-  //       //        // @ts-expect-error
-  //       //        description: `A vehicle with this ${field.replace("_", " ")} is already registered. ${result.vehicle?.owner?.name}`,
-  //       //   });
-
-  //       // Check if result.vehicle and result.vehicle.id are valid before setting vehicleId
-  //       if (result.vehicle && result.vehicle.id) {
-  //         setValue("vehicleId", result.vehicle.id);
-  //         setVehicleId(result.vehicle.id);
-  //       } else {
-  //         toast.error("Vehicle ID not found.");
-  //       }
-  //     } else {
-  //       setExistingFields((prev) => {
-  //         const newSet = new Set(prev);
-  //         newSet.delete(field);
-  //         return newSet;
-  //       });
-  //     }
-  //   } catch (error) {
-  //     console.log(`Error checking existing vehicle for ${field}:`, error);
-  //     toast.error(`Failed to check existing ${field.replace("_", " ")}`);
-  //   }
-  // };
 
   const onSubmit = async (data: newGroupSchemaValues) => {
     setIsLoading(true);
-    console.log(data);
-    // const url = `${API}${URLS.group.all}`;
-    // try {
-    //   const createGroupResponse = await fetch(url, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json",
-    //     },
-    //     body: JSON.stringify({
-    //       groupName: data.groupName,
-    //       vehicleIds: [data.vehicleId],
-    //     }),
-    //   });
-    //   const result = await createGroupResponse.json();
-    //   if (createGroupResponse.ok) {
-    //     toast.success("Group Created successfully", {
-    //       description: new Date().toLocaleDateString(),
-    //     });
-    //     router.push("/groups?page=1&limit=15");
-    //   } else {
-    //     toast.error("Group Not Created", {
-    //       description: Array.isArray(result.errors?.message)
-    //         ? result.errors.message[0]
-    //         : result.errors?.message || "An unknown error occurred",
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.log("Error creating group:", error);
-    //   toast.error("An error occurred while creating the group");
-    // } finally {
-    //   setIsLoading(false);
-    // }
     const url = "/api/add-company";
     const res = await fetch(url, {
       method: "POST",

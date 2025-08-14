@@ -44,7 +44,6 @@ export default function VehicleWalletPage({
          // @ts-expect-error
          setVehicle(currentVehicle?.success?.data.vehicle);
        } catch (error) {
-         console.log("Error fetching wallet data:", error);
          toast({
            title: "Error",
            description: "Failed to fetch wallet data. Please try again.",
@@ -73,7 +72,6 @@ export default function VehicleWalletPage({
            description: "Vehicle wallet updated successfully.",
          });
        } catch (error) {
-         console.log("Error updating wallet:", error);
          toast({
            title: "Error",
            description: "Failed to update wallet. Please try again.",

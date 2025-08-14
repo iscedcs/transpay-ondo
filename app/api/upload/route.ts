@@ -22,7 +22,6 @@ export async function POST(request: Request) {
     });
 
     const imageUrl = `${url}${fields.key}`;
-    console.log({ imageUrl, fields, url });
     return Response.json({ url, fields, imageUrl });
   } catch (error) {
     return new Response(JSON.stringify({ error: "Unknown error occurred" }), {

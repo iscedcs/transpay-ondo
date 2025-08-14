@@ -74,7 +74,6 @@ export const allUsers = async ({
       },
     };
   } catch (error) {
-    console.log("Error fetching users:", error);
     return { error: "Something went wrong!!!" };
   }
 };
@@ -128,7 +127,6 @@ export const allAgentsCreatedByAdminId = async ({
       },
     };
   } catch (error) {
-    console.log("Error fetching users:", error);
     return { error: "Something went wrong!!!" };
   }
 };

@@ -98,7 +98,7 @@ export function VehiclesContent() {
         const response = await getLGAs({ limit: 100, page: 1 });
         setLgas(response.data.map((lga) => ({ id: lga.id, name: lga.name })));
       } catch (error) {
-        console.log("Failed to fetch LGAs:", error);
+        // TODO: Handle error fetching LGAs
       }
     };
 
@@ -121,8 +121,6 @@ export function VehiclesContent() {
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to fetch vehicle stats";
-      console.log("Error fetching vehicle stats:", errorMessage);
-      // Don't show error toast for stats, just log it
     } finally {
       setStatsLoading(false);
     }

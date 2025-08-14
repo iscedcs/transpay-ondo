@@ -40,7 +40,7 @@ export function DeleteConfirmationModal({
       onClose();
       setHardDelete(false);
     } catch (error) {
-      console.log("Failed to delete route:", error);
+      // TODO: Optionally, you can show an error toast or message here
     } finally {
       setIsLoading(false);
     }

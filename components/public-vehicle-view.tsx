@@ -134,8 +134,7 @@ export function PublicVehicleView({ vehicle, qrId }: PublicVehicleViewProps) {
         });
         setShareDialogOpen(false);
       } catch (err) {
-        // User cancelled or error occurred
-        console.log("Share cancelled or failed:", err);
+        // NOTE: User cancelled or error occurred
       }
     } else {
       // Fallback to copy

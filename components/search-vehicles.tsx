@@ -125,9 +125,7 @@ export function SearchVehicles({
     try {
       const response = await getLGAs();
       setLGAs(response.data);
-    } catch (error) {
-      console.error("Failed to load LGAs:", error);
-    }
+    } catch (error) {}
   };
 
   const handleSearch = useCallback(
@@ -158,7 +156,6 @@ export function SearchVehicles({
 
         // Check if response and data exist before filtering
         if (!response || !response.data || !response.data) {
-          console.error("Invalid response structure:", response);
           toast.error("Invalid response from server");
           setVehicles([]);
           setTotalCount(0);
@@ -226,11 +223,6 @@ export function SearchVehicles({
 
               return vehicleDate >= fromDate && vehicleDate <= toDate;
             } catch (error) {
-              console.warn(
-                "Invalid date for vehicle:",
-                vehicle.id,
-                vehicle.createdAt
-              );
               return false;
             }
           });
@@ -248,8 +240,6 @@ export function SearchVehicles({
         // Update URL with search params
         updateURL();
       } catch (error) {
-        console.error("Search failed:", error);
-
         // More specific error messages
         if (error instanceof Error) {
           if (error.message.includes("fetch")) {

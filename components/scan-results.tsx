@@ -22,7 +22,6 @@ interface ScanResultsProps {
 }
 
 export function ScanResults({ scanResult }: ScanResultsProps) {
-  console.log({ scanResult });
   const { scan, vehicle, agent, charged } = scanResult.data;
 
   const formatCurrency = (amount: number | string) => {

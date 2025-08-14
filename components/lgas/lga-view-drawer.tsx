@@ -67,7 +67,7 @@ export function LGAViewDrawer({ lga, isOpen, onClose }: LGAViewDrawerProps) {
       setScans(scansData);
       setRoutes(routesData);
     } catch (error) {
-      console.log("Failed to load LGA data:", error);
+      // TODO: Handle error (e.g., show toast notification)
     } finally {
       setLoading(false);
     }

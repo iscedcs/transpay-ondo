@@ -74,7 +74,6 @@ export function SimpleImageUploader({
         throw new Error("Upload failed");
       }
     } catch (error) {
-      console.log("Upload error:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to upload image"
       );

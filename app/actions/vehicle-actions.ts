@@ -15,34 +15,32 @@ export async function checkExistingVehicle(field: string, value: string): Promis
      }
 
      try {
-          const existingVehicle = await db.vehicle.findFirst({
-               where: {
-                    [field]: value,
-                    deletedAt: null, // Assuming we want to exclude soft-deleted vehicles
-               },
-               select: {
-                    id: true,
-                    [field]: true,
-                    User: true,
-                    VehicleGroup: {
-                         select: {
-                         groupName: true,
-                         id: true
-                         },
-                    },
-               },
-          });
+       const existingVehicle = await db.vehicle.findFirst({
+         where: {
+           [field]: value,
+           deletedAt: null, // Assuming we want to exclude soft-deleted vehicles
+         },
+         select: {
+           id: true,
+           [field]: true,
+           User: true,
+           VehicleGroup: {
+             select: {
+               groupName: true,
+               id: true,
+             },
+           },
+         },
+       });
 
-          return {
-               exists: !!existingVehicle,
-               field,
-               value,
-               vehicle: existingVehicle ? existingVehicle : null
-          };
+       return {
+         exists: !!existingVehicle,
+         field,
+         value,
+         vehicle: existingVehicle ? existingVehicle : null,
+       };
      } catch (error) {
-          console.log({error})
-          console.log(`Error checking existing vehicle for ${field}:`, error);
-          throw new Error(`Failed to check existing vehicle for ${field}`);
+       throw new Error(`Failed to check existing vehicle for ${field}`);
      }
 }
 

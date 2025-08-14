@@ -33,10 +33,6 @@ export const getUsers = async (o: {
     const result = await res.json();
 
     if (!res.ok || !result.success) {
-      console.log(
-        `Failed to fetch users: ${res.status} ${res.statusText}`,
-        result
-      );
       return undefined;
     }
 
@@ -51,7 +47,6 @@ export const getUsers = async (o: {
       },
     };
   } catch (error: any) {
-    console.log("Error fetching users:", error.message, error);
     return undefined;
   }
 };
@@ -65,18 +60,15 @@ export const getUser = async (id: string) => {
       Authorization: `Bearer ${session?.user.access_token}`,
     };
     const url = `${API}${URLS.user.all}/${id}`;
-    console.log("Fetched Url :", url);
 
     const res = await fetch(url, { headers, next: { revalidate: 0 } });
     const result = await res.json();
     if (!res.ok || !result.success) {
-      console.log("API error:", result);
       return undefined;
     }
     const user: IUserExtended = result.data;
     return user;
   } catch (error) {
-    console.log("Error fetching user:", error);
     return null;
   }
 };
