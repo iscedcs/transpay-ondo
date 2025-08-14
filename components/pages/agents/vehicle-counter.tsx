@@ -15,7 +15,7 @@ import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 //                return <Car className="h-4 w-4" />;
 //           case "truck":
 //                return <Truck className="h-4 w-4" />;
-//           case "motorcycle":
+//           case "MOTOR_CYCLE":
 //                return <Bike className="h-4 w-4" />;
 //           default:
 //                return null;

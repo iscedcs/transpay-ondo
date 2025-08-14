@@ -189,6 +189,7 @@ model User {
   email                                                  String               @unique
   role                                                   Role                 @default(VEHICLE_OWNER)
   gender                                                 String?
+  image                                                  String?
   marital_status                                         String?
   whatsapp                                               String?
   nok_name                                               String?
@@ -198,6 +199,7 @@ model User {
   blacklisted                                            Boolean              @default(false)
   address                                                Json?
   identification                                         Json?
+  refreshToken                                           String?
   createdAt                                              DateTime             @default(now())
   updatedAt                                              DateTime
   deletedAt                                              DateTime?
@@ -205,8 +207,6 @@ model User {
   createdBy                                              String?
   lgaId                                                  String?
   status                                                 UserStatus           @default(ACTIVE)
-  image                                                  String?
-  refreshToken                                           String?
   ApiKey                                                 ApiKey[]
   AuditTrail                                             AuditTrail[]
   FlaggedRecord_FlaggedRecord_approvedByToUser           FlaggedRecord[]      @relation("FlaggedRecord_approvedByToUser")
@@ -227,6 +227,7 @@ model User {
 model Vehicle {
   id                           String                       @id
   color                        String?
+  category                     VehicleCategories?
   plateNumber                  String                       @unique
   image                        String?
   blacklisted                  Boolean                      @default(false)
@@ -238,19 +239,18 @@ model Vehicle {
   stateCode                    String?                      @unique
   vCode                        String?                      @unique
   securityCode                 String?                      @unique @db.VarChar(5)
+  customerReference            String?                      @unique
   startDate                    DateTime                     @default(now())
   groupId                      String?
+  vehicleSettingId             String?
+  isFlagged                    Boolean                      @default(false)
+  flaggedAt                    DateTime?
   createdAt                    DateTime                     @default(now())
+  createdBy                    String?
   updatedAt                    DateTime
   deletedAt                    DateTime?
   registeredLgaId              String?
   last_payment_date            DateTime?
-  flaggedAt                    DateTime?
-  isFlagged                    Boolean                      @default(false)
-  customerReference            String?                      @unique
-  createdBy                    String?
-  category                     VehicleCategories?
-  vehicleSettingId             String?
   AuditTrail                   AuditTrail[]
   BarCodes                     BarCodes?
   Driver                       Driver[]
@@ -346,6 +346,8 @@ model VehicleTransaction {
   vehicleId            String?
   lgaId                String?
   transactionReference String                  @unique
+  customerReference    String?
+  failureReason        String?
   inReference          String?
   outReference         String?
   description          String                  @default("")
@@ -371,8 +373,6 @@ model VehicleTransaction {
   createdAt            DateTime                @default(now())
   updatedAt            DateTime
   deletedAt            DateTime?
-  customerReference    String?
-  failureReason        String?
   LGA                  LGA?                    @relation(fields: [lgaId], references: [id])
   Vehicle              Vehicle?                @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   Webhook              Webhook[]
@@ -468,10 +468,10 @@ model Scan {
   longitude        Float
   detectedLgaId    String?
   declaredRouteHit Boolean
-  createdAt        DateTime  @default(now())
   amount           Decimal?  @default(0)
   charged          Boolean   @default(false)
   levyType         LevyType? @default(BOTH_FEE)
+  createdAt        DateTime  @default(now())
   LGA              LGA?      @relation(fields: [detectedLgaId], references: [id])
   User             User      @relation(fields: [userId], references: [id])
   Vehicle          Vehicle   @relation(fields: [vehicleId], references: [id])
@@ -482,9 +482,9 @@ model UserUnblockRequest {
   userId                                   String
   reason                                   String?
   resolved                                 Boolean   @default(false)
+  resolvedBy                               String?
   createdAt                                DateTime  @default(now())
   resolvedAt                               DateTime?
-  resolvedBy                               String?
   User_UserUnblockRequest_resolvedByToUser User?     @relation("UserUnblockRequest_resolvedByToUser", fields: [resolvedBy], references: [id])
   User                                     User      @relation(fields: [userId], references: [id])
 }
@@ -526,6 +526,7 @@ model VirtualAccounts {
 model Webhook {
   id                   String              @id
   event                String
+  orderId              String?
   transactionId        String?
   metadata             Json
   processed            Boolean             @default(false)
@@ -533,7 +534,6 @@ model Webhook {
   createdAt            DateTime            @default(now())
   updatedAt            DateTime
   deletedAt            DateTime?
-  orderId              String?
   PaymentOrder         PaymentOrder?       @relation(fields: [orderId], references: [id])
   VehicleTransaction   VehicleTransaction? @relation(fields: [transactionId], references: [id])
 
@@ -653,13 +653,9 @@ enum StickerRequestStatus {
 
 enum TransactionCategories {
   TRICYCLE
-  SHUTTLE_BUS
-  BUS_INTRASTATE
-  TRUCKS
-  TAXIS
-  MASS_TRANSIT
-  BUS_INTERSTATE
-  OTHERS
+  BUS
+  TAXI
+  MOTOR_CYCLE
 }
 
 enum TransactionTypes {
@@ -692,8 +688,8 @@ enum TransactionStatus {
   PAID
   OWING
   SUCCESS
-  FAILED
   PENDING
+  FAILED
 }
 
 enum UserStatus {
@@ -715,9 +711,7 @@ enum LevyType {
 
 enum VehicleCategories {
   TRICYCLE
-  SHUTTLE_BUS
-  BUS_INTRASTATE
-  TRUCKS
-  BUS_INTERSTATE
-  OTHERS
+  BUS
+  TAXI
+  MOTOR_CYCLE
 }

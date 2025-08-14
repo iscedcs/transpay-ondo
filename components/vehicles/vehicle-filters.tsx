@@ -263,7 +263,7 @@ export function VehicleFiltersComponent({
                 <SelectItem value="bus">Bus</SelectItem>
                 <SelectItem value="taxi">Taxi</SelectItem>
                 <SelectItem value="truck">Truck</SelectItem>
-                <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                <SelectItem value="MOTOR_CYCLE">MOTOR_CYCLE</SelectItem>
                 <SelectItem value="tricycle">Tricycle</SelectItem>
                 <SelectItem value="car">Car</SelectItem>
               </SelectContent>

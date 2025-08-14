@@ -1033,7 +1033,7 @@ export async function getLGAAdminActivities(limit = 20) {
 
     return activities;
   } catch (error) {
-    
-    throw new Error("Failed to fetch activities");
+    devLog("Error fetching LGA Admin activities:", error);
+    return [];
   }
 }

@@ -141,7 +141,7 @@ export const vehicleStatusOptions = [
 
 export const vehicleCategoryOptions = [
   { value: "TRICYCLE", label: "Tricycle" },
-  { value: "MOTORCYCLE", label: "Motorcycle" },
+  { value: "MOTOR_CYCLE", label: "MOTOR_CYCLE" },
   { value: "CAR", label: "Car" },
   { value: "TRUCK", label: "Truck" },
   { value: "BUS", label: "Bus" },

@@ -66,7 +66,13 @@ export interface Identification {
   number: string
 }
 
-export type VehicleCategory = "TRICYCLE" | "TAXI" | "BUS" | "TRUCK" | "MOTORCYCLE" | "PRIVATE_CAR"
+export type VehicleCategory =
+  | "TRICYCLE"
+  | "TAXI"
+  | "BUS"
+  | "TRUCK"
+  | "MOTOR_CYCLE"
+  | "PRIVATE_CAR";
 
 export type VehicleStatus = "ACTIVE" | "INACTIVE" | "SUSPENDED" | "PENDING_VERIFICATION"
 

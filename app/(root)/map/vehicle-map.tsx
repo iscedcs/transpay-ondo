@@ -22,7 +22,7 @@
 //      const minLat = 5.8;
 //      const maxLat = 6.9;
 
-//      const vehicleTypes = ["Car", "Truck", "Van", "Bus", "Motorcycle"];
+//      const vehicleTypes = ["Car", "Truck", "Van", "Bus", "MOTOR_CYCLE"];
 //      const majorRoads = ["Onitsha-Owerri Expressway", "Enugu-Onitsha Expressway", "Awka Road", "Zik Avenue", "Old Onitsha Road", "Nnamdi Azikiwe Avenue"];
 
 //      return Array.from({ length: count }, (_, i) => ({

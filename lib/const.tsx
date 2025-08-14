@@ -2395,22 +2395,22 @@ export const vehicleTypeData = [
   { name: "TRICYCLE", value: 2000 },
   { name: "BUS", value: 2400 },
   { name: "TAXI", value: 2400 },
-  { name: "MOTORCYCLE", value: 1000 },
+  { name: "MOTOR_CYCLE", value: 1000 },
 ];
 
-export const VEHICLE_CATEGORIES = ["TRICYCLE", "BUS", "TAXI", "MOTORCYCLE"];
+export const VEHICLE_CATEGORIES = ["TRICYCLE", "BUS", "TAXI", "MOTOR_CYCLE"];
 export const VEHICLE_CATEGORIES_PRICE = [
   { name: "TRICYCLE", price: 1000 },
   { name: "BUS", price: 2400 },
   { name: "TAXI", price: 2400 },
-  { name: "MOTORCYCLE", price: 3000 },
+  { name: "MOTOR_CYCLE", price: 3000 },
 ];
 
 export enum VehicleValues {
   TRICYCLE = 333,
   BUS = 400,
   TAXI = 400,
-  MOTORCYCLE = 500,
+  MOTOR_CYCLE = 500,
 }
 
 export const STICKER_FEE = 500;

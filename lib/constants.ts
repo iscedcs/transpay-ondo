@@ -31,7 +31,7 @@ export const STATE_CONFIG = {
 
   // Vehicle categories and levy amounts
   vehicleCategories: [
-    { id: "motorcycle", name: "Motorcycle", dailyLevy: 200 },
+    { id: "MOTOR_CYCLE", name: "MOTOR_CYCLE", dailyLevy: 200 },
     { id: "tricycle", name: "Tricycle", dailyLevy: 300 },
     { id: "taxi", name: "Taxi", dailyLevy: 500 },
     { id: "bus", name: "Bus", dailyLevy: 800 },
