@@ -111,7 +111,7 @@ export default async function LGAPage({
             <div>
               <h1 className="text-2xl font-bold">{lga.name}</h1>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline">Edo State</Badge>
+                <Badge variant="outline">Ondo State</Badge>
                 <Badge className="text-white">
                   {formatFees(JSON.parse(lga.fee) as VehicleFee[])} levy
                 </Badge>

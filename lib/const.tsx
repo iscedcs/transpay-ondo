@@ -1938,7 +1938,7 @@ export const SLIDES = [
     desc="Accountability in a civilized society is the stepping stone to development and progressive environment"
     images="/avater.png"
     author="ISCE Digital Concept"
-    title="Edo State"
+    title="Ondo State"
   />,
 ];
 

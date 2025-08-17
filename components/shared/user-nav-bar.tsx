@@ -1,5 +1,14 @@
 "use client";
+import {
+  SIDEBAR_LINKS,
+  SIDEBAR_LINKS_ADMIN,
+  SIDEBAR_LINKS_EIRS_ADMIN,
+  SIDEBAR_LINKS_LGA_ADMIN,
+  SIDEBAR_LINKS_LGA_AGENT,
+  SIDEBAR_LINKS_LGA_C_AGENT,
+} from "@/lib/const";
 import { getInitials } from "@/lib/utils";
+import { Role } from "@prisma/client";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -16,15 +25,6 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import {
-  SIDEBAR_LINKS,
-  SIDEBAR_LINKS_ADMIN,
-  SIDEBAR_LINKS_EIRS_ADMIN,
-  SIDEBAR_LINKS_LGA_ADMIN,
-  SIDEBAR_LINKS_LGA_AGENT,
-  SIDEBAR_LINKS_LGA_C_AGENT,
-} from "@/lib/const";
-import { Role } from "@prisma/client";
 
 export function UserNav() {
   const session = useSession();
@@ -53,7 +53,7 @@ export function UserNav() {
           <Button variant="link" className="relative h-8 w-8  rounded-full">
             <Avatar className="h-9 w-9">
               <AvatarImage
-                src={"/anambara.png"}
+                src={"/ondo.png"}
                 alt={user.name || "Default User"}
               />
               <AvatarFallback>
@@ -75,7 +75,7 @@ export function UserNav() {
             <div className="">
               <Avatar className="h-14 w-14">
                 <AvatarImage
-                  src={"/anambara.png"}
+                  src={"/ondo.png"}
                   alt={user.name || "Agent User"}
                 />
                 <AvatarFallback>

@@ -1,5 +1,5 @@
 const CONFIG = {
-  stateName: "Edo State",
+  stateName: "Ondo State",
   shortName: "Edo",
   capital: "Benin City",
   country: "Nigeria",
