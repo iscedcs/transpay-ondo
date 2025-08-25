@@ -612,6 +612,8 @@ model VehicleSetting {
   description   String?
   totalVehicles Int?      @default(0)
   isActive      Boolean   @default(false)
+  startDate     DateTime?
+  endDate       DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime
   deletedAt     DateTime?
