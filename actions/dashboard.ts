@@ -194,11 +194,11 @@ export const getUsersByRole = async () => {
   if (!session || !session.user) {
     return [
       { role: "ADMIN", count: 0 },
-      { role: "EIRS_ADMIN", count: 0 },
-      { role: "EIRS_AGENT", count: 0 },
-      { role: "LGA_ADMIN", count: 0 },
-      { role: "LGA_AGENT", count: 0 },
-      { role: "LGA_C_AGENT", count: 0 },
+      { role: "ODIRS_ADMIN", count: 0 },
+      { role: "ODIRS_AGENT", count: 0 },
+      // { role: "ODIRS_ADMIN", count: 0 },
+      // { role: "LGA_AGENT", count: 0 },
+      { role: "ODIRS_C_AGENT", count: 0 },
       { role: "VEHICLE_OWNER", count: 0 },
     ];
   }
@@ -206,11 +206,11 @@ export const getUsersByRole = async () => {
   if (!token) {
     return [
       { role: "ADMIN", count: 0 },
-      { role: "EIRS_ADMIN", count: 0 },
-      { role: "EIRS_AGENT", count: 0 },
-      { role: "LGA_ADMIN", count: 0 },
-      { role: "LGA_AGENT", count: 0 },
-      { role: "LGA_C_AGENT", count: 0 },
+      { role: "ODIRS_ADMIN", count: 0 },
+      { role: "ODIRS_AGENT", count: 0 },
+      // { role: "ODIRS_ADMIN", count: 0 },
+      // { role: "LGA_AGENT", count: 0 },
+      { role: "ODIRS_C_AGENT", count: 0 },
       { role: "VEHICLE_OWNER", count: 0 },
     ];
   }
@@ -223,11 +223,11 @@ export const getUsersByRole = async () => {
   if (!res.ok) {
     return [
       { role: "ADMIN", count: 0 },
-      { role: "EIRS_ADMIN", count: 0 },
-      { role: "EIRS_AGENT", count: 0 },
-      { role: "LGA_ADMIN", count: 0 },
-      { role: "LGA_AGENT", count: 0 },
-      { role: "LGA_C_AGENT", count: 0 },
+      { role: "ODIRS_ADMIN", count: 0 },
+      { role: "ODIRS_AGENT", count: 0 },
+      // { role: "ODIRS_ADMIN", count: 0 },
+      // { role: "LGA_AGENT", count: 0 },
+      { role: "ODIRS_C_AGENT", count: 0 },
       { role: "VEHICLE_OWNER", count: 0 },
     ];
   }
@@ -237,11 +237,11 @@ export const getUsersByRole = async () => {
   if (!user_count) {
     return [
       { role: "ADMIN", count: 0 },
-      { role: "EIRS_ADMIN", count: 0 },
-      { role: "EIRS_AGENT", count: 0 },
-      { role: "LGA_ADMIN", count: 0 },
-      { role: "LGA_AGENT", count: 0 },
-      { role: "LGA_C_AGENT", count: 0 },
+      { role: "ODIRS_ADMIN", count: 0 },
+      { role: "ODIRS_AGENT", count: 0 },
+      // { role: "ODIRS_ADMIN", count: 0 },
+      // { role: "LGA_AGENT", count: 0 },
+      { role: "ODIRS_C_AGENT", count: 0 },
       { role: "VEHICLE_OWNER", count: 0 },
     ];
   }
@@ -310,7 +310,6 @@ export async function fetchLGARevenue() {
   };
   const res = await fetch(URL, { headers, cache: "no-store" });
   if (!res.ok) {
-    
     return [
       { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
       { lga: "OREDO", count: 1, percentage: 50 },
@@ -320,7 +319,6 @@ export async function fetchLGARevenue() {
 
   const lga_revenue_all = data.data;
   if (!lga_revenue_all) {
-    
     return [
       { lgaName: "Warri South", vehicleCount: 450 },
       { lgaName: "Ndokwa East", vehicleCount: 320 },
@@ -354,7 +352,6 @@ export async function fetchVehicleDistribution() {
   };
   const res = await fetch(URL, { headers, cache: "no-store" });
   if (!res.ok) {
-    
     return [
       { lga: "ESAN SOUTH-EAST", count: 1, percentage: 50 },
       { lga: "OREDO", count: 1, percentage: 50 },
@@ -364,7 +361,6 @@ export async function fetchVehicleDistribution() {
 
   const vehicle_count_by_lga = data.data;
   if (!vehicle_count_by_lga) {
-    
     return [
       { lgaName: "Warri South", vehicleCount: 450 },
       { lgaName: "Ndokwa East", vehicleCount: 320 },
@@ -500,7 +496,6 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       },
     };
   } catch (error) {
-    
     throw new Error("Failed to fetch dashboard statistics");
   }
 }
@@ -538,7 +533,6 @@ export async function getRecentScans(limit = 10) {
 
     return scans;
   } catch (error) {
-    
     throw new Error("Failed to fetch recent scans");
   }
 }
@@ -555,7 +549,7 @@ export async function getLGAAgentDashboardStats(): Promise<DashboardStats> {
   }
 
   // Ensure user is LGA_AGENT and has an assigned LGA
-  if (user.role !== "LGA_AGENT" || !user.lgaId) {
+  if (user.role !== "AGENCY_AGENT" || !user.lgaId) {
     throw new Error("Access denied: LGA Agent role required with assigned LGA");
   }
 
@@ -645,7 +639,6 @@ export async function getLGAAgentDashboardStats(): Promise<DashboardStats> {
       },
     };
   } catch (error) {
-    
     throw new Error("Failed to fetch dashboard statistics");
   }
 }
@@ -661,7 +654,7 @@ export async function getLGAAgentRecentScans(limit = 10) {
     throw new Error("Unauthorized");
   }
 
-  if (user.role !== "LGA_AGENT" || !user.lgaId) {
+  if (user.role !== "AGENCY_AGENT" || !user.lgaId) {
     throw new Error("Access denied: LGA Agent role required with assigned LGA");
   }
 
@@ -695,7 +688,6 @@ export async function getLGAAgentRecentScans(limit = 10) {
 
     return scans;
   } catch (error) {
-    
     throw new Error("Failed to fetch recent scans");
   }
 }
@@ -718,8 +710,8 @@ export async function getLGAAdminDashboardStats(): Promise<
     throw new Error("Unauthorized");
   }
 
-  // Ensure user is LGA_ADMIN and has an assigned LGA
-  if (user.role !== "LGA_ADMIN" || !user.lgaId) {
+  // Ensure user is ODIRS_ADMIN and has an assigned LGA
+  if (user.role !== "ODIRS_ADMIN" || !user.lgaId) {
     throw new Error("Access denied: LGA Admin role required with assigned LGA");
   }
 
@@ -734,7 +726,7 @@ export async function getLGAAdminDashboardStats(): Promise<
       deletedAt: null,
       lgaId: user.lgaId, // Only users in their LGA
       role: {
-        in: ["LGA_AGENT", "LGA_C_AGENT"], // Only agents
+        in: ["AGENCY_AGENT", "ODIRS_C_AGENT"], // Only agents
       } as { in: Role[] },
     };
 
@@ -879,7 +871,6 @@ export async function getLGAAdminDashboardStats(): Promise<
       monthlyRevenue: Number(monthlyRevenue._sum.amount || 0),
     };
   } catch (error) {
-    
     throw new Error("Failed to fetch dashboard statistics");
   }
 }
@@ -895,7 +886,7 @@ export async function getLGAAdminAgentPerformance() {
     throw new Error("Unauthorized");
   }
 
-  if (user.role !== "LGA_ADMIN" || !user.lgaId) {
+  if (user.role !== "ODIRS_ADMIN" || !user.lgaId) {
     throw new Error("Access denied: LGA Admin role required with assigned LGA");
   }
 
@@ -905,7 +896,7 @@ export async function getLGAAdminAgentPerformance() {
       where: {
         lgaId: user.lgaId,
         role: {
-          in: ["LGA_AGENT", "LGA_C_AGENT"],
+          in: ["AGENCY_AGENT", "ODIRS_C_AGENT"],
         },
         deletedAt: null,
       },
@@ -970,7 +961,6 @@ export async function getLGAAdminAgentPerformance() {
 
     return agentPerformance;
   } catch (error) {
-    
     throw new Error("Failed to fetch agent performance data");
   }
 }
@@ -986,7 +976,7 @@ export async function getLGAAdminActivities(limit = 20) {
     throw new Error("Unauthorized");
   }
 
-  if (user.role !== "LGA_ADMIN" || !user.lgaId) {
+  if (user.role !== "ODIRS_ADMIN" || !user.lgaId) {
     throw new Error("Access denied: LGA Admin role required with assigned LGA");
   }
 

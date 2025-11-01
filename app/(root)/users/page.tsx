@@ -57,6 +57,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
   }
 
   const usersResult = await getUsers(params);
+  // console.log({ usersResult });
 
   return (
     <div className="mx-auto p-5 space-y-6">
@@ -81,8 +82,7 @@ export default async function UsersPage({ searchParams }: UsersPageProps) {
               className={cn(
                 buttonVariants({ variant: "default" }),
                 "flex items-center gap-2"
-              )}
-            >
+              )}>
               <Plus className="h-4 w-4" />
               Add User
             </Link>

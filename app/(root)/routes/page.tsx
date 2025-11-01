@@ -45,8 +45,8 @@ export default function RoutesPage() {
           ![
             Role.SUPERADMIN,
             Role.ADMIN,
-            Role.LGA_ADMIN,
-            Role.LGA_AGENT,
+            Role.AGENCY_ADMIN,
+            Role.AGENCY_AGENT,
           ].includes(user.role)
         ) {
           window.location.href = "/dashboard?error=unauthorized";
@@ -59,7 +59,7 @@ export default function RoutesPage() {
         if (user.role === "ADMIN" && user.lgaId) {
           setFilters({ stateId: "1" }); // Admin locked to their state
         } else if (
-          (user.role === "LGA_ADMIN" || user.role === "LGA_AGENT") &&
+          (user.role === "AGENCY_ADMIN" || user.role === "AGENCY_AGENT") &&
           user.lgaId
         ) {
           setFilters({ lgaId: user.lgaId }); // LGA users locked to their LGA
@@ -86,8 +86,8 @@ export default function RoutesPage() {
       // Load LGA-specific routes for LGA Admin/Agent
       if (
         currentUser &&
-        (currentUser.role === "LGA_ADMIN" ||
-          currentUser.role === "LGA_AGENT") &&
+        (currentUser.role === "AGENCY_ADMIN" ||
+          currentUser.role === "AGENCY_AGENT") &&
         currentUser.lgaId
       ) {
         const lgaRoutesData = await getRoutesForLGA(currentUser.lgaId);
@@ -181,7 +181,7 @@ export default function RoutesPage() {
   }
 
   const isLGAUser =
-    currentUser.role === "LGA_ADMIN" || currentUser.role === "LGA_AGENT";
+    currentUser.role === "AGENCY_ADMIN" || currentUser.role === "AGENCY_AGENT";
   const lgaName = isLGAUser
     ? STATE_CONFIG.lgas.find((lga) => lga.id === currentUser.lgaId)?.name
     : "";
@@ -234,11 +234,13 @@ export default function RoutesPage() {
               <div className="text-blue-600 mt-1">ℹ️</div>
               <div>
                 <h4 className="font-medium text-blue-900">
-                  {currentUser.role === "LGA_ADMIN" ? "LGA Admin" : "LGA Agent"}{" "}
+                  {currentUser.role === "AGENCY_ADMIN"
+                    ? "LGA Admin"
+                    : "LGA Agent"}{" "}
                   Access Scope
                 </h4>
                 <p className="text-sm text-blue-700 mt-1">
-                  {currentUser.role === "LGA_ADMIN"
+                  {currentUser.role === "AGENCY_ADMIN"
                     ? `You can view and edit routes that pass through ${lgaName}. You cannot delete routes or assign new ones.`
                     : `You can view routes that pass through ${lgaName}. You cannot edit, delete, or assign routes.`}
                 </p>

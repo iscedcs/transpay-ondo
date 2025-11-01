@@ -64,35 +64,22 @@ export function getVehicleTypes(): string[] {
 export const assignableRoles: Record<string, string[]> = {
   SUPERADMIN: [
     "ADMIN",
-    "EIRS_ADMIN",
-    "EIRS_AGENT",
-    "LGA_ADMIN",
-    "LGA_AGENT",
-    "LGA_C_AGENT",
+    "ODIRS_ADMIN",
+    "ODIRS_C_AGENT",
     "VEHICLE_OWNER",
-    "POS_AGENT",
+    "AGENCY_ADMIN",
+    "AGENCY_AGENT",
+    "SUPPORT_AGENT",
+    "AUDIT",
   ],
-  ADMIN: [
-    "EIRS_ADMIN",
-    "EIRS_AGENT",
-    "LGA_ADMIN",
-    "LGA_AGENT",
-    "LGA_C_AGENT",
-    "VEHICLE_OWNER",
-    "POS_AGENT",
-  ],
-  EIRS_ADMIN: [
-    "EIRS_AGENT",
-    "LGA_ADMIN",
-    "LGA_AGENT",
-    "LGA_C_AGENT",
-    "VEHICLE_OWNER",
-    "POS_AGENT",
-  ],
-  LGA_ADMIN: ["LGA_AGENT", "LGA_C_AGENT", "VEHICLE_OWNER"],
-  EIRS_AGENT: ["VEHICLE_OWNER"],
-  LGA_AGENT: ["VEHICLE_OWNER"],
-  LGA_C_AGENT: [],
+  ADMIN: ["ODIRS_ADMIN", "ODIRS_C_AGENT", "VEHICLE_OWNER", "SUPPORT_AGENT"],
+  ODIRS_ADMIN: ["ODIRS_AGENT", "VEHICLE_OWNER"],
+
+  ODIRS_AGENT: ["VEHICLE_OWNER"],
+
+  AGENCY_ADMIN: ["AGENCY_AGENT", "VEHICLE_OWNER"],
+
+  AGENCY_AGENT: ["VEHICLE_OWNER"],
+
   VEHICLE_OWNER: [],
-  POS_AGENT: [],
 };

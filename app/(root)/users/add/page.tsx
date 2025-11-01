@@ -40,7 +40,7 @@ const userFormSchema = z
   .object({
     firstName: z.string().min(1, "First name is required"),
     lastName: z.string().min(1, "Last name is required"),
-    email: z.string().optional(), // Made optional as per requirements
+    email: z.string().optional(),
     phone: z
       .string()
       .min(10, "Phone number is required and must be at least 10 characters"),
@@ -187,7 +187,7 @@ export default function AddUserPage() {
       const email =
         data.email && data.email.trim() !== ""
           ? data.email
-          : `${data.phone}@transpayedo.com`;
+          : `${data.phone}@transpayondo.com`;
 
       // Prepare the user data for submission
       const userData = {
@@ -241,8 +241,7 @@ export default function AddUserPage() {
             variant="outline"
             onClick={() => router.back()}
             className="flex items-center gap-2"
-            size="sm"
-          >
+            size="sm">
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
@@ -327,7 +326,7 @@ export default function AddUserPage() {
                     />
                     <p className="text-xs text-muted-foreground">
                       If not provided, we'll use your phone number with
-                      @transpayedo.com
+                      @transpayondo.com
                     </p>
                     {form.formState.errors.email && (
                       <p className="text-xs text-destructive">
@@ -361,8 +360,7 @@ export default function AddUserPage() {
                       onValueChange={(value) =>
                         form.setValue("role", value as any)
                       }
-                      defaultValue={form.watch("role")}
-                    >
+                      defaultValue={form.watch("role")}>
                       <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select role" />
                       </SelectTrigger>
@@ -386,8 +384,7 @@ export default function AddUserPage() {
                       onValueChange={(value) =>
                         form.setValue("gender", value as any)
                       }
-                      defaultValue={form.watch("gender") || "MALE"}
-                    >
+                      defaultValue={form.watch("gender") || "MALE"}>
                       <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
@@ -412,8 +409,7 @@ export default function AddUserPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="identification"
-                      className="text-sm font-medium"
-                    >
+                      className="text-sm font-medium">
                       Means of Identification{" "}
                       <span className="text-red-500">*</span>
                     </Label>
@@ -421,8 +417,7 @@ export default function AddUserPage() {
                       onValueChange={(value) =>
                         form.setValue("identification", value)
                       }
-                      defaultValue={form.watch("identification")}
-                    >
+                      defaultValue={form.watch("identification")}>
                       <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select identification type" />
                       </SelectTrigger>
@@ -440,8 +435,7 @@ export default function AddUserPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="identificationNumber"
-                      className="text-sm font-medium"
-                    >
+                      className="text-sm font-medium">
                       Identification Number{" "}
                       <span className="text-red-500">*</span>
                     </Label>
@@ -481,8 +475,7 @@ export default function AddUserPage() {
                         variant="ghost"
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
+                        onClick={() => setShowPassword(!showPassword)}>
                         {showPassword ? (
                           <EyeOff className="h-4 w-4" />
                         ) : (
@@ -500,8 +493,7 @@ export default function AddUserPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="confirmPassword"
-                      className="text-sm font-medium"
-                    >
+                      className="text-sm font-medium">
                       Confirm Password <span className="text-red-500">*</span>
                     </Label>
                     <div className="relative">
@@ -519,8 +511,7 @@ export default function AddUserPage() {
                         className="absolute right-0 top-0 h-full px-3"
                         onClick={() =>
                           setShowConfirmPassword(!showConfirmPassword)
-                        }
-                      >
+                        }>
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4" />
                         ) : (
@@ -540,15 +531,13 @@ export default function AddUserPage() {
                 <Button
                   variant="outline"
                   onClick={() => router.back()}
-                  size="sm"
-                >
+                  size="sm">
                   Cancel
                 </Button>
                 <Button
                   type="button"
                   onClick={(e) => handleNext(e, "basic", "address")}
-                  size="sm"
-                >
+                  size="sm">
                   Next: Address & LGA
                 </Button>
               </CardFooter>
@@ -681,8 +670,7 @@ export default function AddUserPage() {
                           form.setValue("address.lga", selectedLga.name);
                         }
                       }}
-                      defaultValue={form.watch("lgaId")}
-                    >
+                      defaultValue={form.watch("lgaId")}>
                       <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select LGA" />
                       </SelectTrigger>
@@ -715,15 +703,13 @@ export default function AddUserPage() {
                 <Button
                   variant="outline"
                   onClick={() => setActiveTab("basic")}
-                  size="sm"
-                >
+                  size="sm">
                   Back
                 </Button>
                 <Button
                   type="button"
                   onClick={(e) => handleNext(e, "address", "additional")}
-                  size="sm"
-                >
+                  size="sm">
                   Next: Additional Details
                 </Button>
               </CardFooter>
@@ -748,16 +734,14 @@ export default function AddUserPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="marital_status"
-                      className="text-sm font-medium"
-                    >
+                      className="text-sm font-medium">
                       Marital Status <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       onValueChange={(value) =>
                         form.setValue("marital_status", value as any)
                       }
-                      defaultValue={form.watch("marital_status") || "SINGLE"}
-                    >
+                      defaultValue={form.watch("marital_status") || "SINGLE"}>
                       <SelectTrigger className="text-sm">
                         <SelectValue placeholder="Select marital status" />
                       </SelectTrigger>
@@ -778,8 +762,7 @@ export default function AddUserPage() {
                   <div className="space-y-2">
                     <Label
                       htmlFor="maiden_name"
-                      className="text-sm font-medium"
-                    >
+                      className="text-sm font-medium">
                       Mother's Maiden Name{" "}
                       <span className="text-red-500">*</span>
                     </Label>
@@ -836,8 +819,7 @@ export default function AddUserPage() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="nok_phone"
-                        className="text-sm font-medium"
-                      >
+                        className="text-sm font-medium">
                         Next of Kin Phone
                       </Label>
                       <Input
@@ -851,8 +833,7 @@ export default function AddUserPage() {
                     <div className="space-y-2">
                       <Label
                         htmlFor="nok_relationship"
-                        className="text-sm font-medium"
-                      >
+                        className="text-sm font-medium">
                         Relationship
                       </Label>
                       <Input
@@ -869,16 +850,14 @@ export default function AddUserPage() {
                 <Button
                   variant="outline"
                   onClick={() => setActiveTab("address")}
-                  size="sm"
-                >
+                  size="sm">
                   Back
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
                   className="flex items-center gap-2"
-                  size="sm"
-                >
+                  size="sm">
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (

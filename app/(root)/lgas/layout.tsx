@@ -21,7 +21,7 @@ export default async function DashboardLayout({
   const authorized = isAuthorized(session.user.role as Role, [
     "SUPERADMIN",
     "ADMIN",
-    "EIRS_ADMIN",
+    "ODIRS_ADMIN",
   ]);
 
   if (!authorized) {

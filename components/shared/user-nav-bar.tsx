@@ -2,10 +2,10 @@
 import {
   SIDEBAR_LINKS,
   SIDEBAR_LINKS_ADMIN,
-  SIDEBAR_LINKS_EIRS_ADMIN,
-  SIDEBAR_LINKS_LGA_ADMIN,
-  SIDEBAR_LINKS_LGA_AGENT,
-  SIDEBAR_LINKS_LGA_C_AGENT,
+  SIDEBAR_LINKS_ODIRS_ADMIN,
+  SIDEBAR_LINKS_ODIRS_C_AGENT,
+  AGENCY_ADMIN,
+  AGENCY_AGENT,
 } from "@/lib/const";
 import { getInitials } from "@/lib/utils";
 import { Role } from "@prisma/client";
@@ -95,14 +95,14 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {(user.role === Role.LGA_AGENT
-            ? SIDEBAR_LINKS_LGA_AGENT
-            : user.role === Role.LGA_ADMIN
-            ? SIDEBAR_LINKS_LGA_ADMIN
-            : user.role === Role.EIRS_ADMIN
-            ? SIDEBAR_LINKS_EIRS_ADMIN
-            : user.role === Role.LGA_C_AGENT
-            ? SIDEBAR_LINKS_LGA_C_AGENT
+          {(user.role === Role.AGENCY_AGENT
+            ? AGENCY_AGENT
+            : user.role === Role.AGENCY_ADMIN
+            ? AGENCY_ADMIN
+            : user.role === Role.ODIRS_ADMIN
+            ? SIDEBAR_LINKS_ODIRS_ADMIN
+            : user.role === Role.ODIRS_C_AGENT
+            ? SIDEBAR_LINKS_ODIRS_C_AGENT
             : user.role === Role.ADMIN
             ? SIDEBAR_LINKS_ADMIN
             : SIDEBAR_LINKS
@@ -111,7 +111,11 @@ export function UserNav() {
               <Link href={link.href}>
                 {link.title}
                 <DropdownMenuShortcut className="h-4 w-4">
-                  {link.icon}
+                  {typeof link.icon === "function" ? (
+                    <link.icon className="h-4 w-4" />
+                  ) : (
+                    link.icon
+                  )}
                 </DropdownMenuShortcut>
               </Link>
             </DropdownMenuItem>

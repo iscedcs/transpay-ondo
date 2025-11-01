@@ -1,9 +1,9 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { AlertTriangle, Shield, Phone, Mail } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Shield, Phone, Mail } from "lucide-react";
 
 interface CounterfeitErrorProps {
-  qrid: string
+  qrid: string;
 }
 
 export default function CounterfeitError({ qrid }: CounterfeitErrorProps) {
@@ -18,13 +18,15 @@ export default function CounterfeitError({ qrid }: CounterfeitErrorProps) {
             </div>
           </div>
 
-          <h1 className="text-2xl font-bold text-red-900 mb-2">Counterfeit Sticker Detected</h1>
+          <h1 className="text-2xl font-bold text-red-900 mb-2">
+            Counterfeit Sticker Detected
+          </h1>
 
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
             <p className="text-red-800 font-semibold mb-2">⚠️ SECURITY ALERT</p>
             <p className="text-red-700 text-sm">
-              This QR code does not match our authentic verification system. This may be a fraudulent or counterfeit
-              sticker.
+              This QR code does not match our authentic verification system.
+              This may be a fraudulent or counterfeit sticker.
             </p>
           </div>
 
@@ -37,18 +39,24 @@ export default function CounterfeitError({ qrid }: CounterfeitErrorProps) {
             </div>
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p className="text-sm text-gray-700">Report this incident to prevent fraud</p>
+              <p className="text-sm text-gray-700">
+                Report this incident to prevent fraud
+              </p>
             </div>
             <div className="flex items-start gap-2">
               <div className="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
-              <p className="text-sm text-gray-700">Verify authenticity through official channels only</p>
+              <p className="text-sm text-gray-700">
+                Verify authenticity through official channels only
+              </p>
             </div>
           </div>
 
           <div className="bg-gray-50 rounded-lg p-3 mb-4">
             <p className="text-xs text-gray-600 mb-1">Scanned QR Code:</p>
             <p className="text-sm font-mono text-gray-800 break-all">{qrid}</p>
-            <p className="text-xs text-gray-500 mt-1">Timestamp: {new Date().toLocaleString()}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Timestamp: {new Date().toLocaleString()}
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -59,10 +67,9 @@ export default function CounterfeitError({ qrid }: CounterfeitErrorProps) {
             <Button
               variant="outline"
               className="w-full border-red-200 text-red-700 hover:bg-red-50 bg-transparent"
-              size="sm"
-            >
+              size="sm">
               <Mail className="w-4 h-4 mr-2" />
-              Email: security@transpayedo.com
+              Email: security@transpayondo.com
             </Button>
           </div>
 
@@ -72,5 +79,5 @@ export default function CounterfeitError({ qrid }: CounterfeitErrorProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

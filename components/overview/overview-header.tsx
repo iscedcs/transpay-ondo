@@ -58,10 +58,10 @@ export function OverviewHeader({
         return "Platform Overview";
       case USER_ROLES.ADMIN:
         return "State Overview";
-      case USER_ROLES.LGA_ADMIN:
+      case USER_ROLES.ODIRS_ADMIN:
         return "LGA Overview";
-      case USER_ROLES.LGA_AGENT:
-      case USER_ROLES.LGA_C_AGENT:
+      case USER_ROLES.AGENCY_AGENT:
+      case USER_ROLES.ODIRS_C_AGENT:
         return "My Activity Overview";
       default:
         return "Overview";
@@ -74,10 +74,10 @@ export function OverviewHeader({
         return "System-wide performance and activity summary";
       case USER_ROLES.ADMIN:
         return "State-level performance and activity summary";
-      case USER_ROLES.LGA_ADMIN:
+      case USER_ROLES.AGENCY_ADMIN:
         return "Local Government Area performance summary";
-      case USER_ROLES.LGA_AGENT:
-      case USER_ROLES.LGA_C_AGENT:
+      case USER_ROLES.AGENCY_AGENT:
+      case USER_ROLES.ODIRS_C_AGENT:
         return "Your personal activity and performance";
       default:
         return "";
@@ -126,8 +126,7 @@ export function OverviewHeader({
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className="w-[240px] justify-start text-left font-normal"
-                >
+                  className="w-[240px] justify-start text-left font-normal">
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {dateFrom ? (
                     dateTo ? (

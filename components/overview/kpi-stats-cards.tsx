@@ -82,8 +82,8 @@ export function KPIStatsCards({ stats, user }: KPIStatsCardsProps) {
 
     // Customize based on role
     switch (user.role) {
-      case Role.LGA_AGENT:
-      case Role.LGA_C_AGENT:
+      case Role.AGENCY_AGENT:
+      case Role.ODIRS_C_AGENT:
         return [
           {
             ...baseStats[0],

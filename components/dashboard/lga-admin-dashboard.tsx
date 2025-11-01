@@ -189,7 +189,7 @@ export function LGAAdminDashboard() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          LGA Admin Dashboard
+          ODIRS Admin Dashboard
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
           Manage your local government area operations and monitor agent
@@ -201,32 +201,28 @@ export function LGAAdminDashboard() {
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <Button
           onClick={() => router.push("/vehicles/add")}
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Add Vehicle
         </Button>
         <Button
           onClick={() => router.push("/users/add")}
           variant="outline"
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <UserPlus className="h-4 w-4" />
           Add Agent
         </Button>
         <Button
           onClick={() => router.push("/vehicles")}
           variant="outline"
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <Eye className="h-4 w-4" />
           View Vehicles
         </Button>
         <Button
           onClick={() => router.push("/scan")}
           variant="outline"
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <Scan className="h-4 w-4" />
           Scan Vehicle
         </Button>
@@ -458,8 +454,7 @@ export function LGAAdminDashboard() {
                     <Link
                       href={`/user/${agent.id}`}
                       key={agent.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg space-y-3 sm:space-y-0"
-                    >
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg space-y-3 sm:space-y-0">
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-10 w-10">
                           <AvatarFallback>
@@ -540,8 +535,7 @@ export function LGAAdminDashboard() {
                   activities.map((activity) => (
                     <div
                       key={activity.id}
-                      className="flex items-start space-x-3 p-3 border rounded-lg"
-                    >
+                      className="flex items-start space-x-3 p-3 border rounded-lg">
                       <div className="flex-shrink-0">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">

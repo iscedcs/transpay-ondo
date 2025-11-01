@@ -13,4 +13,4 @@ With multi-channel payments, real‑time vehicle visibility, a user‑friendly d
 
 ## Learn More
 
-- [Transpay Ondo Website](https://www.transpayedo.com)
+- [Transpay Ondo Website](https://www.transpaypondo.com)

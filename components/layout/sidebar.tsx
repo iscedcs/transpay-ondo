@@ -1,12 +1,12 @@
 "use client";
 
 import {
+  AGENCY_ADMIN,
+  AGENCY_AGENT,
   SIDEBAR_LINKS,
   SIDEBAR_LINKS_ADMIN,
-  SIDEBAR_LINKS_EIRS_ADMIN,
-  SIDEBAR_LINKS_LGA_ADMIN,
-  SIDEBAR_LINKS_LGA_AGENT,
-  SIDEBAR_LINKS_LGA_C_AGENT,
+  SIDEBAR_LINKS_ODIRS_ADMIN,
+  SIDEBAR_LINKS_ODIRS_C_AGENT,
   SIDEBAR_NO_USER,
 } from "@/lib/const";
 import { Role } from "@prisma/client";
@@ -36,13 +36,13 @@ export default function Sidebar() {
     <div className="no-scrollbar fixed z-10 hidden h-full w-52 justify-between overflow-y-scroll text-secondary bg-white/50 backdrop-blur px-5 md:flex border-r">
       <div className="flex h-full w-full flex-col gap-3 pt-20">
         {(ROLE?.toLowerCase() === "agent"
-          ? SIDEBAR_LINKS_LGA_AGENT
-          : ROLE === Role.LGA_ADMIN
-          ? SIDEBAR_LINKS_LGA_ADMIN
-          : ROLE === Role.LGA_AGENT
-          ? SIDEBAR_LINKS_LGA_C_AGENT
-          : ROLE === Role.EIRS_ADMIN
-          ? SIDEBAR_LINKS_EIRS_ADMIN
+          ? SIDEBAR_LINKS_ODIRS_C_AGENT
+          : ROLE === Role.ODIRS_ADMIN
+          ? SIDEBAR_LINKS_ODIRS_ADMIN
+          : ROLE === Role.AGENCY_AGENT
+          ? AGENCY_AGENT
+          : ROLE === Role.AGENCY_ADMIN
+          ? AGENCY_ADMIN
           : ROLE === Role.ADMIN
           ? SIDEBAR_LINKS_ADMIN
           : ROLE === Role.SUPERADMIN
@@ -53,7 +53,13 @@ export default function Sidebar() {
             key={i}
             title={link.title}
             href={link.href}
-            icon={link.icon}
+            icon={
+              typeof link.icon === "function" ? (
+                <link.icon className="h-4 w-4" />
+              ) : (
+                link.icon
+              )
+            }
           />
         ))}
         {/* <Separator />

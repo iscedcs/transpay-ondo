@@ -9,7 +9,7 @@ import type {
   AddWhitelistRequest,
 } from "@/types/ip-whitelist";
 
-const API_BASE_URL = "https://pre-release-api.transpayedo.com/api";
+const API_BASE_URL = "https://pre-release-transpay-ondo.vercel.app/api";
 
 async function createApiClient() {
   const session = await auth();
