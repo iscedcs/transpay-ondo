@@ -59,14 +59,19 @@ export default function AddAgentPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
 
+  const role = session?.user?.role;
+  const token = session?.user?.access_token;
+  const agencyIdFromUser = session?.user?.id;
+
   const [isLoading, setIsLoading] = useState(false);
   const [agencies, setAgencies] = useState<{ id: string; name: string }[]>([]);
   const [lgas, setLgas] = useState<{ id: string; name: string }[]>([]);
+  const [agencyName, setAgencyName] = useState<string>("");
 
   const form = useForm<AddAgentFormValues>({
     resolver: zodResolver(addAgentSchema),
     defaultValues: {
-      agencyId: searchParams.get("agencyId") || "",
+      agencyId: searchParams.get("agencyId") || agencyIdFromUser || "",
       firstName: "",
       lastName: "",
       email: "",
@@ -84,42 +89,59 @@ export default function AddAgentPage() {
     },
   });
 
-  // --- Fetch Agencies ---
+  // --- Fetch Agencies (Superadmin only) ---
   useEffect(() => {
     const fetchAgencies = async () => {
       try {
-        if (!session?.user?.access_token) return;
-        const res = await axios.get(`${API}${URLS.agency.all}`, {
-          headers: {
-            Authorization: `Bearer ${session.user?.access_token}`,
-          },
-        });
-        if (res.data?.success) {
-          setAgencies(
-            res.data.data.map((a: any) => ({ id: a.id, name: a.name }))
+        if (!token) return;
+
+        if (role === "AGENCY_ADMIN" && agencyIdFromUser) {
+          // Fetch only their own agency
+          const res = await axios.get(
+            `${API}${URLS.agency.one.replace("{id}", agencyIdFromUser)}`,
+            { headers: { Authorization: `Bearer ${token}` } }
           );
+          if (res.data?.success) {
+            setAgencyName(res.data.data.name);
+            form.setValue("agencyId", res.data.data.id);
+          }
+        } else {
+          // Superadmin: fetch all agencies
+          const res = await axios.get(`${API}${URLS.agency.all}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (res.data?.success) {
+            setAgencies(
+              res.data.data.map((a: any) => ({ id: a.id, name: a.name }))
+            );
+          }
         }
       } catch {
-        toast.error("Failed to load agencies");
+        toast.error("Failed to load agency data");
       }
     };
-    fetchAgencies();
-  }, [session]);
 
-  // --- Fetch LGAs ---
+    fetchAgencies();
+  }, [token, role, agencyIdFromUser, form]);
+
+  // --- Fetch LGAs (for both SUPERADMIN and AGENCY_ADMIN) ---
   useEffect(() => {
     const fetchLGAData = async () => {
       try {
-        const response = await getLGAs({ limit: 50, page: 1 });
-        setLgas(response.data.map((lga) => ({ id: lga.id, name: lga.name })));
+        if (!token) return;
+
+        if (role === "SUPERADMIN" || role === "AGENCY_ADMIN") {
+          const response = await getLGAs({ limit: 50, page: 1 });
+          setLgas(response.data.map((lga) => ({ id: lga.id, name: lga.name })));
+        }
       } catch (error) {
-        toast.error("Error", {
-          description: "Failed to load LGA data. Please try again later.",
+        toast.error("Failed to load LGA data", {
+          description: "Please try again later.",
         });
       }
     };
     fetchLGAData();
-  }, []);
+  }, [token, role]);
 
   // --- Submit Handler ---
   const onSubmit = async (data: AddAgentFormValues) => {
@@ -127,7 +149,7 @@ export default function AddAgentPage() {
     try {
       const res = await axios.post(`${API}${URLS.agency.add_agent}`, data, {
         headers: {
-          Authorization: `Bearer ${session?.user?.access_token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -156,7 +178,9 @@ export default function AddAgentPage() {
             Add Agent to Agency
           </h1>
           <p className="text-sm text-muted-foreground">
-            Register a new agent under a selected agency
+            {role === "AGENCY_ADMIN"
+              ? "Add a new agent to your agency"
+              : "Register a new agent under a selected agency"}
           </p>
         </div>
         <Button
@@ -183,26 +207,30 @@ export default function AddAgentPage() {
             {/* Agency Select */}
             <div className="space-y-2">
               <Label>Agency</Label>
-              <Select
-                onValueChange={(value) => form.setValue("agencyId", value)}
-                defaultValue={form.watch("agencyId")}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Agency" />
-                </SelectTrigger>
-                <SelectContent>
-                  {agencies.length > 0 ? (
-                    agencies.map((agency) => (
-                      <SelectItem key={agency.id} value={agency.id}>
-                        {agency.name}
+              {role === "AGENCY_ADMIN" ? (
+                <Input value={agencyName || "Loading..."} disabled />
+              ) : (
+                <Select
+                  onValueChange={(value) => form.setValue("agencyId", value)}
+                  defaultValue={form.watch("agencyId")}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Agency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {agencies.length > 0 ? (
+                      agencies.map((agency) => (
+                        <SelectItem key={agency.id} value={agency.id}>
+                          {agency.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="loading" disabled>
+                        Loading agencies...
                       </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="loading" disabled>
-                      Loading agencies...
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
               {form.formState.errors.agencyId && (
                 <p className="text-xs text-destructive">
                   {form.formState.errors.agencyId.message}
@@ -273,7 +301,13 @@ export default function AddAgentPage() {
                   }}
                   defaultValue={form.watch("address.lga")}>
                   <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Select LGA" />
+                    <SelectValue
+                      placeholder={
+                        lgas.length === 0
+                          ? "Loading LGAs..."
+                          : "Select Local Government Area"
+                      }
+                    />
                   </SelectTrigger>
                   <SelectContent>
                     {lgas.length > 0 ? (

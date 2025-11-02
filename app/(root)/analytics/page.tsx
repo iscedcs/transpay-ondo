@@ -16,7 +16,7 @@ import {
      Car,
      CreditCard,
      Currency,
-     DollarSign,
+  
      TrendingDown,
      TrendingUp,
      Truck,

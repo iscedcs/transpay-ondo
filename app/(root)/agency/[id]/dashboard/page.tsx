@@ -1,28 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowLeft,
+  BarChart3,
   Loader2,
   RefreshCcw,
   TrendingUp,
   Users2,
-  DollarSign,
-  BarChart3,
-  ArrowLeft,
 } from "lucide-react";
+
+import { NairaIcon } from "@/components/shared/nairaicon";
 import { API, URLS } from "@/lib/const";
 
 export default function AgencyDashboardPage() {
@@ -67,14 +68,14 @@ export default function AgencyDashboardPage() {
   if (isLoading)
     return (
       <div className="flex justify-center items-center h-64 text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading dashboard...
+        <Loader2 className="h-6 w-6 animate-spin mr-2" /> Loading transaction...
       </div>
     );
 
   if (!dashboard)
     return (
       <div className="text-center py-12 text-muted-foreground">
-        Failed to load agency dashboard.
+        Failed to load agency transaction.
       </div>
     );
 
@@ -86,7 +87,7 @@ export default function AgencyDashboardPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            {agency?.name} Dashboard
+            {agency?.name} Revenue
           </h1>
           <p className="text-sm text-muted-foreground">
             Overview of performance, agents, and transactions
@@ -140,7 +141,7 @@ export default function AgencyDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Volume</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <NairaIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -195,7 +196,7 @@ export default function AgencyDashboardPage() {
                     <tr key={tx.id} className="border-b">
                       <td className="px-4 py-2 font-medium">{tx.id}</td>
                       <td className="px-4 py-2">
-                        ₦{tx.amount?.toLocaleString() || 0}
+                        ₦{tx.vehicleOwnerAmount?.toLocaleString() || 0}
                       </td>
                       <td className="px-4 py-2">
                         <span

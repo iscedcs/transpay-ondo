@@ -1,70 +1,83 @@
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { MoreHorizontal, Eye, CheckCircle, XCircle, Clock, FileText, DollarSign, Currency } from "lucide-react"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import type { InsuranceClaim } from "../insurance/types"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  CheckCircle,
+  Clock,
+  Currency,
+  Eye,
+  FileText,
+  MoreHorizontal,
+  XCircle,
+} from "lucide-react";
+import type { InsuranceClaim } from "../insurance/types";
 
 interface InsuranceCompanyTableProps {
-  claims: InsuranceClaim[]
+  claims: InsuranceClaim[];
 }
 
 export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "APPROVED":
-        return "default"
+        return "default";
       case "PAID":
-        return "default"
+        return "default";
       case "PENDING":
-        return "secondary"
+        return "secondary";
       case "UNDER_REVIEW":
-        return "secondary"
+        return "secondary";
       case "REJECTED":
-        return "destructive"
+        return "destructive";
       default:
-        return "outline"
+        return "outline";
     }
-  }
+  };
 
   const getClaimTypeBadgeVariant = (type: string) => {
     switch (type) {
       case "FIRE":
-        return "destructive"
+        return "destructive";
       case "THEFT":
-        return "secondary"
+        return "secondary";
       case "ACCIDENT":
-        return "default"
+        return "default";
       case "OTHER":
-        return "outline"
+        return "outline";
       default:
-        return "outline"
+        return "outline";
     }
-  }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "APPROVED":
       case "PAID":
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
       case "REJECTED":
-        return <XCircle className="h-4 w-4 text-red-500" />
+        return <XCircle className="h-4 w-4 text-red-500" />;
       case "UNDER_REVIEW":
-        return <Eye className="h-4 w-4 text-blue-500" />
+        return <Eye className="h-4 w-4 text-blue-500" />;
       default:
-        return <Clock className="h-4 w-4 text-yellow-500" />
+        return <Clock className="h-4 w-4 text-yellow-500" />;
     }
-  }
+  };
 
   const formatCurrency = (amount?: number) => {
-    if (!amount) return "N/A"
+    if (!amount) return "N/A";
     return new Intl.NumberFormat("en-NG", {
       style: "currency",
       currency: "NGN",
       minimumFractionDigits: 0,
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -73,8 +86,8 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
+  };
 
   if (claims.length === 0) {
     return (
@@ -83,11 +96,13 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
           <div className="text-center">
             <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold">No claims found</h3>
-            <p className="text-muted-foreground">Try adjusting your search filters</p>
+            <p className="text-muted-foreground">
+              Try adjusting your search filters
+            </p>
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -108,9 +123,15 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
                     {getStatusIcon(claim.status)}
                   </CardTitle>
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <Badge variant={getClaimTypeBadgeVariant(claim.claimType)}>{claim.claimType}</Badge>
-                    <Badge variant={getStatusBadgeVariant(claim.status)}>{claim.status}</Badge>
-                    <span className="text-sm text-muted-foreground">{claim.plateNumber}</span>
+                    <Badge variant={getClaimTypeBadgeVariant(claim.claimType)}>
+                      {claim.claimType}
+                    </Badge>
+                    <Badge variant={getStatusBadgeVariant(claim.status)}>
+                      {claim.status}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {claim.plateNumber}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -179,14 +200,20 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
                 <div className="flex items-center gap-2 text-sm">
                   <Currency className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Claim Amount:</span>
-                  <span className="font-medium">{formatCurrency(claim.claimAmount)}</span>
+                  <span className="font-medium">
+                    {formatCurrency(claim.claimAmount)}
+                  </span>
                 </div>
 
                 {claim.approvedAmount && (
                   <div className="flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Approved Amount:</span>
-                    <span className="font-medium text-green-600">{formatCurrency(claim.approvedAmount)}</span>
+                    <span className="text-muted-foreground">
+                      Approved Amount:
+                    </span>
+                    <span className="font-medium text-green-600">
+                      {formatCurrency(claim.approvedAmount)}
+                    </span>
                   </div>
                 )}
 
@@ -205,7 +232,8 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
               </div>
             </div>
 
-            {(claim.status === "PENDING" || claim.status === "UNDER_REVIEW") && (
+            {(claim.status === "PENDING" ||
+              claim.status === "UNDER_REVIEW") && (
               <div className="mt-4 pt-4 border-t">
                 <div className="flex gap-2 flex-wrap">
                   <Button size="sm" className="bg-green-600 hover:bg-green-700">
@@ -227,5 +255,5 @@ export function InsuranceCompanyTable({ claims }: InsuranceCompanyTableProps) {
         </Card>
       ))}
     </div>
-  )
+  );
 }

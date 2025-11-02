@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  getLGAAdminActivities,
+  getLGAAdminAgentPerformance,
+  getLGAAdminDashboardStats,
+} from "@/actions/dashboard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,38 +16,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Car,
-  Users,
   Activity,
-  TrendingUp,
-  Plus,
-  Eye,
-  Scan,
-  DollarSign,
-  UserPlus,
-  BarChart3,
-  Clock,
-  CheckCircle,
   AlertCircle,
-  Shield,
+  BarChart3,
+  Car,
+  CheckCircle,
+  Clock,
   Currency,
+  Eye,
+  Plus,
+  Scan,
+  Shield,
+  TrendingUp,
+  UserPlus,
+  Users,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import {
-  getLGAAdminDashboardStats,
-  getLGAAdminAgentPerformance,
-  getLGAAdminActivities,
-} from "@/actions/dashboard";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface DashboardStats {
   totalVehicles: number;

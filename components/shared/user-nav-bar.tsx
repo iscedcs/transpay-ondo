@@ -25,6 +25,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import React from "react";
 
 export function UserNav() {
   const session = useSession();
@@ -45,6 +46,19 @@ export function UserNav() {
   }
 
   const user = session.data.user;
+
+  const links =
+    user.role === Role.AGENCY_AGENT
+      ? AGENCY_AGENT
+      : user.role === Role.AGENCY_ADMIN
+      ? AGENCY_ADMIN(user.id)
+      : user.role === Role.ODIRS_ADMIN
+      ? SIDEBAR_LINKS_ODIRS_ADMIN
+      : user.role === Role.ODIRS_C_AGENT
+      ? SIDEBAR_LINKS_ODIRS_C_AGENT
+      : user.role === Role.ADMIN
+      ? SIDEBAR_LINKS_ADMIN
+      : SIDEBAR_LINKS;
 
   return (
     <DropdownMenu>
@@ -95,31 +109,24 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          {(user.role === Role.AGENCY_AGENT
-            ? AGENCY_AGENT
-            : user.role === Role.AGENCY_ADMIN
-            ? AGENCY_ADMIN
-            : user.role === Role.ODIRS_ADMIN
-            ? SIDEBAR_LINKS_ODIRS_ADMIN
-            : user.role === Role.ODIRS_C_AGENT
-            ? SIDEBAR_LINKS_ODIRS_C_AGENT
-            : user.role === Role.ADMIN
-            ? SIDEBAR_LINKS_ADMIN
-            : SIDEBAR_LINKS
-          ).map((link, k) => (
-            <DropdownMenuItem className="md:hidden" asChild key={k}>
-              <Link href={link.href}>
-                {link.title}
-                <DropdownMenuShortcut className="h-4 w-4">
-                  {typeof link.icon === "function" ? (
-                    <link.icon className="h-4 w-4" />
-                  ) : (
-                    link.icon
-                  )}
-                </DropdownMenuShortcut>
-              </Link>
-            </DropdownMenuItem>
-          ))}
+          {Array.isArray(links) &&
+            links.map((link, k) => {
+              const Icon = link.icon as any;
+              return (
+                <DropdownMenuItem className="md:hidden" asChild key={k}>
+                  <Link href={link.href}>
+                    {link.title}
+                    <DropdownMenuShortcut className="h-4 w-4">
+                      {React.isValidElement(link.icon) ? (
+                        link.icon
+                      ) : typeof Icon === "function" ? (
+                        <Icon className="h-4 w-4" />
+                      ) : null}
+                    </DropdownMenuShortcut>
+                  </Link>
+                </DropdownMenuItem>
+              );
+            })}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>

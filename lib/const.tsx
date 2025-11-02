@@ -12,6 +12,7 @@ import {
   Shield,
   ShieldCheck,
   Split,
+  WalletCards,
 } from "lucide-react";
 import {
   aboutIcon,
@@ -47,7 +48,7 @@ export const SIDEBAR_LINKS = [
   {
     title: "Agency",
     href: "/agency",
-    icon: adminIcon,
+    icon: <LogsIcon className="w-5 h-5" />,
   },
   {
     title: "Stickers",
@@ -216,57 +217,62 @@ export const SIDEBAR_LINKS_ODIRS_C_AGENT = [
     icon: searchIcon,
   },
 ];
-export const AGENCY_ADMIN = [
+export const AGENCY_ADMIN = (agencyId: string) => [
   {
     title: "Dashboard",
-    href: "/dashboard",
+    href: "/agency",
     icon: dashboardIcon,
   },
   {
     title: "Agents",
-    href: "/agents",
+    href: `/agency/${agencyId}/agents`,
     icon: agentsIcon,
   },
   {
     title: "Activities",
-    href: " /activities",
+    href: `/agency/${agencyId}`,
     icon: <ActivitySquareIcon className="h-5 w-5" />,
   },
   {
-    title: "Settlement",
-    href: "/settlement",
+    title: "Revenue",
+    href: `/agency/${agencyId}/dashboard`,
     icon: revenueIcon,
   },
+  // {
+  //   title: "Settlement",
+  //   href: `/agency/agents/commission`,
+  //   icon: <Split className="h-5 w-5" />,
+  // },
   {
     title: "Transactions",
-    href: "/transactions",
+    href: `/agency/${agencyId}/transactions`,
     icon: <ChartBarIcon className="h-5 w-5" />,
   },
   {
-    title: "Audit Logs",
-    href: "/audit-logs ",
-    icon: LogsIcon,
+    title: "Search",
+    href: "/agency/search",
+    icon: searchIcon,
   },
 ];
 export const AGENCY_AGENT = [
   {
     title: "Dashboard",
-    href: "/agent",
+    href: "/agency/agents",
     icon: dashboardIcon,
   },
   {
-    title: "Search Vehicle",
-    href: "/search",
-    icon: searchIcon,
-  },
-  {
     title: "Fund Vehicle",
-    href: "/fund-vehicle",
+    href: "/agency/agents/search",
     icon: <CreditCard className="h-5 w-5" />,
   },
   {
+    title: "Commission",
+    href: "/agency/agents/commission",
+    icon: <WalletCards className="h-5 w-5" />,
+  },
+  {
     title: "Transactions",
-    href: "/agent/transactions",
+    href: "/agency/agents/transactions",
     icon: revenueIcon,
   },
 
@@ -2003,6 +2009,9 @@ export const URLS = {
     one: "/api/agency/one/{id}",
     agency_dashboard: "/api/agency/dashboard/{id}",
     one_agency_agent: "/api/agency/agents/{id}",
+    one_agency_admin: "/api/agency/admin-user/{id}",
+    one_agency_transactions: "/api/agency/transactions/{id}",
+    admin_with_agency_id: "/api/agency/admin/{id}",
     update: "/api/agency/update/{id}",
     delete: "/api/agency/delete/{id}",
   },
@@ -2012,7 +2021,7 @@ export const URLS = {
     payment: "/api/agency-agent/mock-payment",
     transactions: "/api/agency-agent/transactions",
     dashboard: "/api/agency-agent/dashboard",
-    discount: "/api/agency-agent/dashboard",
+    discount: "/api/agency-agent/discount-info",
   },
 };
 

@@ -44,7 +44,7 @@ export default async function DashboardPage() {
   return (
     <div>
       {userRequest.user.lga && (
-        <div className="mx-auto container grid gap-6 px-4 md:px-6 lg:px-8">
+        <div className="mx-auto  grid gap-6 px-4 ">
           <div className="flex justify-between gap-5 font-bold uppercase">
             <div className="">{userRequest.user.lga.name}</div>
           </div>

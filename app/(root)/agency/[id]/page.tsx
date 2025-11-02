@@ -25,6 +25,8 @@ import {
   TrendingUp,
   Plus,
   Edit2,
+  FileText,
+  Search,
 } from "lucide-react";
 import AgencyEditForm from "@/components/dashboard/agency/agency-edit-form";
 
@@ -42,29 +44,32 @@ export default function AgencyDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [showEdit, setShowEdit] = useState(false);
 
+  const role = session?.user?.role;
+  const token = session?.user?.access_token;
+
   useEffect(() => {
     const fetchAgencyData = async () => {
       try {
-        if (!session?.user?.access_token) return;
+        if (!token) return;
 
         const [agencyRes, agentRes, dashboardRes] = await Promise.all([
           axios.get(`${API}${URLS.agency.one.replace("{id}", agencyId)}`, {
-            headers: { Authorization: `Bearer ${session.user.access_token}` },
+            headers: { Authorization: `Bearer ${token}` },
           }),
           axios.get(
             `${API}${URLS.agency.one_agency_agent.replace("{id}", agencyId)}`,
             {
-              headers: { Authorization: `Bearer ${session.user.access_token}` },
+              headers: { Authorization: `Bearer ${token}` },
             }
           ),
           axios.get(
             `${API}${URLS.agency.agency_dashboard.replace("{id}", agencyId)}`,
             {
-              headers: { Authorization: `Bearer ${session.user.access_token}` },
+              headers: { Authorization: `Bearer ${token}` },
             }
           ),
         ]);
-        console.log("Agent API Response:", agentRes.data);
+        // console.log("Agent API Response:", agentRes.data);
 
         if (agencyRes.data?.success) setAgency(agencyRes.data.data);
         if (agentRes.data?.success) {
@@ -76,7 +81,11 @@ export default function AgencyDetailPage() {
             : [];
           setAgents(extractedAgents);
         }
-        if (dashboardRes.data?.success) setDashboard(dashboardRes.data.data);
+        if (dashboardRes.data?.success) {
+          setDashboard(dashboardRes.data.data);
+        } else {
+          toast.error(dashboardRes.data?.message || "Failed to load dashboard");
+        }
       } catch (error: any) {
         console.error(error);
         toast.error("Failed to load agency data", {
@@ -89,7 +98,7 @@ export default function AgencyDetailPage() {
     };
 
     fetchAgencyData();
-  }, [agencyId, session]);
+  }, [agencyId, token]);
 
   if (isLoading)
     return (
@@ -104,6 +113,8 @@ export default function AgencyDetailPage() {
         Failed to load agency information.
       </div>
     );
+
+  const isSuperAdmin = role === "SUPERADMIN";
 
   return (
     <div className="space-y-6 px-4">
@@ -126,207 +137,419 @@ export default function AgencyDetailPage() {
         </Button>
       </div>
 
-      {/* Agency Info Card */}
-      <Card>
-        <CardHeader className="flex justify-between items-start">
-          <div>
-            <CardTitle>Agency Information</CardTitle>
-            <CardDescription>Basic details about this agency</CardDescription>
-          </div>
-        </CardHeader>
+      {isSuperAdmin ? (
+        <>
+          <Card>
+            <CardHeader className="flex justify-between items-start">
+              <div>
+                <CardTitle>Agency Information</CardTitle>
+                <CardDescription>
+                  Basic details about this agency
+                </CardDescription>
+              </div>
+            </CardHeader>
 
-        {!showEdit ? (
-          <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Email</p>
-              <p className="font-semibold">{agency.contactEmail}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Phone</p>
-              <p className="font-semibold">{agency.contactPhone}</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Admin</p>
-              <p className="font-semibold">
-                {agency.agencyAdmin
-                  ? `${agency.agencyAdmin.firstName} ${agency.agencyAdmin.lastName}`
-                  : "N/A"}
-              </p>
-              {agency.agencyAdmin && (
-                <p className="text-sm text-muted-foreground">
-                  {agency.agencyAdmin.email}
+            {!showEdit ? (
+              <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Email
+                  </p>
+                  <p className="font-semibold">{agency.contactEmail}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Phone
+                  </p>
+                  <p className="font-semibold">{agency.contactPhone}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Admin
+                  </p>
+                  <p className="font-semibold">
+                    {agency.agencyAdmin
+                      ? `${agency.agencyAdmin.firstName} ${agency.agencyAdmin.lastName}`
+                      : "N/A"}
+                  </p>
+                  {agency.agencyAdmin && (
+                    <p className="text-sm text-muted-foreground">
+                      {agency.agencyAdmin.email}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Status
+                  </p>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-semibold ${
+                      agency.status === "ACTIVE"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                    }`}>
+                    {agency.status}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Created
+                  </p>
+                  <p className="font-semibold">
+                    {new Date(agency.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="hover:bg-muted"
+                  onClick={() => setShowEdit((prev) => !prev)}
+                  title={showEdit ? "Close edit mode" : "Edit agency"}>
+                  <Edit2 className="h-4 w-4 text-muted-foreground" />
+                </Button>
+              </CardContent>
+            ) : (
+              <CardContent>
+                <AgencyEditForm
+                  agencyId={agencyId}
+                  onUpdated={() => {
+                    toast.success("Agency details refreshed");
+                    setShowEdit(false);
+                  }}
+                />
+              </CardContent>
+            )}
+          </Card>
+
+          {/* Stats Overview */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Agents
+                </CardTitle>
+                <Users2 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{agents.length}</div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Transactions
+                </CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {dashboard?.statistics?.totalTransactions}{" "}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Revenue
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  ₦{(dashboard?.statistics?.totalVolume || 0).toLocaleString()}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Status</CardTitle>
+                <Building2 className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{agency.status}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>More Actions</CardTitle>
+              <CardDescription>
+                Access detailed reports and manage agents for this agency
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button
+                asChild
+                variant="default"
+                className="flex items-center gap-2">
+                <Link href={`/agency/${agencyId}/dashboard`}>
+                  <TrendingUp className="h-4 w-4" />
+                  View Dashboard
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="default"
+                className="flex items-center gap-2">
+                <Link href={`/agency/${agencyId}/agents`}>
+                  <Users2 className="h-4 w-4" />
+                  View Agents
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Agent List */}
+          <Card>
+            <CardHeader className="flex flex-row justify-between items-center">
+              <div>
+                <CardTitle>Agents</CardTitle>
+                <CardDescription>All agents under this agency</CardDescription>
+              </div>
+              <Button asChild size="sm" className="flex items-center gap-2">
+                <Link href={`/agency/add/agent?agencyId=${agency.id}`}>
+                  <Plus className="h-4 w-4" /> Add Agent
+                </Link>
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {agents.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4">
+                  No agents found for this agency.
                 </p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="px-4 py-2 text-left">Name</th>
+                        <th className="px-4 py-2 text-left">Email</th>
+                        <th className="px-4 py-2 text-left">Phone</th>
+                        <th className="px-4 py-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {agents.map((agent) => (
+                        <tr key={agent.id} className="border-b">
+                          <td className="px-4 py-2">
+                            {agent.firstName} {agent.lastName}
+                          </td>
+                          <td className="px-4 py-2">{agent.email}</td>
+                          <td className="px-4 py-2">{agent.phone}</td>
+                          <td className="px-4 py-2">
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                agent.status === "ACTIVE"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}>
+                              {agent.status || "INACTIVE"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Status
-              </p>
-              <span
-                className={`px-2 py-1 rounded text-xs font-semibold ${
-                  agency.status === "ACTIVE"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}>
-                {agency.status}
-              </span>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                Created
-              </p>
-              <p className="font-semibold">
-                {new Date(agency.createdAt).toLocaleDateString()}
-              </p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hover:bg-muted"
-              onClick={() => setShowEdit((prev) => !prev)}
-              title={showEdit ? "Close edit mode" : "Edit agency"}>
-              <Edit2 className="h-4 w-4 text-muted-foreground" />
-            </Button>
-          </CardContent>
-        ) : (
-          <CardContent>
-            <AgencyEditForm
-              agencyId={agencyId}
-              onUpdated={() => {
-                toast.success("Agency details refreshed");
-                setShowEdit(false);
-              }}
-            />
-          </CardContent>
-        )}
-      </Card>
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        /* ================= AGENCY ADMIN VIEW ================= */
+        <>
+          <Card className="bg-gradient-to-br from-background via-muted/30 to-background border border-muted/40 shadow-sm">
+            <CardHeader>
+              <CardTitle>Agency Details</CardTitle>
+              <CardDescription>
+                Overview of your assigned agency
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Contact Email
+                </p>
+                <p className="font-semibold">{agency.contactEmail}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Contact Phone
+                </p>
+                <p className="font-semibold">{agency.contactPhone}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Agency Status
+                </p>
+                <span
+                  className={`px-2 py-1 rounded text-xs font-semibold ${
+                    agency.status === "ACTIVE"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                  }`}>
+                  {agency.status}
+                </span>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Created On
+                </p>
+                <p className="font-semibold">
+                  {new Date(agency.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Agents</CardTitle>
-            <Users2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{agents.length}</div>
-          </CardContent>
-        </Card>
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+              <CardDescription>
+                Access your main tools and reports
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-3">
+              <Button
+                asChild
+                variant="default"
+                className="flex items-center gap-2">
+                <Link href={`/agency/${agencyId}/dashboard`}>
+                  <TrendingUp className="h-4 w-4" /> View Dashboard
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="default"
+                className="flex items-center gap-2">
+                <Link href={`/agency/${agencyId}/agents`}>
+                  <Users2 className="h-4 w-4" /> View Agents
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="default"
+                className="flex items-center gap-2">
+                <Link href={`/agency/${agencyId}/transactions`}>
+                  <FileText className="h-4 w-4" /> View Transactions
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="default"
+                className="flex items-center gap-2">
+                <Link href="/agency/search">
+                  <Search className="h-4 w-4" /> Search Vehicle
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Transactions</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {dashboard?.transactions || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ₦{dashboard?.totalRevenue?.toLocaleString() || 0}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Status</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{agency.status}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>More Actions</CardTitle>
-          <CardDescription>
-            Access detailed reports and manage agents for this agency
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button asChild variant="default" className="flex items-center gap-2">
-            <Link href={`/agency/${agencyId}/dashboard`}>
-              <TrendingUp className="h-4 w-4" />
-              View Dashboard
-            </Link>
-          </Button>
-
-          <Button asChild variant="default" className="flex items-center gap-2">
-            <Link href={`/agency/${agencyId}/agents`}>
-              <Users2 className="h-4 w-4" />
-              View Agents
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
-
-      {/* Agent List */}
-      <Card>
-        <CardHeader className="flex justify-between items-center">
-          <div>
-            <CardTitle>Agents</CardTitle>
-            <CardDescription>All agents under this agency</CardDescription>
-          </div>
-          <Button asChild size="sm" className="flex items-center gap-2">
-            <Link href={`/agency/add/agent?agencyId=${agency.id}`}>
-              <Plus className="h-4 w-4" /> Add Agent
-            </Link>
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {agents.length === 0 ? (
-            <p className="text-sm text-muted-foreground py-4">
-              No agents found for this agency.
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/50">
-                  <tr>
-                    <th className="px-4 py-2 text-left">Name</th>
-                    <th className="px-4 py-2 text-left">Email</th>
-                    <th className="px-4 py-2 text-left">Phone</th>
-                    <th className="px-4 py-2 text-left">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {agents.map((agent) => (
-                    <tr key={agent.id} className="border-b">
-                      <td className="px-4 py-2">
-                        {agent.firstName} {agent.lastName}
-                      </td>
-                      <td className="px-4 py-2">{agent.email}</td>
-                      <td className="px-4 py-2">{agent.phone}</td>
-                      <td className="px-4 py-2">
+          {/* Recent Agents */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Agents</CardTitle>
+              <CardDescription>
+                {` A quick view of your agency’s agents`}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {agents.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-4">
+                  No agents yet under this agency.
+                </p>
+              ) : (
+                <ul className="space-y-2">
+                  {agents.slice(0, 4).map((agent) => (
+                    <li key={agent.id} className="border-b pb-2">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="font-semibold">
+                            {agent.firstName} {agent.lastName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {agent.email}
+                          </p>
+                        </div>
                         <span
-                          className={`px-2 py-1 rounded text-xs font-semibold ${
+                          className={`text-xs px-2 py-1 rounded font-medium ${
                             agent.status === "ACTIVE"
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
                           }`}>
                           {agent.status || "INACTIVE"}
                         </span>
-                      </td>
-                    </tr>
+                      </div>
+                    </li>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Transactions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Transactions</CardTitle>
+              <CardDescription>
+                Overview of your latest transactions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {dashboard?.recentTransactions?.length ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="px-4 py-2 text-left">Reference</th>
+                        <th className="px-4 py-2 text-left">Amount</th>
+                        <th className="px-4 py-2 text-left">Status</th>
+                        <th className="px-4 py-2 text-left">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {dashboard.recentTransactions.map((t: any) => (
+                        <tr key={t.transactionReference} className="border-b">
+                          <td className="px-4 py-2">
+                            {t.transactionReference}
+                          </td>
+                          <td className="px-4 py-2">
+                            ₦{" "}
+                            {Number(t.vehicleOwnerAmount || 0).toLocaleString()}
+                          </td>
+                          <td className="px-4 py-2">
+                            <span
+                              className={`px-2 py-1 rounded text-xs font-semibold ${
+                                t.status === "SUCCESS"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-red-100 text-red-700"
+                              }`}>
+                              {t.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-2">
+                            {new Date(t.createdAt).toLocaleDateString()}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground py-4">
+                  No recent transactions found.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
