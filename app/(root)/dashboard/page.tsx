@@ -6,6 +6,8 @@ import { LGACAgentDashboard } from "@/components/dashboard/lga-c-agent-dashboard
 import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 import SuperadminDashboard from "./superadmin-dashboard.tsx";
+import AgencyListPage from "../agency/page";
+import AgencyAgentsDashboardPage from "../agency/agents/page";
 // import AgencyAdminDashboard from "@/components/dashboard/agency/admin-agency-dashboard.jsx";
 
 export default async function DashboardPage() {
@@ -30,12 +32,10 @@ export default async function DashboardPage() {
         return <LGAAdminDashboard />;
       case Role.ODIRS_C_AGENT:
         return <LGACAgentDashboard />;
+      case Role.AGENCY_ADMIN:
+        return <AgencyListPage />;
       case Role.AGENCY_AGENT:
-        return <LGAAgentDashboard />;
-      // case Role.AGENCY_ADMIN:
-      //   return <AgencyAdminDashboard />;
-      // case Role.AGENCY_AGENT:
-      //   return <AgencyAgentDashboard />;
+        return <AgencyAgentsDashboardPage />;
       default:
         return <SuperadminDashboard />;
     }

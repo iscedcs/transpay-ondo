@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { TrendingUp, Search, FileText, BadgePercent } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { agentAPI } from "@/lib/utils";
+import { BadgePercent, FileText, Search } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function AgencyAgentsDashboardPage() {
   const { data: session } = useSession();
