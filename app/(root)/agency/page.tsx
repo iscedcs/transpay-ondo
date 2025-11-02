@@ -444,47 +444,63 @@ export default function AgencyListPage() {
             </CardHeader>
             <CardContent>
               {dashboard?.recentTransactions?.length ? (
-                <table className="w-full text-sm">
-                  <thead className="bg-muted/50">
-                    <tr>
-                      <th className="text-left px-4 py-2">Plate Number</th>
-                      <th className="text-left px-4 py-2">Agent</th>
-                      <th className="text-left px-4 py-2">Amount</th>
-                      <th className="text-left px-4 py-2">Status</th>
-                      <th className="text-left px-4 py-2">Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dashboard.recentTransactions.slice(0, 5).map((t: any) => (
-                      <tr key={t.id} className="border-b hover:bg-muted/40">
-                        <td className="px-4 py-2 font-medium">
-                          {t.vehicle?.plateNumber || "N/A"}
-                        </td>
-                        <td className="px-4 py-2">
-                          {t.agent?.firstName} {t.agent?.lastName}
-                        </td>
-                        <td className="px-4 py-2">
-                          ₦{Number(t.vehicleOwnerAmount).toLocaleString()}
-                        </td>
-                        <td className="px-4 py-2">
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-semibold ${
-                              t.status === "PENDING"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : t.status === "SUCCESS"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-red-100 text-red-700"
-                            }`}>
-                            {t.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-2">
-                          {new Date(t.createdAt).toLocaleDateString()}
-                        </td>
+                <div className="overflow-x-auto rounded-md border">
+                  <table className="w-full text-sm min-w-[600px]">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="text-left px-4 py-2 whitespace-nowrap">
+                          Plate Number
+                        </th>
+                        <th className="text-left px-4 py-2 whitespace-nowrap">
+                          Agent
+                        </th>
+                        <th className="text-left px-4 py-2 whitespace-nowrap">
+                          Amount
+                        </th>
+                        <th className="text-left px-4 py-2 whitespace-nowrap">
+                          Status
+                        </th>
+                        <th className="text-left px-4 py-2 whitespace-nowrap">
+                          Date
+                        </th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {dashboard.recentTransactions
+                        .slice(0, 5)
+                        .map((t: any) => (
+                          <tr
+                            key={t.id}
+                            className="border-b hover:bg-muted/40 transition-colors">
+                            <td className="px-4 py-2 font-medium whitespace-nowrap">
+                              {t.vehicle?.plateNumber || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              {t.agent?.firstName} {t.agent?.lastName}
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              ₦{Number(t.vehicleOwnerAmount).toLocaleString()}
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              <span
+                                className={`px-2 py-1 rounded text-xs font-semibold ${
+                                  t.status === "PENDING"
+                                    ? "bg-yellow-100 text-yellow-700"
+                                    : t.status === "SUCCESS"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                                }`}>
+                                {t.status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2 whitespace-nowrap">
+                              {new Date(t.createdAt).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
               ) : (
                 <p className="text-sm text-muted-foreground">
                   No recent transactions yet.

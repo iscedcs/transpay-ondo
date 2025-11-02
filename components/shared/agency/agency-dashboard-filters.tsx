@@ -26,7 +26,7 @@ export default function AgencyDashboardFilters({
               setActive(r.value);
               onChange(r.value);
             }}
-            className={`relative px-3 py-1.5 text-sm rounded-lg transition-all ${
+            className={`relative px-3 py-1.5 md:text-sm text-xs rounded-lg transition-all ${
               active === r.value
                 ? "text-white font-semibold"
                 : "text-muted-foreground hover:text-foreground"

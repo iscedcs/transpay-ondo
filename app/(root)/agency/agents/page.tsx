@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { agentAPI } from "@/lib/utils";
+import { CardStackIcon } from "@radix-ui/react-icons";
 import { BadgePercent, FileText, Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -58,6 +59,34 @@ export default function AgencyAgentsDashboardPage() {
         </p>
       </div>
 
+      {/* Quick Actions */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="md:flex grid flex-wrap gap-3">
+          <Button asChild>
+            <Link href="/agency/agents/search">
+              <CardStackIcon className="h-4 w-4 mr-2" /> Fund Vehicle
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/agency/agents/search">
+              <Search className="h-4 w-4 mr-2" /> Search Vehicle
+            </Link>
+          </Button>
+          <Button asChild variant="default">
+            <Link href="/agency/agents/transactions">
+              <FileText className="h-4 w-4 mr-2" /> View Transactions
+            </Link>
+          </Button>
+          <Button asChild variant="default">
+            <Link href="/agency/agents/commission">
+              <BadgePercent className="h-4 w-4 mr-2" /> View Discounts
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
@@ -102,29 +131,6 @@ export default function AgencyAgentsDashboardPage() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button asChild>
-            <Link href="/agency/agents/search">
-              <Search className="h-4 w-4 mr-2" /> Search Vehicle
-            </Link>
-          </Button>
-          <Button asChild variant="default">
-            <Link href="/agency/agents/transactions">
-              <FileText className="h-4 w-4 mr-2" /> View Transactions
-            </Link>
-          </Button>
-          <Button asChild variant="default">
-            <Link href="/agency/agents/commission">
-              <BadgePercent className="h-4 w-4 mr-2" /> View Discounts
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
       {/* Recent Transactions */}
       {dashboard?.recentTransactions?.length > 0 && (
         <Card>

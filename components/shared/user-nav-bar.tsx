@@ -6,12 +6,13 @@ import {
   SIDEBAR_LINKS_ODIRS_C_AGENT,
   AGENCY_ADMIN,
   AGENCY_AGENT,
+  API,
+  URLS,
 } from "@/lib/const";
 import { getInitials } from "@/lib/utils";
 import { Role } from "@prisma/client";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { ModeToggle } from "../dark-mode-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -25,19 +26,44 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export function UserNav() {
-  const session = useSession();
-  const pathName = usePathname();
+  const { data: session } = useSession();
+  const [agencyId, setAgencyId] = useState<string | null>(null);
+  const ROLE = session?.user?.role;
+  const user = session?.user;
 
-  // if (session.status === "loading") {
-  //      return (
-  //           <Skeleton className="h-10 w-36 animate-pulse rounded bg-primary/30 text-primary-foreground" />
-  //      );
-  // }
+  useEffect(() => {
+    const fetchAgencyId = async () => {
+      if (ROLE === Role.AGENCY_ADMIN && session?.user?.id) {
+        try {
+          const res = await axios.get(
+            `${API}${URLS.agency.one_agency_admin.replace(
+              "{id}",
+              session.user.id
+            )}`,
+            {
+              headers: {
+                Authorization: `Bearer ${session.user.access_token}`,
+              },
+            }
+          );
+          if (res.data?.success && res.data.data?.agency?.id) {
+            setAgencyId(res.data.data.agency.id);
+          } else {
+            console.warn("No agency ID found in response:", res.data);
+          }
+        } catch (err) {
+          console.error("Failed to fetch agency info:", err);
+        }
+      }
+    };
+    fetchAgencyId();
+  }, [ROLE, session?.user.id]);
 
-  if (!session.data || !session.data.user) {
+  if (!user) {
     return (
       <Button asChild>
         <Link href="/sign-in">Login</Link>
@@ -45,13 +71,11 @@ export function UserNav() {
     );
   }
 
-  const user = session.data.user;
-
   const links =
     user.role === Role.AGENCY_AGENT
       ? AGENCY_AGENT
       : user.role === Role.AGENCY_ADMIN
-      ? AGENCY_ADMIN(user.id)
+      ? AGENCY_ADMIN(agencyId!)
       : user.role === Role.ODIRS_ADMIN
       ? SIDEBAR_LINKS_ODIRS_ADMIN
       : user.role === Role.ODIRS_C_AGENT
