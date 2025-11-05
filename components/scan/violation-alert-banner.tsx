@@ -1,52 +1,52 @@
-"use client"
+"use client";
 
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, Currency, DollarSign } from "lucide-react"
-import type { ScanResponse } from "@/types/scan"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import type { ScanResponse } from "@/types/scan";
+import { AlertTriangle, Currency } from "lucide-react";
 
 interface ViolationAlertBannerProps {
-  violation: NonNullable<ScanResponse["violation"]>
+  violation: NonNullable<ScanResponse["violation"]>;
 }
 
 export function ViolationAlertBanner({ violation }: ViolationAlertBannerProps) {
   const getViolationIcon = (type: string) => {
     switch (type) {
       case "out_of_route":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "expired_registration":
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
       case "unpaid_levy":
-        return <Currency className="h-4 w-4" />
+        return <Currency className="h-4 w-4" />;
       default:
-        return <AlertTriangle className="h-4 w-4" />
+        return <AlertTriangle className="h-4 w-4" />;
     }
-  }
+  };
 
   const getViolationTitle = (type: string) => {
     switch (type) {
       case "out_of_route":
-        return "Route Violation Detected"
+        return "Route Violation Detected";
       case "expired_registration":
-        return "Expired Registration"
+        return "Expired Registration";
       case "unpaid_levy":
-        return "Unpaid Levy"
+        return "Unpaid Levy";
       default:
-        return "Violation Detected"
+        return "Violation Detected";
     }
-  }
+  };
 
   const getAlertVariant = (type: string) => {
     switch (type) {
       case "out_of_route":
-        return "destructive"
+        return "destructive";
       case "expired_registration":
-        return "destructive"
+        return "destructive";
       case "unpaid_levy":
-        return "default"
+        return "default";
       default:
-        return "destructive"
+        return "destructive";
     }
-  }
+  };
 
   return (
     <Alert variant={getAlertVariant(violation.type)} className="mb-4">
@@ -55,9 +55,11 @@ export function ViolationAlertBanner({ violation }: ViolationAlertBannerProps) {
       <AlertDescription className="space-y-2">
         <p>{violation.message}</p>
         {violation.levyCharged && (
-          <p className="font-medium">Levy charged: ₦{violation.levyCharged.toLocaleString()}</p>
+          <p className="font-medium">
+            Levy charged: ₦{violation.levyCharged.toLocaleString()}
+          </p>
         )}
       </AlertDescription>
     </Alert>
-  )
+  );
 }

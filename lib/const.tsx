@@ -3,18 +3,22 @@ import { Role } from "@prisma/client";
 import {
   ActivitySquareIcon,
   CarTaxiFront,
+  ChartBarIcon,
   CreditCard,
+  LogsIcon,
   MapPin,
   QrCodeIcon,
   SettingsIcon,
   Shield,
   ShieldCheck,
   Split,
+  WalletCards,
 } from "lucide-react";
 import {
   aboutIcon,
   adminIcon,
   agentDriverIcon,
+  agentsIcon,
   dashboardIcon,
   homeIcon,
   peopleIcon,
@@ -40,6 +44,11 @@ export const SIDEBAR_LINKS = [
     title: "Users",
     href: "/users",
     icon: adminIcon,
+  },
+  {
+    title: "Agency",
+    href: "/agency",
+    icon: <LogsIcon className="w-5 h-5" />,
   },
   {
     title: "Stickers",
@@ -144,7 +153,7 @@ export const SIDEBAR_LINKS_ADMIN = [
     icon: <CreditCard className="h-5 w-5" />,
   },
 ];
-export const SIDEBAR_LINKS_EIRS_ADMIN = [
+export const SIDEBAR_LINKS_ODIRS_ADMIN = [
   {
     title: "Dashboard",
     href: "/dashboard",
@@ -180,22 +189,17 @@ export const SIDEBAR_LINKS_EIRS_ADMIN = [
     href: "/revenue",
     icon: revenueIcon,
   },
-  {
-    title: "Fund Vehicle",
-    href: "/fund-vehicle",
-    icon: <CreditCard className="h-5 w-5" />,
-  },
+  // {
+  //   title: "Fund Vehicle",
+  //   href: "/fund-vehicle",
+  //   icon: <CreditCard className="h-5 w-5" />,
+  // },
 ];
-export const SIDEBAR_LINKS_LGA_ADMIN = [
+export const SIDEBAR_LINKS_ODIRS_C_AGENT = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: dashboardIcon,
-  },
-  {
-    title: "Users",
-    href: "/users",
-    icon: adminIcon,
   },
   {
     title: "Vehicles",
@@ -211,60 +215,71 @@ export const SIDEBAR_LINKS_LGA_ADMIN = [
     title: "Search",
     href: "/search",
     icon: searchIcon,
+  },
+];
+export const AGENCY_ADMIN = (agencyId: string) => [
+  {
+    title: "Dashboard",
+    href: "/agency",
+    icon: dashboardIcon,
+  },
+  {
+    title: "Agents",
+    href: `/agency/${agencyId}/agents`,
+    icon: agentsIcon,
+  },
+  {
+    title: "Activities",
+    href: `/agency/${agencyId}`,
+    icon: <ActivitySquareIcon className="h-5 w-5" />,
   },
   {
     title: "Revenue",
-    href: "/revenue",
+    href: `/agency/${agencyId}/dashboard`,
     icon: revenueIcon,
+  },
+  // {
+  //   title: "Settlement",
+  //   href: `/agency/agents/commission`,
+  //   icon: <Split className="h-5 w-5" />,
+  // },
+  {
+    title: "Transactions",
+    href: `/agency/${agencyId}/transactions`,
+    icon: <ChartBarIcon className="h-5 w-5" />,
+  },
+  {
+    title: "Search",
+    href: "/agency/search",
+    icon: searchIcon,
+  },
+];
+export const AGENCY_AGENT = [
+  {
+    title: "Dashboard",
+    href: "/agency/agents",
+    icon: dashboardIcon,
   },
   {
     title: "Fund Vehicle",
-    href: "/fund-vehicle",
+    href: "/agency/agents/search",
     icon: <CreditCard className="h-5 w-5" />,
   },
-];
-export const SIDEBAR_LINKS_LGA_AGENT = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: dashboardIcon,
+    title: "Commission",
+    href: "/agency/agents/commission",
+    icon: <WalletCards className="h-5 w-5" />,
   },
   {
-    title: "Vehicles",
-    href: "/vehicles?page=1&limit=15",
-    icon: <CarTaxiFront className="h-5 w-5" />,
+    title: "Transactions",
+    href: "/agency/agents/transactions",
+    icon: revenueIcon,
   },
+
   {
     title: "Scan",
     href: "/scan",
     icon: scanIcon,
-  },
-  {
-    title: "Search",
-    href: "/search",
-    icon: searchIcon,
-  },
-];
-export const SIDEBAR_LINKS_LGA_C_AGENT = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: dashboardIcon,
-  },
-  {
-    title: "Vehicles",
-    href: "/vehicles?page=1&limit=15",
-    icon: <CarTaxiFront className="h-5 w-5" />,
-  },
-  {
-    title: "Scan",
-    href: "/scan",
-    icon: scanIcon,
-  },
-  {
-    title: "Search",
-    href: "/search",
-    icon: searchIcon,
   },
 ];
 export const SIDEBAR_NO_USER = [
@@ -274,6 +289,66 @@ export const SIDEBAR_NO_USER = [
     icon: scanIcon,
   },
 ];
+
+// export const SIDEBAR_LINKS_LGA_ADMIN = [
+//   {
+//     title: "Dashboard",
+//     href: "/dashboard",
+//     icon: dashboardIcon,
+//   },
+//   {
+//     title: "Users",
+//     href: "/users",
+//     icon: adminIcon,
+//   },
+//   {
+//     title: "Vehicles",
+//     href: "/vehicles?page=1&limit=15",
+//     icon: <CarTaxiFront className="h-5 w-5" />,
+//   },
+//   {
+//     title: "Scan",
+//     href: "/scan",
+//     icon: scanIcon,
+//   },
+//   {
+//     title: "Search",
+//     href: "/search",
+//     icon: searchIcon,
+//   },
+//   {
+//     title: "Revenue",
+//     href: "/revenue",
+//     icon: revenueIcon,
+//   },
+//   {
+//     title: "Fund Vehicle",
+//     href: "/fund-vehicle",
+//     icon: <CreditCard className="h-5 w-5" />,
+//   },
+// ];
+// export const SIDEBAR_LINKS_LGA_AGENT = [
+//   {
+//     title: "Dashboard",
+//     href: "/dashboard",
+//     icon: dashboardIcon,
+//   },
+//   {
+//     title: "Vehicles",
+//     href: "/vehicles?page=1&limit=15",
+//     icon: <CarTaxiFront className="h-5 w-5" />,
+//   },
+//   {
+//     title: "Scan",
+//     href: "/scan",
+//     icon: scanIcon,
+//   },
+//   {
+//     title: "Search",
+//     href: "/search",
+//     icon: searchIcon,
+//   },
+// ];
 export const MANAGE_SIDEBAR_LINKS = [
   {
     name: "Home",
@@ -1803,7 +1878,7 @@ export const LGA = [
 
 export const API =
   process.env.BACKEND_URL ||
-  "https://transpay-api-edo-9ta8i.ondigitalocean.app/";
+  "https://transpay-ondo-api-h63bp.ondigitalocean.app";
 export const URLS = {
   activity: {
     all: "/api/activities",
@@ -1926,6 +2001,28 @@ export const URLS = {
     vehicles: "/api/lga/vehicles/{id}",
     scans: "/api/lga/scans/{id}",
   },
+  agency: {
+    create: "/api/agency/create",
+    create_with_Admin: "/api/agency/create-with-admin",
+    add_agent: "/api/agency/add-agent",
+    all: "/api/agency/all",
+    one: "/api/agency/one/{id}",
+    agency_dashboard: "/api/agency/dashboard/{id}",
+    one_agency_agent: "/api/agency/agents/{id}",
+    one_agency_admin: "/api/agency/admin-user/{id}",
+    one_agency_transactions: "/api/agency/transactions/{id}",
+    admin_with_agency_id: "/api/agency/admin/{id}",
+    update: "/api/agency/update/{id}",
+    delete: "/api/agency/delete/{id}",
+  },
+  agency_agent: {
+    search: "/api/agency-agent/search-vehicle",
+    fund: "/api/agency-agent/initiate-funding",
+    payment: "/api/agency-agent/mock-payment",
+    transactions: "/api/agency-agent/transactions",
+    dashboard: "/api/agency-agent/dashboard",
+    discount: "/api/agency-agent/discount-info",
+  },
 };
 
 export const TRACKER_BASE_URL =
@@ -1936,8 +2033,8 @@ export const SLIDES = [
   <CarouselSlides
     key={1}
     desc="Accountability in a civilized society is the stepping stone to development and progressive environment"
-    images="/avater.png"
-    author="ISCE Digital Concept"
+    images="/ondo.png"
+    author="Transpay"
     title="Ondo State"
   />,
 ];
@@ -2486,13 +2583,13 @@ export const MONTHLY = [
 export const ADMIN_ROLES: string[] = [
   Role.SUPERADMIN,
   Role.ADMIN,
-  Role.LGA_ADMIN,
+  Role.AGENCY_ADMIN,
 ];
 export const READONLY_ADMIN_ROLES: string[] = [
   Role.SUPERADMIN,
   Role.ADMIN,
-  Role.EIRS_ADMIN,
-  Role.LGA_ADMIN,
+  Role.ODIRS_ADMIN,
+  Role.AGENCY_ADMIN,
 ];
 export const SUPER_ADMIN_ROLES: string[] = [Role.SUPERADMIN];
 

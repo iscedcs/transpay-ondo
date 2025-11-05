@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback, useMemo, useEffect } from "react";
+import { LGA, VehicleFee } from "@/actions/lga";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { MapPin, DollarSign, Calendar, Layers, X, Currency } from "lucide-react";
+import { Calendar, Currency, Layers, MapPin, X } from "lucide-react";
 import dynamic from "next/dynamic";
-import { LGA, VehicleFee } from "@/actions/lga";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // Dynamically import Leaflet components to avoid SSR issues
 const MapContainer = dynamic(
@@ -182,8 +182,7 @@ export function LGABoundariesMap({ lgas, loading }: LGABoundariesMapProps) {
           variant="outline"
           size="sm"
           onClick={toggleMapType}
-          className="bg-white shadow-lg"
-        >
+          className="bg-white shadow-lg">
           <Layers className="h-4 w-4 mr-2" />
           {mapType === "satellite" ? "Map View" : "Satellite View"}
         </Button>
@@ -196,8 +195,7 @@ export function LGABoundariesMap({ lgas, loading }: LGABoundariesMapProps) {
           center={defaultCenter}
           zoom={8}
           style={{ height: "100%", width: "100%" }}
-          zoomControl={false}
-        >
+          zoomControl={false}>
           <ZoomControl position="bottomright" />
 
           {/* Base map layer */}
@@ -323,8 +321,7 @@ export function LGABoundariesMap({ lgas, loading }: LGABoundariesMapProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedLGA(null)}
-                  className="h-6 w-6 p-0"
-                >
+                  className="h-6 w-6 p-0">
                   <X className="h-4 w-4" />
                 </Button>
               </div>
@@ -334,8 +331,7 @@ export function LGABoundariesMap({ lgas, loading }: LGABoundariesMapProps) {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">Status:</span>
                 <Badge
-                  variant={selectedLGA.deletedAt ? "destructive" : "default"}
-                >
+                  variant={selectedLGA.deletedAt ? "destructive" : "default"}>
                   {selectedLGA.deletedAt ? "Deleted" : "Active"}
                 </Badge>
               </div>
@@ -359,8 +355,7 @@ export function LGABoundariesMap({ lgas, loading }: LGABoundariesMapProps) {
                       {selectedLGA.fee.map((fee, index) => (
                         <div
                           key={index}
-                          className="flex justify-between text-sm"
-                        >
+                          className="flex justify-between text-sm">
                           <span className="text-gray-600">
                             {fee.vehicleCategory}:
                           </span>

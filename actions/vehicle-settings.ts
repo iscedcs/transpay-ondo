@@ -12,7 +12,7 @@ import type {
 } from "@/types/vehicle-settings";
 
 const API_BASE_URL =
-  "https://pre-release-api.transpayedo.com/api/vehicle-settings";
+  "https://pre-release-api.transpayondo.com/api/vehicle-settings";
 
 const createApiClient = async () => {
   const session = await auth();

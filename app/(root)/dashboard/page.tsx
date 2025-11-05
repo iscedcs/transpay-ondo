@@ -6,6 +6,9 @@ import { LGACAgentDashboard } from "@/components/dashboard/lga-c-agent-dashboard
 import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 import SuperadminDashboard from "./superadmin-dashboard.tsx";
+import AgencyListPage from "../agency/page";
+import AgencyAgentsDashboardPage from "../agency/agents/page";
+// import AgencyAdminDashboard from "@/components/dashboard/agency/admin-agency-dashboard.jsx";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -25,12 +28,14 @@ export default async function DashboardPage() {
   // BEGIN: ed8c6549bwf9
   const renderDashboard = () => {
     switch (userRequest.user.role) {
-      case Role.LGA_ADMIN:
+      case Role.ODIRS_ADMIN:
         return <LGAAdminDashboard />;
-      case Role.LGA_C_AGENT:
+      case Role.ODIRS_C_AGENT:
         return <LGACAgentDashboard />;
-      case Role.LGA_AGENT:
-        return <LGAAgentDashboard />;
+      case Role.AGENCY_ADMIN:
+        return <AgencyListPage />;
+      case Role.AGENCY_AGENT:
+        return <AgencyAgentsDashboardPage />;
       default:
         return <SuperadminDashboard />;
     }
@@ -39,7 +44,7 @@ export default async function DashboardPage() {
   return (
     <div>
       {userRequest.user.lga && (
-        <div className="mx-auto container grid gap-6 px-4 md:px-6 lg:px-8">
+        <div className="mx-auto  grid gap-6 px-4 ">
           <div className="flex justify-between gap-5 font-bold uppercase">
             <div className="">{userRequest.user.lga.name}</div>
           </div>

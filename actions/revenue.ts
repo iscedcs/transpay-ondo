@@ -41,9 +41,9 @@ export async function getRevenueData(params: RevenueDataParams) {
     };
 
     // Apply LGA filtering based on user role
-    if (userRole === "LGA_ADMIN" && userLgaId) {
+    if (userRole === "ODIRS_ADMIN" && userLgaId) {
       baseConditions.lgaId = userLgaId;
-    } else if (lga && userRole !== "LGA_ADMIN") {
+    } else if (lga && userRole !== "ODIRS_ADMIN") {
       baseConditions.lgaId = lga;
     }
 
@@ -101,10 +101,10 @@ export async function getRevenueData(params: RevenueDataParams) {
     // Get active vehicles count
     const activeVehicles = await db.vehicle.count({
       where: {
-        ...(userRole === "LGA_ADMIN" && userLgaId
+        ...(userRole === "ODIRS_ADMIN" && userLgaId
           ? { registeredLgaId: userLgaId }
           : {}),
-        ...(lga && userRole !== "LGA_ADMIN" ? { registeredLgaId: lga } : {}),
+        ...(lga && userRole !== "ODIRS_ADMIN" ? { registeredLgaId: lga } : {}),
         status: "ACTIVE",
       },
     });
@@ -123,7 +123,7 @@ export async function getRevenueData(params: RevenueDataParams) {
 
     // Calculate LGA percentage for LGA_ADMIN
     let lgaPercentage = 0;
-    if (userRole === "LGA_ADMIN" && userLgaId) {
+    if (userRole === "ODIRS_ADMIN" && userLgaId) {
       const stateWideRevenue = await db.vehicleTransaction.aggregate({
         where: {
           type: "CREDIT",
@@ -144,7 +144,7 @@ export async function getRevenueData(params: RevenueDataParams) {
 
     // Get available LGAs for filtering
     const availableLGAs =
-      userRole !== "LGA_ADMIN"
+      userRole !== "ODIRS_ADMIN"
         ? await db.lGA.findMany({
             select: {
               id: true,
@@ -164,7 +164,7 @@ export async function getRevenueData(params: RevenueDataParams) {
 
     // Generate comparison data if needed
     let comparisonData = null;
-    if (compare && lgas && lgas.length > 0 && userRole !== "LGA_ADMIN") {
+    if (compare && lgas && lgas.length > 0 && userRole !== "ODIRS_ADMIN") {
       comparisonData = await generateComparisonData(lgas, dateRange);
     }
 

@@ -6,15 +6,15 @@ import { Role } from "@prisma/client";
 
 // Pagination parameters: page, pageSize, and filtering by role
 interface AllUsersFetchParams {
-     page?: number;
-     pageSize?: number;
-     role?: Role; // Optional role filter
+  page?: number;
+  pageSize?: number;
+  role?: Role; // Optional role filter
 }
 
 interface AllAgentsCreatedByAdminIdFetchParams {
-     page?: number;
-     pageSize?: number;
-     adminId: string;
+  page?: number;
+  pageSize?: number;
+  adminId: string;
 }
 
 export const allUsers = async ({
@@ -113,7 +113,7 @@ export const allAgentsCreatedByAdminId = async ({
     // Fetch the total number of users with the same role (or all users if no role filter)
     const totalUsers = await db.user.count({
       where: {
-        role: "LGA_AGENT",
+        role: "AGENCY_AGENT",
       },
     });
 

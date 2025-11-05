@@ -11,7 +11,7 @@ export default async function RevenuePage({
 }) {
   // Require authentication with proper roles
   const user = await requireAuth({
-    allowedRoles: ["SUPERADMIN", "ADMIN", "EIRS_ADMIN", "LGA_ADMIN"],
+    allowedRoles: ["SUPERADMIN", "ADMIN", "ODIRS_ADMIN", "AGENCY_ADMIN"],
   });
 
   const params = await searchParams;

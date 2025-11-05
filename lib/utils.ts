@@ -24,6 +24,8 @@ import {
 } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { VehicleValues } from "./const";
+import axios from "axios";
+import { API, URLS } from "@/lib/const";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -886,9 +888,9 @@ export function isValidMillisecondTimestamp(
 }
 
 // Logger utility for development environment
-type LogLevel = 'log' | 'warn' | 'error' | 'info';
+type LogLevel = "log" | "warn" | "error" | "info";
 
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === "development";
 
 export function logger(level: LogLevel, ...args: unknown[]) {
   if (isDev) {
@@ -897,8 +899,27 @@ export function logger(level: LogLevel, ...args: unknown[]) {
   }
 }
 
+export async function agentAPI(
+  endpoint: string,
+  method: "GET" | "POST" = "GET",
+  token: string,
+  body?: any,
+  params?: any
+) {
+  const config = {
+    method,
+    url: `${API}${endpoint}`,
+    headers: { Authorization: `Bearer ${token}` },
+    data: body,
+    params,
+  };
+
+  const response = await axios(config);
+  return response.data;
+}
+
 // Convenience helpers
-export const devLog = (...args: unknown[]) => logger('log', ...args);
-export const devWarn = (...args: unknown[]) => logger('warn', ...args);
-export const devError = (...args: unknown[]) => logger('error', ...args);
-export const devInfo = (...args: unknown[]) => logger('info', ...args);
+export const devLog = (...args: unknown[]) => logger("log", ...args);
+export const devWarn = (...args: unknown[]) => logger("warn", ...args);
+export const devError = (...args: unknown[]) => logger("error", ...args);
+export const devInfo = (...args: unknown[]) => logger("info", ...args);

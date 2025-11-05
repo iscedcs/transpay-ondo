@@ -125,6 +125,7 @@ export async function getUsers(
     const data: UsersResponse = await response.json();
 
     // Just return directly — backend already filters visibility
+    // console.log({ data }.data);
     return {
       ...data,
       data: {
@@ -153,7 +154,6 @@ export async function getUsers(
     };
   }
 }
-
 
 export async function getUserById(id: string): Promise<User> {
   const session = await auth();

@@ -1,6 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  getLGAAdminActivities,
+  getLGAAdminAgentPerformance,
+  getLGAAdminDashboardStats,
+} from "@/actions/dashboard";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,38 +16,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Car,
-  Users,
   Activity,
-  TrendingUp,
-  Plus,
-  Eye,
-  Scan,
-  DollarSign,
-  UserPlus,
-  BarChart3,
-  Clock,
-  CheckCircle,
   AlertCircle,
-  Shield,
+  BarChart3,
+  Car,
+  CheckCircle,
+  Clock,
   Currency,
+  Eye,
+  Plus,
+  Scan,
+  Shield,
+  TrendingUp,
+  UserPlus,
+  Users,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import {
-  getLGAAdminDashboardStats,
-  getLGAAdminAgentPerformance,
-  getLGAAdminActivities,
-} from "@/actions/dashboard";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface DashboardStats {
   totalVehicles: number;
@@ -189,7 +188,7 @@ export function LGAAdminDashboard() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-          LGA Admin Dashboard
+          ODIRS Admin Dashboard
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
           Manage your local government area operations and monitor agent
@@ -201,32 +200,28 @@ export function LGAAdminDashboard() {
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <Button
           onClick={() => router.push("/vehicles/add")}
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <Plus className="h-4 w-4" />
           Add Vehicle
         </Button>
         <Button
           onClick={() => router.push("/users/add")}
           variant="outline"
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <UserPlus className="h-4 w-4" />
           Add Agent
         </Button>
         <Button
           onClick={() => router.push("/vehicles")}
           variant="outline"
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <Eye className="h-4 w-4" />
           View Vehicles
         </Button>
         <Button
           onClick={() => router.push("/scan")}
           variant="outline"
-          className="flex items-center gap-2"
-        >
+          className="flex items-center gap-2">
           <Scan className="h-4 w-4" />
           Scan Vehicle
         </Button>
@@ -458,8 +453,7 @@ export function LGAAdminDashboard() {
                     <Link
                       href={`/user/${agent.id}`}
                       key={agent.id}
-                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg space-y-3 sm:space-y-0"
-                    >
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-lg space-y-3 sm:space-y-0">
                       <div className="flex items-center space-x-3">
                         <Avatar className="h-10 w-10">
                           <AvatarFallback>
@@ -540,8 +534,7 @@ export function LGAAdminDashboard() {
                   activities.map((activity) => (
                     <div
                       key={activity.id}
-                      className="flex items-start space-x-3 p-3 border rounded-lg"
-                    >
+                      className="flex items-start space-x-3 p-3 border rounded-lg">
                       <div className="flex-shrink-0">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="text-xs">

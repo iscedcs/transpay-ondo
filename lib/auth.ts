@@ -25,9 +25,9 @@ export function getAvailableRolesForUser(userRole: string): string[] {
     case USER_ROLES.ADMIN:
       return [
         USER_ROLES.ADMIN,
-        USER_ROLES.LGA_ADMIN,
-        USER_ROLES.LGA_AGENT,
-        USER_ROLES.LGA_C_AGENT,
+        USER_ROLES.AGENCY_ADMIN,
+        USER_ROLES.AGENCY_AGENT,
+        USER_ROLES.ODIRS_C_AGENT,
         USER_ROLES.VEHICLE_OWNER,
       ];
     default:
@@ -129,15 +129,15 @@ export class RBAC {
   }
 
   static canManageLGAs(userRole: UserRole | null): boolean {
-    return isAuthorized(userRole, ["SUPERADMIN", "ADMIN", "LGA_ADMIN"]);
+    return isAuthorized(userRole, ["SUPERADMIN", "ADMIN", "AGENCY_ADMIN"]);
   }
 
   static canCreateVehicles(userRole: UserRole | null): boolean {
     return isAuthorized(userRole, [
       "SUPERADMIN",
       "ADMIN",
-      "LGA_ADMIN",
-      "LGA_AGENT",
+      "AGENCY_ADMIN",
+      "AGENCY_AGENT",
     ]);
   }
 
@@ -145,9 +145,9 @@ export class RBAC {
     return isAuthorized(userRole, [
       "SUPERADMIN",
       "ADMIN",
-      "LGA_ADMIN",
-      "LGA_AGENT",
-      "LGA_C_AGENT",
+      "AGENCY_ADMIN",
+      "AGENCY_AGENT",
+      "ODIRS_C_AGENT",
     ]);
   }
 
@@ -155,8 +155,8 @@ export class RBAC {
     return isAuthorized(userRole, [
       "SUPERADMIN",
       "ADMIN",
-      "LGA_ADMIN",
-      "LGA_AGENT",
+      "AGENCY_ADMIN",
+      "AGENCY_AGENT",
     ]);
   }
 
@@ -164,9 +164,9 @@ export class RBAC {
     return isAuthorized(userRole, [
       "SUPERADMIN",
       "ADMIN",
-      "LGA_ADMIN",
-      "LGA_AGENT",
-      "LGA_C_AGENT",
+      "AGENCY_ADMIN",
+      "AGENCY_AGENT",
+      "ODIRS_C_AGENT",
     ]);
   }
 
@@ -175,11 +175,15 @@ export class RBAC {
   }
 
   static isComplianceAgent(userRole: UserRole | null): boolean {
-    return userRole === "LGA_C_AGENT";
+    return userRole === "ODIRS_C_AGENT";
   }
 
   static isLGARole(userRole: UserRole | null): boolean {
-    return isAuthorized(userRole, ["LGA_ADMIN", "LGA_AGENT", "LGA_C_AGENT"]);
+    return isAuthorized(userRole, [
+      "AGENCY_ADMIN",
+      "AGENCY_AGENT",
+      "ODIRS_C_AGENT",
+    ]);
   }
 }
 

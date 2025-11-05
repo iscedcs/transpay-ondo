@@ -47,7 +47,7 @@ async function LGAOverviewContent({ lgaId }: { lgaId: string }) {
   const user: any = (await getMe()).user;
 
   // Check access permissions
-  const allowedRoles = [Role.SUPERADMIN, Role.ADMIN, Role.LGA_ADMIN];
+  const allowedRoles = [Role.SUPERADMIN, Role.ADMIN, Role.ODIRS_ADMIN];
   checkUserAccess(user, allowedRoles);
 
   try {
@@ -114,8 +114,7 @@ export default async function LGAOverviewPage({
               <ChartLoading />
             </div>
           </div>
-        }
-      >
+        }>
         <LGAOverviewContent lgaId={lgaId} />
       </Suspense>
     </div>

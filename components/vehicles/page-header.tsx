@@ -30,9 +30,9 @@ export function PageHeader({
         return "Manage all vehicles across all states and LGAs. Register new vehicles, update information, and monitor compliance.";
       case USER_ROLES.ADMIN:
         return "Manage vehicles within your state. Register new vehicles, update information, and monitor compliance.";
-      case USER_ROLES.LGA_ADMIN:
+      case USER_ROLES.ODIRS_ADMIN:
         return "Manage vehicles within your LGA. Register new vehicles, update information, and monitor compliance.";
-      case USER_ROLES.LGA_AGENT:
+      case USER_ROLES.ODIRS_C_AGENT:
         return "View and scan vehicles within your assigned LGA. Update compliance status and payment records.";
       default:
         return "Vehicle management and compliance tracking.";

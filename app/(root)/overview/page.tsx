@@ -57,11 +57,10 @@ async function OverviewContent() {
   const allowedRoles = [
     Role.SUPERADMIN,
     Role.ADMIN,
-    Role.EIRS_ADMIN,
-    Role.LGA_ADMIN,
-    Role.LGA_AGENT,
-    Role.EIRS_AGENT,
-    Role.LGA_C_AGENT,
+    Role.ODIRS_ADMIN,
+    Role.AGENCY_ADMIN,
+    Role.ODIRS_C_AGENT,
+    Role.AGENCY_AGENT,
   ];
   checkUserAccess(user, allowedRoles);
 
@@ -132,8 +131,7 @@ export default async function OverviewPage() {
               <ChartLoading />
             </div>
           </div>
-        }
-      >
+        }>
         <OverviewContent />
       </Suspense>
     </div>

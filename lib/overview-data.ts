@@ -36,7 +36,7 @@ export async function getOverviewStats(user: User): Promise<KPIStats> {
         scansToday: Math.floor(baseStats.scansToday * 0.3),
         agentsActiveToday: Math.floor(baseStats.agentsActiveToday * 0.3),
       };
-    case USER_ROLES.LGA_ADMIN:
+    case USER_ROLES.AGENCY_ADMIN:
       return {
         ...baseStats,
         totalVehicles: Math.floor(baseStats.totalVehicles * 0.05), // LGA scope
@@ -45,8 +45,8 @@ export async function getOverviewStats(user: User): Promise<KPIStats> {
         scansToday: Math.floor(baseStats.scansToday * 0.05),
         agentsActiveToday: Math.floor(baseStats.agentsActiveToday * 0.05),
       };
-    case USER_ROLES.LGA_AGENT:
-    case USER_ROLES.LGA_C_AGENT:
+    case USER_ROLES.AGENCY_AGENT:
+    case USER_ROLES.ODIRS_C_AGENT:
       return {
         ...baseStats,
         totalVehicles: Math.floor(baseStats.totalVehicles * 0.01), // Personal scope
@@ -155,12 +155,12 @@ export async function getAgentPerformance(
       return mockAgents;
     case USER_ROLES.ADMIN:
       return mockAgents; // In real app, filter by state
-    case USER_ROLES.LGA_ADMIN:
+    case USER_ROLES.AGENCY_ADMIN:
       return mockAgents.filter(
         (agent) => agent.assignedLga === "Lagos Mainland"
       ); // User's LGA
-    case USER_ROLES.LGA_AGENT:
-    case USER_ROLES.LGA_C_AGENT:
+    case USER_ROLES.AGENCY_AGENT:
+    case USER_ROLES.ODIRS_C_AGENT:
       return mockAgents.filter((agent) => agent.id === user.id); // Only themselves
     default:
       return [];
@@ -246,10 +246,10 @@ export async function getRecentActivity(user: User): Promise<RecentActivity[]> {
     case USER_ROLES.SUPERADMIN:
     case USER_ROLES.ADMIN:
       return mockActivities;
-    case USER_ROLES.LGA_ADMIN:
+    case USER_ROLES.AGENCY_ADMIN:
       return mockActivities; // In real app, filter by LGA
-    case USER_ROLES.LGA_AGENT:
-    case USER_ROLES.LGA_C_AGENT:
+    case USER_ROLES.AGENCY_AGENT:
+    case USER_ROLES.ODIRS_C_AGENT:
       return mockActivities.filter((activity) => activity.userId === user.id);
     default:
       return [];
@@ -336,10 +336,10 @@ function getUserDataMultiplier(role: string): number {
       return 1.0;
     case USER_ROLES.ADMIN:
       return 0.3;
-    case USER_ROLES.LGA_ADMIN:
+    case USER_ROLES.AGENCY_ADMIN:
       return 0.05;
-    case USER_ROLES.LGA_AGENT:
-    case USER_ROLES.LGA_C_AGENT:
+    case USER_ROLES.AGENCY_AGENT:
+    case USER_ROLES.ODIRS_C_AGENT:
       return 0.01;
     default:
       return 0;
@@ -352,9 +352,9 @@ function canAccessLGA(user: User, lgaId: string): boolean {
       return true;
     case USER_ROLES.ADMIN:
       return true; // In real app, check if LGA is in user's state
-    case USER_ROLES.LGA_ADMIN:
-    case USER_ROLES.LGA_AGENT:
-    case USER_ROLES.LGA_C_AGENT:
+    case USER_ROLES.AGENCY_ADMIN:
+    case USER_ROLES.AGENCY_AGENT:
+    case USER_ROLES.ODIRS_C_AGENT:
       return user.lgaId === lgaId;
     default:
       return false;

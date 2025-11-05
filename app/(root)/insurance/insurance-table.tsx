@@ -1,16 +1,7 @@
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  MoreHorizontal,
-  Shield,
-  Calendar,
-  DollarSign,
-  AlertTriangle,
-  CheckCircle,
-  Currency,
-} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +9,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
+import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  Currency,
+  MoreHorizontal,
+  Shield,
+} from "lucide-react";
 import type { VehicleInsuranceData } from "./types";
 
 interface InsuranceTableProps {
@@ -99,8 +98,7 @@ export function InsuranceTable({ vehicles }: InsuranceTableProps) {
                       {vehicle.planName}
                     </Badge>
                     <Badge
-                      variant={getEligibilityBadgeVariant(vehicle.isEligible)}
-                    >
+                      variant={getEligibilityBadgeVariant(vehicle.isEligible)}>
                       {vehicle.isEligible ? "Eligible" : "Not Eligible"}
                     </Badge>
                     {vehicle.isActive && (
